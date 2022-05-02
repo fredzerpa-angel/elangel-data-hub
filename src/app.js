@@ -1,9 +1,11 @@
 const express = require('express');
+const studentsRouter = require('./routes/students/students.router');
 
 const app = express();
 
-app.get('/', (req, res) => {
-  return res.send('Home Page');
-});
+// Parse incoming requests with JSON payloads 
+app.use(express.json());
+
+app.use('/students', studentsRouter);
 
 module.exports = app;
