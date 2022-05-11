@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const studentsSchema = new mongoose.Schema({
-  schoolId: {
+  cedulaId: {
     type: String,
     required: false,
   },
