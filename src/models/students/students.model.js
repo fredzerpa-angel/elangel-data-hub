@@ -4,7 +4,7 @@ async function getAllStudents() {
   return await students.find({});
 }
 
-async function getStudentById() {
+async function getStudentById(studentId) {
   // TODO
 }
 
@@ -21,8 +21,8 @@ async function updateStudent(studentId, updateData) {
   return await students.findByIdAndUpdate(studentId, updateData, options);
 }
 
-function deleteStudent() {
-  // TODO: Borrar estudiantes
+async function deleteStudent(studentId) {
+  return await students.findByIdAndDelete(studentId)
 }
 
 module.exports = {

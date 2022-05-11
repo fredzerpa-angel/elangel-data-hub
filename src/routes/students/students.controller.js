@@ -2,6 +2,7 @@ const {
   getAllStudents,
   createStudent,
   updateStudent,
+  deleteStudent,
 } = require('../../models/students/students.model');
 
 async function httpGetAllStudents(req, res) {
@@ -49,8 +50,25 @@ async function httpUpdateStudent(req, res) {
   }
 }
 
+async function httpDeleteStudent(req, res) {
+  const studentId = req.params.id;
+
+  // TODO: Implementar validaciones
+
+  try {
+    return res.status(200).json(await deleteStudent(studentId));
+  } catch (error) {
+    return res.status(502).json({
+      code: 502, // Base de datos tiro un error
+      error: 'Failed to delete student',
+      message: error.message,
+    });
+  }
+}
+
 module.exports = {
   httpGetAllStudents,
   httpCreateStudent,
   httpUpdateStudent,
+  httpDeleteStudent,
 };
