@@ -22,6 +22,20 @@ const parentSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+
+  // Nueva data
+  children: {
+    type: [mongoose.Schema.Types.ObjectId],
+    required: false,
+  },
+  isParentAdmin: {
+    type: Boolean,
+    required: false,
+  },
+  isParentAcademic: {
+    type: Boolean,
+    required: false
+  }
 });
 
 // Conecta studentSchema con "Parents" colleccion
