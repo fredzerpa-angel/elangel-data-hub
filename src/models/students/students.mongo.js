@@ -39,7 +39,7 @@ const studentSchema = new mongoose.Schema({
     required: false,
   },
   birthdate: {
-    type: String,
+    type: Date,
     required: false,
   },
   addressOfBirth: {
@@ -68,7 +68,12 @@ const studentSchema = new mongoose.Schema({
     ref: 'Parent',
     required: false,
   },
-  guardian: {
+  parentAdmin: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Parent',
+    required: false,
+  },
+  parentAcademic: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Parent',
     required: false,
