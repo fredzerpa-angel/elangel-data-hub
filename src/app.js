@@ -1,4 +1,5 @@
 const express = require('express');
+const parentsRouter = require('./routes/parents/parents.router');
 const studentsRouter = require('./routes/students/students.router');
 
 const app = express();
@@ -14,5 +15,6 @@ app.use(
 );
 
 app.use('/students', studentsRouter);
+app.use('/parents', parentsRouter);
 
 module.exports = app;
