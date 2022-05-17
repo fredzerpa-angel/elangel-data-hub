@@ -3,11 +3,42 @@ const {
   createStudent,
   updateStudent,
   deleteStudent,
+  getStudentById,
+  getStudentBySearch,
 } = require('../../models/students/students.model');
 
 async function httpGetAllStudents(req, res) {
+  const { name, cid } = req.query;
+  let response;
+
   try {
-    return res.status(200).json(await getAllStudents());
+    // Si hubo una consulta entonces buscar por consulta
+    if (name || cid) {
+      const search = {
+        searchBy: name ? 'fullname' : 'cedulaId',
+        value: name ?? cid,
+      }
+      response = await getStudentBySearch(search);
+    } else {
+      // Si no hubo consulta entonces retorna todos los estudiantes
+      response = await getAllStudents();
+    }
+    
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(502).json({
+      code: 502, // Base de Datos tiro un error
+      error: 'Failed to fetch students',
+      message: error.message,
+    });
+  }
+}
+
+async function httpGetStudent(req, res) {
+  const { id } = req.params;
+  // TODO: Implementar las validaciones
+  try {
+    return res.status(200).json(await getStudentById(id));
   } catch (error) {
     return res.status(502).json({
       code: 502, // Base de Datos tiro un error
@@ -20,7 +51,7 @@ async function httpGetAllStudents(req, res) {
 async function httpCreateStudent(req, res) {
   const studentData = req.body;
 
-  // TODO: Implementar las validaciones para req.body
+  // TODO: Implementar las validaciones
 
   try {
     return res.status(201).json(await createStudent(studentData));
@@ -68,6 +99,7 @@ async function httpDeleteStudent(req, res) {
 
 module.exports = {
   httpGetAllStudents,
+  httpGetStudent,
   httpCreateStudent,
   httpUpdateStudent,
   httpDeleteStudent,

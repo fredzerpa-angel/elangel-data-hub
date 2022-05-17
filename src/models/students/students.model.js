@@ -4,10 +4,6 @@ async function getAllStudents() {
   return await students.find({});
 }
 
-async function getStudentById(studentId) {
-  // TODO
-}
-
 async function createStudent(studentData) {
   return await students.create(studentData);
 }
@@ -22,7 +18,15 @@ async function updateStudent(studentId, updateData) {
 }
 
 async function deleteStudent(studentId) {
-  return await students.findByIdAndDelete(studentId)
+  return await students.findByIdAndDelete(studentId);
+}
+
+async function getStudentById(studentId) {
+  return await students.findById(studentId);
+}
+
+async function getStudentBySearch({ searchBy, value }) {
+  return await students.find({ [searchBy]: new RegExp(value, 'gi') });
 }
 
 module.exports = {
@@ -30,4 +34,6 @@ module.exports = {
   createStudent,
   updateStudent,
   deleteStudent,
+  getStudentById,
+  getStudentBySearch,
 };
