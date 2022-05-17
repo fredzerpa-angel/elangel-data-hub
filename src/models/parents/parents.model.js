@@ -25,7 +25,7 @@ async function getParentById(parentId) {
   return await parents.findById(parentId);
 }
 
-async function getStudentBySearch({ searchBy, value }) {
+async function getParentBySearch({ searchBy, value }) {
   return await students.find({ [searchBy]: new RegExp(value, 'gi') });
 }
 
@@ -35,5 +35,5 @@ module.exports = {
   updateParent,
   deleteParent,
   getParentById,
-  getStudentBySearch,
+  getParentBySearch,
 };
