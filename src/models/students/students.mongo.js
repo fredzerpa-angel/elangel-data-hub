@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const studentsSchema = new mongoose.Schema({
+  // Data proveniente de Arcadat
   cedulaId: {
     type: String,
     required: false,
@@ -74,5 +75,5 @@ const studentsSchema = new mongoose.Schema({
   },
 });
 
-// Connects studentSchema with "Students" collection
+// Conecta studentSchema con "Students" colleccion
 module.exports = mongoose.model('Student', studentsSchema);

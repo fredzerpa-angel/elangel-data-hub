@@ -9,6 +9,8 @@ const {
 
 async function httpGetAllStudents(req, res) {
   const { name, cid } = req.query;
+
+  // TODO: Implementar las validaciones
   let response;
 
   try {
@@ -17,13 +19,13 @@ async function httpGetAllStudents(req, res) {
       const search = {
         searchBy: name ? 'fullname' : 'cedulaId',
         value: name ?? cid,
-      }
+      };
       response = await getStudentBySearch(search);
     } else {
       // Si no hubo consulta entonces retorna todos los estudiantes
       response = await getAllStudents();
     }
-    
+
     return res.status(200).json(response);
   } catch (error) {
     return res.status(502).json({
