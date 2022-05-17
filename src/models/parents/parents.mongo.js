@@ -38,5 +38,5 @@ const parentSchema = new mongoose.Schema({
   }
 });
 
-// Conecta studentSchema con "Parents" colleccion
+// Conecta parentSchema con "Parents" colleccion
 module.exports = mongoose.model('Parent', parentSchema);
