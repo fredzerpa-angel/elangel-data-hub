@@ -78,6 +78,13 @@ const studentSchema = new mongoose.Schema({
     ref: 'Parent',
     required: false,
   },
+
+  // Nueva data
+  payments: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'Payment',
+    required: false
+  }
 });
 
 // Conecta studentSchema con "Students" colleccion
