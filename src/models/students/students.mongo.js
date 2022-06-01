@@ -83,8 +83,13 @@ const studentSchema = new mongoose.Schema({
   payments: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: 'Payment',
-    required: false
-  }
+    required: false,
+  },
+  debts: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'Debt',
+    required: false,
+  },
 });
 
 // Conecta studentSchema con "Students" colleccion
