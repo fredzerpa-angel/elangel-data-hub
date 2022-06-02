@@ -1,69 +1,56 @@
 const mongoose = require('mongoose');
+const amountSchema = require('../schemas/amount.schema');
 
 const paymentSchema = new mongoose.Schema({
   schoolTerm: {
     type: String,
-    required: false
+    required: false,
   },
   concept: {
     type: String,
-    required: false
+    required: false,
   },
   billId: {
     type: Number,
-    required: false
+    required: false,
   },
   paymentDate: {
     type: Date,
-    required: false
+    required: false,
   },
   paymentTime: {
     type: String,
-    required: false
+    required: false,
   },
   paymentDatetime: {
     type: String,
-    required: false
+    required: false,
   },
   cashier: {
     type: String,
-    required: false
+    required: false,
   },
   payerRefId: {
     type: String,
-    required: false
+    required: false,
   },
   payerName: {
     type: String,
-    required: false
+    required: false,
   },
-  amountBs: {
-    type: mongoose.Types.Decimal128,
-    required: false
-  },
-  amountUsd: {
-    type: mongoose.Types.Decimal128,
-    required: false
-  },
-  moneyConvertionRate: {
-    type: mongoose.Types.Decimal128,
-    required: false
-  },
-  dataDiscount: {
+  amount: amountSchema,
+  discount: {
     type: String,
-    required: false
+    required: false,
   },
   isCredit: {
     type: Boolean,
-    required: false
+    required: false,
   },
-  studentCedulaId: {
-    type: String,
-    required: false
-  },
-  studentFullname: {
-    type: String,
-    required: false
+  student: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Student',
+    required: false,
   },
 });
 
