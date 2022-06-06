@@ -8,18 +8,14 @@ const {
 } = require('../../models/students/students.model');
 
 async function httpGetAllStudents(req, res) {
-  const { name, cid } = req.query;
+  const { search } = req.query;
 
   // TODO: Implementar las validaciones
   let response;
 
   try {
     // Si hubo una consulta entonces buscar por consulta
-    if (name || cid) {
-      const search = {
-        searchBy: name ? 'fullname' : 'cedulaId',
-        value: name ?? cid,
-      };
+    if (search) {
       response = await getStudentBySearch(search);
     } else {
       // Si no hubo consulta entonces retorna todos los estudiantes

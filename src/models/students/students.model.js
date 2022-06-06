@@ -25,8 +25,12 @@ async function getStudentById(studentId) {
   return await students.findById(studentId);
 }
 
-async function getStudentBySearch({ searchBy, value }) {
-  return await students.find({ [searchBy]: new RegExp(value, 'gi') });
+async function getStudentBySearch(search) {
+  return await students.find()
+  .or([
+    { fullname: new RegExp(search, 'gi') },
+    { cedulaId: new RegExp(search, 'gi') },
+  ]);
 }
 
 module.exports = {

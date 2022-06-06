@@ -8,18 +8,14 @@ const {
 } = require('../../models/parents/parents.model');
 
 async function httpGetAllParents(req, res) {
-  const { name, cid } = req.query;
+  const { search } = req.query;
 
   // TODO: Implementar las validaciones
   let response;
 
   try {
     // Si hubo una consulta entonces buscar por consulta
-    if (name || cid) {
-      const search = {
-        searchBy: name ? 'fullname' : 'cedulaId',
-        value: name ?? cid,
-      };
+    if (search) {
       response = await getParentBySearch(search);
     } else {
       // Si no hubo consulta entonces retorna todos los estudiantes

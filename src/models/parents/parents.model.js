@@ -25,8 +25,12 @@ async function getParentById(parentId) {
   return await parents.findById(parentId);
 }
 
-async function getParentBySearch({ searchBy, value }) {
-  return await parents.find({ [searchBy]: new RegExp(value, 'gi') });
+async function getParentBySearch(search) {
+  return await parents.find()
+  .or([
+    { fullname: new RegExp(search, 'gi') },
+    { cedulaId: new RegExp(search, 'gi') },
+  ]);
 }
 
 module.exports = {
