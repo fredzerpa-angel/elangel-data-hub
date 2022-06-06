@@ -14,20 +14,36 @@ const paymentSchema = new mongoose.Schema({
     type: Number,
     required: false,
   },
-  paymentDate: {
-    type: Date,
-    required: false,
-  },
-  paymentTime: {
+  amount: amountSchema,
+  discount: {
     type: String,
     required: false,
   },
-  paymentDatetime: {
-    type: String,
+  isCredit: {
+    type: Boolean,
     required: false,
+  },
+  time: {
+    date: {
+      type: Date,
+      required: false,
+    },
+    hour: {
+      type: String,
+      required: false,
+    },
+    datetime: {
+      type: String,
+      required: false,
+    },
+    timezone: {
+      type: String,
+      required: false,
+    },
   },
   cashier: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Employee',
     required: false,
   },
   payerRefId: {
@@ -36,15 +52,6 @@ const paymentSchema = new mongoose.Schema({
   },
   payerName: {
     type: String,
-    required: false,
-  },
-  amount: amountSchema,
-  discount: {
-    type: String,
-    required: false,
-  },
-  isCredit: {
-    type: Boolean,
     required: false,
   },
   student: {
