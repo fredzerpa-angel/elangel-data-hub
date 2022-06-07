@@ -13,8 +13,15 @@ const amountSchema = new mongoose.Schema({
     required: false,
   },
   convertionRate: {
-    type: Number,
-    required: false,
+    rate: {
+      type: Number,
+      required: false,
+    },
+    // Dependiendo del dia el valor de la moneda fluctua (inflacion)
+    date: {
+      type: Date,
+      required: false,
+    },
   },
 });
 module.exports = amountSchema;
