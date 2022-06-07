@@ -5,6 +5,7 @@ const studentSchema = new mongoose.Schema({
   documentId: {
     type: String,
     required: false,
+    unique: true,
   },
   gradeLevelAttended: {
     type: String,
@@ -33,6 +34,7 @@ const studentSchema = new mongoose.Schema({
   email: {
     type: String,
     required: false,
+    unique: true,
   },
   gender: {
     type: String,
@@ -50,33 +52,38 @@ const studentSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
-  phoneMain: {
-    type: String,
-    required: false,
+  phones: {
+    main: {
+      type: String,
+      required: false,
+    },
+    secondary: {
+      type: String,
+      required: false,
+    },
   },
-  phoneSecondary: {
-    type: String,
-    required: false,
-  },
-  father: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Parent',
-    required: false,
-  },
-  mother: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Parent',
-    required: false,
-  },
-  parentAdmin: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Parent',
-    required: false,
-  },
-  parentAcademic: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Parent',
-    required: false,
+
+  parents: {
+    father: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Parent',
+      required: false,
+    },
+    mother: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Parent',
+      required: false,
+    },
+    admin: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Parent',
+      required: false,
+    },
+    academic: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Parent',
+      required: false,
+    },
   },
 
   // Nueva data
