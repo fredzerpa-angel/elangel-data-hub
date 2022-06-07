@@ -5,6 +5,7 @@ const parentSchema = new mongoose.Schema({
   documentId: {
     type: String,
     required: false,
+    unique: true,
   },
   fullname: {
     type: String,
@@ -13,6 +14,7 @@ const parentSchema = new mongoose.Schema({
   email: {
     type: String,
     required: false,
+    unique: true,
   },
   phoneMain: {
     type: String,
