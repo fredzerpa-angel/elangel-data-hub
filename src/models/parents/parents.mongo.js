@@ -16,16 +16,16 @@ const parentSchema = new mongoose.Schema({
     required: false,
     unique: true,
   },
-  phoneMain: {
-    type: String,
-    required: false,
+  phones: {
+    main: {
+      type: String,
+      required: false,
+    },
+    secondary: {
+      type: String,
+      required: false,
+    },
   },
-  phoneSecondary: {
-    type: String,
-    required: false,
-  },
-
-  // Nueva data
   children: {
     type: [mongoose.Schema.Types.ObjectId],
     required: false,
