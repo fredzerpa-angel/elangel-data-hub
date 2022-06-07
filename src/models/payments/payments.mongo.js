@@ -42,22 +42,25 @@ const paymentSchema = new mongoose.Schema({
       required: false,
     },
   },
-  cashier: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Employee',
-    required: false,
-  },
-  payerRefId: {
-    type: String,
-    required: false,
-  },
-  payerName: {
-    type: String,
-    required: false,
+
+  payer: {
+    fullname: {
+      type: String,
+      required: false,
+    },
+    refId: {
+      type: String,
+      required: false,
+    },
   },
   student: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Student',
+    required: false,
+  },
+  cashier: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Employee',
     required: false,
   },
 });

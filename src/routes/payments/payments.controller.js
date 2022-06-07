@@ -8,12 +8,10 @@ const {
 } = require('../../models/payments/payments.model');
 
 async function httpGetAllPayments(req, res) {
-  const { student, name, ref } = req.query;
-  const QUERY_MAP = {
-    student: 'studentFullname',
-    name: 'payerName',
-    ref: 'payerRefId'
-  }
+  const { payer, student, cashier } = req.query;
+
+  // Selecciona que tipo de busqueda se desea hacer: Payer, Student, Cashier
+  // Si no existe un tipo de busqueda retorna undefined
   const queryType = Object.keys(req.query)[0];
 
   // TODO: Implementar las validaciones
@@ -22,12 +20,12 @@ async function httpGetAllPayments(req, res) {
   try {
     // Si hubo una consulta entonces buscar por consulta
     if (queryType) {
-      const search = {
-        searchBy: QUERY_MAP[queryType],
-        value: student ?? name ?? ref,
+      const searchParams = {
+        searchBy: queryType,
+        value: payer ?? student ?? cashier,
       };
-      
-      response = await getPaymentBySearch(search);
+
+      response = await getPaymentBySearch(searchParams);
     } else {
       // Si no hubo consulta entonces retorna todos los estudiantes
       response = await getAllPayments();

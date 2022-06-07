@@ -1,4 +1,5 @@
 const payments = require('./payments.mongo');
+const { getStudentBySearch } = require('../students/students.model');
 
 async function getAllPayments() {
   return await payments.find({});
@@ -26,7 +27,49 @@ async function getPaymentById(paymentId) {
 }
 
 async function getPaymentBySearch({ searchBy, value }) {
-  return await payments.find({ [searchBy]: new RegExp(value, 'gi') });
+  // Payer no posee un Schema propio por lo que su busqueda
+  // es distinta
+  if (searchBy === 'payer')
+    return await payments
+      .find()
+      .or([
+        { 'payer.fullname': new RegExp(value, 'gi') },
+        { 'payer.refId': new RegExp(value, 'gi') },
+      ]);
+
+  // Obtenemos respuesta del Modelo por filtrado
+  // Nota: la respuesta es un array de todos los resultados posibles
+  const response =
+    searchBy === 'student'
+      ? await getStudentBySearch(value)
+      : await getCashierBySearch(value);
+
+  const ids = response.map(res => res._id);
+
+  // Retornamos las deudas que esten relacionadas a la respuesta
+  const populateConfig = [
+    {
+      path: 'student',
+      select: {
+        __v: 0,
+        payments: 0,
+      },
+    },
+    {
+      path: 'cashier',
+      select: {
+        __v: 0,
+      },
+    },
+  ];
+
+  // Busca todas las deudas relacionadas a un Estudiante o Cajero
+  // Donde su Id este en el Array de Ids
+  return await payments
+    .find({
+      [searchBy]: { $in: ids },
+    })
+    .populate(populateConfig);
 }
 
 module.exports = {
