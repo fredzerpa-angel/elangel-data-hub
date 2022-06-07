@@ -29,7 +29,7 @@ async function getStudentBySearch(search) {
   return await students.find()
   .or([
     { fullname: new RegExp(search, 'gi') },
-    { cedulaId: new RegExp(search, 'gi') },
+    { documentId: new RegExp(search, 'gi') },
   ]);
 }
 

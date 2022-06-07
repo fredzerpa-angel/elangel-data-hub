@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const parentSchema = new mongoose.Schema({
   // Data proveniente de Arcadat
-  cedulaId: {
+  documentId: {
     type: String,
     required: false,
   },

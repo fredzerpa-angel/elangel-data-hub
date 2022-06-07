@@ -29,7 +29,7 @@ async function getParentBySearch(search) {
   return await parents.find()
   .or([
     { fullname: new RegExp(search, 'gi') },
-    { cedulaId: new RegExp(search, 'gi') },
+    { documentId: new RegExp(search, 'gi') },
   ]);
 }
 
