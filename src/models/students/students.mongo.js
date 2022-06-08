@@ -9,53 +9,53 @@ const studentSchema = new mongoose.Schema({
   },
   gradeLevelAttended: {
     type: String,
-    required: false,
+    required: true,
   },
   paymentPlan: {
     type: String,
-    required: false,
+    required: true,
   },
   discountPlan: {
     type: String,
-    required: false,
+    required: true,
   },
   names: {
     type: String,
-    required: false,
+    required: true,
   },
   lastnames: {
     type: String,
-    required: false,
+    required: true,
   },
   fullname: {
     type: String,
-    required: false,
+    required: true,
   },
   email: {
     type: String,
-    required: false,
+    required: true,
     unique: true,
   },
   gender: {
     type: String,
-    required: false,
+    required: true,
   },
   birthdate: {
     type: Date,
-    required: false,
+    required: true,
   },
   addressOfBirth: {
     type: String,
-    required: false,
+    required: true,
   },
   currentAddress: {
     type: String,
-    required: false,
+    required: true,
   },
   phones: {
     main: {
       type: String,
-      required: false,
+      required: true,
     },
     secondary: {
       type: String,
@@ -77,12 +77,12 @@ const studentSchema = new mongoose.Schema({
     admin: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Parent',
-      required: false,
+      required: true,
     },
     academic: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Parent',
-      required: false,
+      required: true,
     },
   },
 

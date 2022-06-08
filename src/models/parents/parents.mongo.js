@@ -4,22 +4,22 @@ const parentSchema = new mongoose.Schema({
   // Data proveniente de Arcadat
   documentId: {
     type: String,
-    required: false,
+    required: true,
     unique: true,
   },
   fullname: {
     type: String,
-    required: false,
+    required: true,
   },
   email: {
     type: String,
-    required: false,
+    required: true,
     unique: true,
   },
   phones: {
     main: {
       type: String,
-      required: false,
+      required: true,
     },
     secondary: {
       type: String,
@@ -28,7 +28,7 @@ const parentSchema = new mongoose.Schema({
   },
   children: {
     type: [mongoose.Schema.Types.ObjectId],
-    required: false,
+    required: true,
   },
   isParentAdmin: {
     type: Boolean,
@@ -36,8 +36,8 @@ const parentSchema = new mongoose.Schema({
   },
   isParentAcademic: {
     type: Boolean,
-    required: false
-  }
+    required: false,
+  },
 });
 
 // Conecta parentSchema con "Parents" colleccion
