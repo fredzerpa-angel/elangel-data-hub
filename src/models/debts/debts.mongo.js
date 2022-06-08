@@ -24,7 +24,7 @@ const debtSchema = new mongoose.Schema({
   },
   concept: {
     type: String,
-    required: true
+    required: true,
   },
   amount: amountSchema,
   // Se registraran los pagos adelantados, atrasados y a tiempo respectivos al concepto

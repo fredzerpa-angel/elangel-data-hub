@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const addressSchema = require('../schemas/address.schema');
 
 const studentSchema = new mongoose.Schema({
   // Data proveniente de Arcadat
@@ -44,12 +45,14 @@ const studentSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  // Se separa de las direcciones tradicionales, ya que es unica
   addressOfBirth: {
-    type: String,
+    type: addressSchema,
     required: true,
   },
-  currentAddress: {
-    type: String,
+  // Se puede tener 1 o mas direcciones
+  addresses: {
+    type: [addressSchema],
     required: true,
   },
   phones: {
