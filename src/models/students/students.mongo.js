@@ -3,9 +3,13 @@ const addressSchema = require('../schemas/address.schema');
 
 const studentSchema = new mongoose.Schema({
   // Data proveniente de Arcadat
-  documentId: {
+  imageUrl: {
     type: String,
     required: false,
+  },
+  documentId: {
+    type: String,
+    required: true,
     unique: true,
   },
   gradeLevelAttended: {
@@ -18,7 +22,7 @@ const studentSchema = new mongoose.Schema({
   },
   discountPlan: {
     type: String,
-    required: true,
+    required: false,
   },
   names: {
     type: String,
