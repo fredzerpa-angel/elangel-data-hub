@@ -80,12 +80,12 @@ const studentSchema = new mongoose.Schema({
     admin: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Parent',
-      required: true,
+      required: false,
     },
     academic: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Parent',
-      required: true,
+      required: false,
     },
   },
 
