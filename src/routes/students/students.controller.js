@@ -1,3 +1,4 @@
+const { DateTime } = require('luxon');
 const {
   getAllStudents,
   createStudent,
@@ -5,6 +6,7 @@ const {
   deleteStudent,
   getStudentById,
   getStudentBySearch,
+  createStudentsByBundle,
 } = require('../../models/students/students.model');
 
 async function httpGetAllStudents(req, res) {
@@ -95,10 +97,43 @@ async function httpDeleteStudent(req, res) {
   }
 }
 
+async function httpCreateStudentsByBundle(req, res) {
+  const bundle = req.body;
+
+  if (!Array.isArray(bundle))
+    return res.status(400).json({
+      code: 400,
+      error: 'Data is not bundled',
+      message: 'The passed data is not an Array of data',
+    });
+
+  // TODO: Implementar validaciones
+
+  // Convierte todas las fechas de nacimiento al formato Date de JS
+  bundle.forEach(
+    student =>
+      (student.birthdate = DateTime.fromFormat(
+        student.birthdate,
+        'dd/MM/yyyy'
+      ).toJSDate())
+  );
+
+  try {
+    return res.status(201).json(await createStudentsByBundle(bundle));
+  } catch (error) {
+    return res.status(502).json({
+      code: 502, // Base de datos tiro un error
+      error: 'Failed to delete student',
+      message: error.message,
+    });
+  }
+}
+
 module.exports = {
   httpGetAllStudents,
   httpGetStudent,
   httpCreateStudent,
+  httpCreateStudentsByBundle,
   httpUpdateStudent,
   httpDeleteStudent,
 };

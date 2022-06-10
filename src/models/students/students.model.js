@@ -26,11 +26,16 @@ async function getStudentById(studentId) {
 }
 
 async function getStudentBySearch(search) {
-  return await students.find()
-  .or([
-    { fullname: new RegExp(search, 'gi') },
-    { documentId: new RegExp(search, 'gi') },
-  ]);
+  return await students
+    .find()
+    .or([
+      { fullname: new RegExp(search, 'gi') },
+      { documentId: new RegExp(search, 'gi') },
+    ]);
+}
+
+async function createStudentsByBundle(bundle) {
+  return await students.insertMany(bundle);
 }
 
 module.exports = {
@@ -40,4 +45,5 @@ module.exports = {
   deleteStudent,
   getStudentById,
   getStudentBySearch,
+  createStudentsByBundle,
 };
