@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const documentsIdSchema = require('../schemas/documentsId.schema');
 
 const parentSchema = new mongoose.Schema({
   // Data proveniente de Arcadat
@@ -6,6 +7,14 @@ const parentSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
+  },
+  names: {
+    type: String,
+    required: true,
+  },
+  lastnames: {
+    type: String,
+    required: true,
   },
   fullname: {
     type: String,
@@ -28,7 +37,7 @@ const parentSchema = new mongoose.Schema({
   },
   children: {
     type: [mongoose.Schema.Types.ObjectId],
-    required: true,
+    required: false,
   },
   isParentAdmin: {
     type: Boolean,
