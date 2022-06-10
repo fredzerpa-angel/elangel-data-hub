@@ -9,7 +9,7 @@ const debtsRouter = require('./routes/debts/debts.router');
 const app = express();
 
 // Parse incoming requests with JSON payloads
-app.use(express.json());
+app.use(express.json({limit: '50mb'}));
 
 // Parse incoming requests with Form payloads
 app.use(
