@@ -4,7 +4,7 @@ const documentsIdSchema = require('../schemas/documentsId.schema');
 const parentSchema = new mongoose.Schema({
   // Data proveniente de Arcadat
   documentId: {
-    type: String,
+    type: documentsIdSchema,
     required: true,
     unique: true,
   },

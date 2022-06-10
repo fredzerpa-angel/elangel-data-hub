@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const addressSchema = require('../schemas/address.schema');
+const addressSchema = require('../schemas/addresses.schema');
+const documentsIdSchema = require('../schemas/documentsId.schema');
 
 const studentSchema = new mongoose.Schema({
   // Data proveniente de Arcadat
@@ -8,7 +9,7 @@ const studentSchema = new mongoose.Schema({
     required: false,
   },
   documentId: {
-    type: String,
+    type: documentsIdSchema,
     required: true,
     unique: true,
   },
