@@ -7,6 +7,7 @@ const addressSchema = new mongoose.Schema({
     required: true,
   },
   parts: {
+    // House es referente al nombre o numero usado para identificar una casa/apartamento
     house: {
       type: String,
       required: false,
@@ -34,11 +35,11 @@ const addressSchema = new mongoose.Schema({
   },
   geo: {
     lat: {
-      type: String,
+      type: Number,
       required: false,
     },
     lon: {
-      type: String,
+      type: Number,
       required: false,
     },
   },
