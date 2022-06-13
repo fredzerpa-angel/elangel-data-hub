@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const amountSchema = require('../schemas/amount.schema');
+const amountSchema = require('../schemas/amounts.schema');
 
 const paymentSchema = new mongoose.Schema({
   schoolTerm: {
