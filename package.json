@@ -16,6 +16,7 @@
   "author": "Fred Zerpa",
   "license": "MIT",
   "dependencies": {
+    "axios": "^0.27.2",
     "dotenv": "^16.0.0",
     "express": "^4.18.0",
     "luxon": "^2.4.0",
