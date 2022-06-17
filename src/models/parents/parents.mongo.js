@@ -35,6 +35,20 @@ const parentSchema = new mongoose.Schema({
       required: false,
     },
   },
+  gender: {
+    type: String,
+    required: true,
+  },
+  birthdate: {
+    type: Date,
+    required: true,
+  },
+  // Se puede tener 1 o mas direcciones
+  addresses: {
+    type: [addressSchema],
+    required: true,
+  },
+
   children: {
     type: [mongoose.Schema.Types.ObjectId],
     required: false,
