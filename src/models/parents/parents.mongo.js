@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const addressSchema = require('../schemas/addresses.schema');
 const documentsIdSchema = require('../schemas/documentsId.schema');
 
 const parentSchema = new mongoose.Schema({
