@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 const amountSchema = require('../schemas/amounts.schema');
 
 const debtSchema = new mongoose.Schema({
+  schoolTerm: {
+    type: String,
+    required: true,
+  },
   student: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Student',
