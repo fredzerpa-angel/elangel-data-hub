@@ -15,21 +15,33 @@ const paymentSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  amount: amountSchema,
-  discount: {
-    type: String,
+  amount: {
+    type: amountSchema,
     required: true,
   },
+  // Este valor esta dado en Bs en Arcadat
+  discount: {
+    type: amountSchema,
+    required: true,
+  },
+  // Credit significa que este pago es un abono
   isCredit: {
     type: Boolean,
     required: true,
   },
+  // Que el pago fue anulado
+  canceled: {
+    type: Boolean,
+    default: false,
+    required: true,
+  },
+
   time: {
     date: {
       type: Date,
       required: true,
     },
-    hour: {
+    time: {
       type: String,
       required: true,
     },
@@ -39,11 +51,12 @@ const paymentSchema = new mongoose.Schema({
     },
     timezone: {
       type: String,
+      default: 'America/Caracas',
       required: true,
     },
   },
 
-  payer: {
+  paymentHolder: {
     fullname: {
       type: String,
       required: true,
