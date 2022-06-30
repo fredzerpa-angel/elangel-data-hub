@@ -41,7 +41,7 @@ const paymentSchema = new mongoose.Schema({
       type: Date,
       required: true,
     },
-    time: {
+    hour: {
       type: String,
       required: true,
     },
