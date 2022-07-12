@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const addressSchema = require('../schemas/addresses.schema');
 const documentsIdSchema = require('../schemas/documentsId.schema');
+const phonesSchema = require('../schemas/phones.schema');
 
 const parentSchema = new mongoose.Schema({
   // Data proveniente de Arcadat
@@ -26,16 +27,7 @@ const parentSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  phones: {
-    main: {
-      type: String,
-      required: true,
-    },
-    secondary: {
-      type: String,
-      required: false,
-    },
-  },
+  phones: phonesSchema,
   gender: {
     type: String,
     required: true,
