@@ -1,4 +1,3 @@
-const { DateTime } = require('luxon');
 const {
   getAllStudents,
   createStudent,
@@ -109,21 +108,12 @@ async function httpCreateStudentsByBundle(req, res) {
 
   // TODO: Implementar validaciones
 
-  // Convierte todas las fechas de nacimiento al formato Date de JS
-  bundle.forEach(
-    student =>
-      (student.birthdate = DateTime.fromFormat(
-        student.birthdate,
-        'dd/MM/yyyy'
-      ).toJSDate())
-  );
-
   try {
     return res.status(201).json(await createStudentsByBundle(bundle));
   } catch (error) {
     return res.status(502).json({
       code: 502, // Base de datos tiro un error
-      error: 'Failed to delete student',
+      error: 'Failed to create bundle of student',
       message: error.message,
     });
   }
