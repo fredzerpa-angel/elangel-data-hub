@@ -11,16 +11,16 @@ const studentSchema = new mongoose.Schema({
   },
   documentId: {
     type: documentsIdSchema,
-    required: true,
+    required: false,
     unique: true,
   },
   gradeLevelAttended: {
     type: String,
-    required: true,
+    required: false,
   },
   paymentPlan: {
     type: String,
-    required: true,
+    required: false,
   },
   discountPlan: {
     type: String,
@@ -28,38 +28,38 @@ const studentSchema = new mongoose.Schema({
   },
   names: {
     type: String,
-    required: true,
+    required: false,
   },
   lastnames: {
     type: String,
-    required: true,
+    required: false,
   },
   fullname: {
     type: String,
-    required: true,
+    required: false,
   },
   email: {
     type: String,
-    required: true,
+    required: false,
     unique: true,
   },
   gender: {
     type: String,
-    required: true,
+    required: false,
   },
   birthdate: {
     type: Date,
-    required: true,
+    required: false,
   },
   // Se separa de las direcciones tradicionales, ya que es unica
   addressOfBirth: {
     type: addressSchema,
-    required: true,
+    required: false,
   },
   // Se puede tener 1 o mas direcciones
   addresses: {
     type: [addressSchema],
-    required: true,
+    required: false,
   },
   phones: phonesSchema,
 

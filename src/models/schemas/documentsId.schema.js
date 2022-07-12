@@ -5,12 +5,12 @@ const documentsIdSchema = new mongoose.Schema({
   // Los tipos usualmente son: Cedula o Pasaporte
   type: {
     type: String,
-    required: true,
+    required: false,
   },
   // Numero de la Cedula o Pasaporte
   number: {
     type: Number,
-    required: true,
+    required: false,
   },
 });
 

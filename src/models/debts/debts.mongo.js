@@ -4,31 +4,31 @@ const amountSchema = require('../schemas/amounts.schema');
 const debtSchema = new mongoose.Schema({
   schoolTerm: {
     type: String,
-    required: true,
+    required: false,
   },
   student: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Student',
-    required: true,
+    required: false,
   },
   father: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Parent',
-    required: true,
+    required: false,
   },
   mother: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Parent',
-    required: true,
+    required: false,
   },
   parentAdmin: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Parent',
-    required: true,
+    required: false,
   },
   concept: {
     type: String,
-    required: true,
+    required: false,
   },
   amount: amountSchema,
   // Se registraran los pagos adelantados, atrasados y a tiempo respectivos al concepto
@@ -41,12 +41,12 @@ const debtSchema = new mongoose.Schema({
   status: {
     pending: {
       type: Boolean,
-      required: true,
+      required: false,
     },
     // Ultima actualizacion de la deuda, usualmente cambiado por un pago
     lastUpdate: {
       type: Date,
-      required: true,
+      required: false,
     },
   },
 });

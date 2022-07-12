@@ -7,39 +7,39 @@ const parentSchema = new mongoose.Schema({
   // Data proveniente de Arcadat
   documentId: {
     type: documentsIdSchema,
-    required: true,
+    required: false,
     unique: true,
   },
   names: {
     type: String,
-    required: true,
+    required: false,
   },
   lastnames: {
     type: String,
-    required: true,
+    required: false,
   },
   fullname: {
     type: String,
-    required: true,
+    required: false,
   },
   email: {
     type: String,
-    required: true,
+    required: false,
     unique: true,
   },
   phones: phonesSchema,
   gender: {
     type: String,
-    required: true,
+    required: false,
   },
   birthdate: {
     type: Date,
-    required: true,
+    required: false,
   },
   // Se puede tener 1 o mas direcciones
   addresses: {
     type: [addressSchema],
-    required: true,
+    required: false,
   },
 
   children: {

@@ -4,7 +4,7 @@ const addressSchema = new mongoose.Schema({
   _id: false, // New Schema creates _id property
   full: {
     type: String,
-    required: true,
+    required: false,
   },
   parts: {
     // House es referente al nombre o numero usado para identificar una casa/apartamento

@@ -4,77 +4,77 @@ const amountSchema = require('../schemas/amounts.schema');
 const paymentSchema = new mongoose.Schema({
   schoolTerm: {
     type: String,
-    required: true,
+    required: false,
   },
   concept: {
     type: String,
-    required: true,
+    required: false,
   },
   billId: {
     type: Number,
-    required: true,
+    required: false,
     unique: true,
   },
   amount: {
     type: amountSchema,
-    required: true,
+    required: false,
   },
   // Este valor esta dado en Bs en Arcadat
   discount: {
     type: amountSchema,
-    required: true,
+    required: false,
   },
   // Credit significa que este pago es un abono
   isCredit: {
     type: Boolean,
-    required: true,
+    required: false,
   },
   // Que el pago fue anulado
   canceled: {
     type: Boolean,
     default: false,
-    required: true,
+    required: false,
   },
 
   time: {
     date: {
       type: Date,
-      required: true,
+      required: false,
     },
     hour: {
       type: String,
-      required: true,
+      required: false,
     },
     datetime: {
       type: String,
-      required: true,
+      required: false,
     },
     timezone: {
       type: String,
       default: 'America/Caracas',
-      required: true,
+      required: false,
     },
   },
 
   paymentHolder: {
     fullname: {
       type: String,
-      required: true,
+      required: false,
     },
     refId: {
       type: String,
-      required: true,
+      required: false,
     },
   },
   student: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Student',
-    required: true,
+    required: false,
   },
   cashier: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Employee',
-    required: true,
+    required: false,
   },
 });
 

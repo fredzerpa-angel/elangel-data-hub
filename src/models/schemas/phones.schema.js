@@ -4,7 +4,7 @@ const phonesSchema = new mongoose.Schema({
   _id: false, // New Schema crea _ids
   main: {
     type: String,
-    required: true,
+    required: false,
   },
   secondary: {
     type: String,
