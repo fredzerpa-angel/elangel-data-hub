@@ -94,6 +94,26 @@ const studentSchema = new mongoose.Schema({
     },
   },
 
+  // Domiciliación
+  directDebit: {
+    id: {
+      type: String,
+      required: false,
+    },
+    code: {
+      type: String,
+      required: false,
+    },
+    name: {
+      type: String,
+      required: false,
+    },
+    account: {
+      type: Number,
+      required: false,
+    },
+  },
+
   // Nueva data
   payments: {
     type: [mongoose.Schema.Types.ObjectId],
