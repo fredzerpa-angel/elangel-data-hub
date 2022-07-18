@@ -11,21 +11,6 @@ const debtSchema = new mongoose.Schema({
     ref: 'Student',
     required: false,
   },
-  father: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Parent',
-    required: false,
-  },
-  mother: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Parent',
-    required: false,
-  },
-  parentAdmin: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Parent',
-    required: false,
-  },
   concept: {
     type: String,
     required: false,
