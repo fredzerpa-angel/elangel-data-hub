@@ -27,6 +27,7 @@ const debtSchema = new mongoose.Schema({
     pending: {
       type: Boolean,
       required: false,
+      default: true,
     },
     // Ultima actualizacion de la deuda, usualmente cambiado por un pago
     lastUpdate: {
