@@ -29,6 +29,11 @@ const debtSchema = new mongoose.Schema({
       required: false,
       default: true,
     },
+    // Creacion de la deuda
+    issuedAt: {
+      type: Date,
+      required: false,
+    },
     // Ultima actualizacion de la deuda, usualmente cambiado por un pago
     lastUpdate: {
       type: Date,
