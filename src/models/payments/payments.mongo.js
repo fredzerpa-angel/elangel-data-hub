@@ -45,7 +45,7 @@ const paymentSchema = new mongoose.Schema({
       required: false,
     },
     datetime: {
-      type: String,
+      type: Date,
       required: false,
     },
     timezone: {
