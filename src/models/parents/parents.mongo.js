@@ -25,7 +25,11 @@ const parentSchema = new mongoose.Schema({
   email: {
     type: String,
     required: false,
-    unique: true,
+    // Chequea que sean valores unicos si no son null
+    index: {
+      unique: true,
+      partialFilterExpression: { email: { $type: 'string' } },
+    },
   },
   phones: phonesSchema,
   gender: {

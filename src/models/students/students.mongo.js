@@ -37,12 +37,16 @@ const studentSchema = new mongoose.Schema({
   fullname: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   email: {
     type: String,
     required: false,
-    unique: true,
+    // Chequea que sean valores unicos si no son null
+    index: {
+      unique: true,
+      partialFilterExpression: { email: { $type: 'string' } },
+    },
   },
   gender: {
     type: String,
