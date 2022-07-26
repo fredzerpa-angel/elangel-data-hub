@@ -33,6 +33,13 @@ async function getParentBySearch(search) {
   ]);
 }
 
+async function upsertParentsByBundle(bundle) {
+  return await students.upsertMany(bundle, {
+    matchFields: ['fullname'], // Compara los docs mediante este campo
+    ensureModel: true, // Valida la data por el Schema
+  });
+}
+
 module.exports = {
   getAllParents,
   createParent,
@@ -40,4 +47,5 @@ module.exports = {
   deleteParent,
   getParentById,
   getParentBySearch,
+  upsertParentsByBundle,
 };

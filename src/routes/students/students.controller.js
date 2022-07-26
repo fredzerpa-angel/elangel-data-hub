@@ -5,7 +5,7 @@ const {
   deleteStudent,
   getStudentById,
   getStudentBySearch,
-  createStudentsByBundle,
+  upsertStudentsByBundle,
 } = require('../../models/students/students.model');
 
 async function httpGetAllStudents(req, res) {
@@ -109,7 +109,7 @@ async function httpCreateStudentsByBundle(req, res) {
   // TODO: Implementar validaciones
 
   try {
-    return res.status(201).json(await createStudentsByBundle(bundle));
+    return res.status(201).json(await upsertStudentsByBundle(bundle));
   } catch (error) {
     return res.status(502).json({
       code: 502, // Base de datos tiro un error

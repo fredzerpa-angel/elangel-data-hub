@@ -36,7 +36,8 @@ const studentSchema = new mongoose.Schema({
   },
   fullname: {
     type: String,
-    required: false,
+    required: true,
+    unique: true
   },
   email: {
     type: String,

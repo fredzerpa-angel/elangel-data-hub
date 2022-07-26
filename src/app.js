@@ -1,3 +1,4 @@
+// Libraries
 const express = require('express');
 
 // Routes
@@ -7,11 +8,9 @@ const studentsRouter = require('./routes/students/students.router');
 const debtsRouter = require('./routes/debts/debts.router');
 
 const app = express();
-
-// Parse incoming requests with JSON payloads
+// Transforma requests entrantes con datos tipo JSON
 app.use(express.json({limit: '50mb'}));
-
-// Parse incoming requests with Form payloads
+// Transforma requests entrantes con datos tipo Form
 app.use(
   express.urlencoded({
     extended: false,

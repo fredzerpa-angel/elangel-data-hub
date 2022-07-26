@@ -1,4 +1,5 @@
 const students = require('./students.mongo');
+const ArcadatApi = require('../../api/Arcadat/Arcadat.api');
 
 async function getAllStudents() {
   return await students.find({});
@@ -34,8 +35,11 @@ async function getStudentBySearch(search) {
     ]);
 }
 
-async function createStudentsByBundle(bundle) {
-  return await students.insertMany(bundle);
+async function upsertStudentsByBundle(bundle) {
+  return await students.upsertMany(bundle, {
+    matchFields: ['fullname'], // Compara los docs mediante este campo
+    ensureModel: true, // Valida la data por el Schema
+  });
 }
 
 module.exports = {
@@ -45,5 +49,5 @@ module.exports = {
   deleteStudent,
   getStudentById,
   getStudentBySearch,
-  createStudentsByBundle,
+  upsertStudentsByBundle,
 };
