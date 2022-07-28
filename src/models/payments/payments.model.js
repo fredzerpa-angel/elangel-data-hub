@@ -72,6 +72,10 @@ async function getPaymentBySearch({ searchBy, value }) {
     .populate(populateConfig);
 }
 
+async function createPaymentsByBundle(bundle) {
+  return await payments.insertMany(bundle, { lean: true });
+}
+
 module.exports = {
   getAllPayments,
   createPayment,
@@ -79,4 +83,5 @@ module.exports = {
   deletePayment,
   getPaymentById,
   getPaymentBySearch,
+  createPaymentsByBundle
 };
