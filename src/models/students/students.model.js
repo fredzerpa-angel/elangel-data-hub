@@ -35,6 +35,14 @@ async function getStudentBySearch(search) {
     ]);
 }
 
+async function getStudentByDocumentId(documentId) {
+  return await students.findOne({ documentId: { number: documentId } });
+}
+
+async function updateStudentByDocumentId(documentId, updateData) {
+  return await students.findOneAndUpdate({ documentId: { number: documentId } }, updateData);
+}
+
 async function upsertStudentsByBundle(bundle) {
   return await students.upsertMany(bundle, {
     matchFields: ['fullname'], // Compara los docs mediante este campo
@@ -49,5 +57,7 @@ module.exports = {
   deleteStudent,
   getStudentById,
   getStudentBySearch,
+  getStudentByDocumentId,
+  updateStudentByDocumentId,
   upsertStudentsByBundle,
 };
