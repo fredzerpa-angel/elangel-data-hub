@@ -50,7 +50,6 @@ const paymentSchema = new mongoose.Schema({
     },
     timezone: {
       type: String,
-      default: 'America/Caracas',
       required: false,
     },
   },
