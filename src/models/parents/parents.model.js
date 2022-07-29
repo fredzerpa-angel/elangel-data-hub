@@ -26,16 +26,21 @@ async function getParentById(parentId) {
 }
 
 async function getParentBySearch(search) {
-  return await parents.find()
-  .or([
-    { fullname: new RegExp(search, 'gi') },
-    { documentId: new RegExp(search, 'gi') },
-  ]);
+  return await parents
+    .find()
+    .or([
+      { fullname: new RegExp(search, 'gi') },
+      { documentId: new RegExp(search, 'gi') },
+    ]);
+}
+
+async function getParentByDocumentId(documentId) {
+  return await parents.findOne({ documentId: { number: documentId } });
 }
 
 async function upsertParentsByBundle(bundle) {
-  return await students.upsertMany(bundle, {
-    matchFields: ['fullname'], // Compara los docs mediante este campo
+  return await parents.upsertMany(bundle, {
+    matchFields: ['documentId.number'], // Compara los docs mediante este campo
     ensureModel: true, // Valida la data por el Schema
   });
 }
@@ -47,5 +52,6 @@ module.exports = {
   deleteParent,
   getParentById,
   getParentBySearch,
+  getParentByDocumentId,
   upsertParentsByBundle,
 };
