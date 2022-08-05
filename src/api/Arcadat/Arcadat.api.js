@@ -156,11 +156,11 @@ async function getPayments() {
   const refactoredPaymentsSchema = payments.map(payment => {
     // Transforma las Keys de los Objects a seguir el SCHEMA_MAP
     const paymentWithSchema = Object.fromEntries(
-      Object.entries(payment).map(([key, value]) => { 
+      Object.entries(payment).map(([key, value]) => {
         const header = SCHEMA_MAP[key];
         // Reemplazamos cualquier character que nosea numero del documentId 
         if (header.includes('documentId.number')) value = value.replace(/\D/gi, '');
-        
+
         return [header, value];
       })
     );
@@ -206,6 +206,32 @@ async function getPendingDebts() {
     data: { data: debts },
   } = await ArcadatClient(config);
 
+  // Son los nuevos conceptos usados actualmente en ARCADAT
+  const ALLOWED_DEBTS_CONCEPTS = [
+    "00-ANTICIPO MATRICULA",
+    "00-ANTICIPO SEPTIEMBRE",
+    "00-MATRICULA",
+    "00-PLATAFORMA EDUC. CONTROL DE ESTUDIO, EVALUACION Y ADM.",
+    "00-SEGURO ESCOLAR",
+    "01-SEPTIEMBRE",
+    "02-OCTUBRE",
+    "03-NOVIEMBRE",
+    "04-DICIEMBRE",
+    "05-ENERO",
+    "06-FEBRERO",
+    "07-MARZO",
+    "08-ABRIL",
+    "09-MAYO",
+    "10-JUNIO",
+    "11-JULIO",
+    "12-AGOSTO",
+    "PROYECTO DE INVERSIÓN"
+  ]
+
+  // Tomamos solo las deudas con conceptos actualizados
+  const allowedDebts = debts.filter(debt => ALLOWED_DEBTS_CONCEPTS.includes(debt.concept));
+
+
   // Creamos un diccionario con las propiedades del Fetch y de Debts Schema
   const SCHEMA_MAP = {
     period: 'schoolTerm',
@@ -213,18 +239,21 @@ async function getPendingDebts() {
     name_student: 'student.fullname',
     concept: 'concept',
     amount: 'amount.usd',
-    expiration_date: 'status.issuedDate',
+    expiration_date: 'status.issuedAt',
   };
 
   // Refactorizamos el Schema de las deudas registrados en Arcadat
   // A nuestro Schema de deudas
-  const refactoredDebtsSchema = debts.map(debt => {
+  const refactoredDebtsSchema = allowedDebts.map(debt => {
     // Transformamos las Objects Keys a las usadas en SCHEMA_MAP
     const debtWithSchema = Object.fromEntries(
       Object.entries(debt).map(([key, value]) => {
+        // Borramos cualquier valor no numerico de las cedulas
+        if (key === 'id_student') value = value.replace(/\D/gi, '');
+
         if (key !== 'expiration_date') return [SCHEMA_MAP[key], value];
 
-        // Get only the date from expiration_date
+        // Tomamos solamente la fecha del expiration_date
         return [SCHEMA_MAP[key], value.date];
       })
     );
@@ -233,7 +262,24 @@ async function getPendingDebts() {
     return convertObjectStringToSchema(debtWithSchema);
   });
 
-  return refactoredDebtsSchema;
+
+  // Agregamos deudas unicas en el record
+  const uniqueDebts = refactoredDebtsSchema.reduce((uniqueDebts, debt) => {
+    // Creamos una llave unica para identificar cada deuda
+    const key = debt.schoolTerm + debt.student.fullname + debt.concept + debt.status.issuedAt;
+    debt.status.lastUpdate = new Date(); // Agregamos fecha de actualizacion ya que estamos viendo la deuda otra vez
+
+    // Buscamos cualquier deuda repetida
+    if (uniqueDebts.has(key)) {
+      // Si se repite la deuda es porque es necesario sumar el monto
+      uniqueDebts.set(key, { ...debt, amount: { usd: uniqueDebts.get(key).amount.usd + debt.amount.usd } })
+    } else {
+      uniqueDebts.set(key, debt);
+    }
+    return uniqueDebts;
+  }, new Map())
+
+  return [...uniqueDebts];
 }
 
 async function getAcademicParents() {
