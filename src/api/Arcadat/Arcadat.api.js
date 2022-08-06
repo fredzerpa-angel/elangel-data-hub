@@ -159,7 +159,7 @@ async function getPayments() {
       Object.entries(payment).map(([key, value]) => {
         const header = SCHEMA_MAP[key];
         // Reemplazamos cualquier character que nosea numero del documentId 
-        if (header.includes('documentId.number')) value = value.replace(/\D/gi, '');
+        if (header.includes('documentId.number')) value = Number(value.replace(/\D/gi, ''))
 
         return [header, value];
       })
@@ -249,12 +249,12 @@ async function getPendingDebts() {
     const debtWithSchema = Object.fromEntries(
       Object.entries(debt).map(([key, value]) => {
         // Borramos cualquier valor no numerico de las cedulas
-        if (key === 'id_student') value = value.replace(/\D/gi, '');
-
-        if (key !== 'expiration_date') return [SCHEMA_MAP[key], value];
+        if (key === 'id_student') value = Number(value.replace(/\D/gi, ''));
 
         // Tomamos solamente la fecha del expiration_date
-        return [SCHEMA_MAP[key], value.date];
+        if (key === 'expiration_date') return [SCHEMA_MAP[key], new Date(value.date)];
+
+        return [SCHEMA_MAP[key], value];
       })
     );
 
@@ -264,7 +264,7 @@ async function getPendingDebts() {
 
 
   // Agregamos deudas unicas en el record
-  const uniqueDebts = refactoredDebtsSchema.reduce((uniqueDebts, debt) => {
+  const uniqueDebtsMap = refactoredDebtsSchema.reduce((uniqueDebts, debt) => {
     // Creamos una llave unica para identificar cada deuda
     const key = debt.schoolTerm + debt.student.fullname + debt.concept + debt.status.issuedAt;
     debt.status.lastUpdate = new Date(); // Agregamos fecha de actualizacion ya que estamos viendo la deuda otra vez
@@ -279,7 +279,9 @@ async function getPendingDebts() {
     return uniqueDebts;
   }, new Map())
 
-  return [...uniqueDebts];
+  // Tomamos solo las deudas y no el key del Map
+  const uniqueDebts = [...uniqueDebtsMap].map(([key, debt]) => debt);
+  return uniqueDebts;
 }
 
 async function getAcademicParents() {
