@@ -1,10 +1,8 @@
 const ArcadatApi = require('../api/Arcadat/Arcadat.api');
-const {
-  upsertParentsByBundle,
-  getParentByDocumentId,
-} = require('../models/parents/parents.model');
+const { getAllDebts, createDebt } = require('../models/debts/debts.model');
+const { upsertParentsByBundle, getParentByDocumentId } = require('../models/parents/parents.model');
 const { getAllPayments, createPayment } = require('../models/payments/payments.model');
-const { upsertStudentsByBundle, updateStudentByDocumentId } = require('../models/students/students.model');
+const { upsertStudentsByBundle, updateStudentByDocumentId, addDebtToStudentByDocumentId, deleteDebtFromStudentByDocumentId } = require('../models/students/students.model');
 
 async function updateParentsCollection() {
   // TODO: Agregar Padres Administrativos
@@ -68,17 +66,61 @@ async function updatePaymentsCollection() {
 }
 
 async function updateDebtsCollection() {
-  // TODO
+  const currentDebts = await ArcadatApi.getPendingDebts();
+  const oldDebts = await getAllDebts();
+
+  // Creamos un registro para poder manejar los cambios en las deudas
+  const records = { // Registro de deudas
+    old: new Map(),
+    new: new Map()
+  }
+
+  oldDebts.forEach(debt => {
+    // Creamos una llave unica para identificar cada deuda
+    const key = debt.schoolTerm + debt.student.fullname + debt.concept + debt.status.issuedAt;
+
+    records.old.set(key, debt);
+  })
+
+  currentDebts.forEach(async debt => {
+    // Creamos una llave unica para identificar cada deuda
+    const key = debt.schoolTerm + debt.student.fullname + debt.concept + debt.status.issuedAt;
+    // Agregamos la deuda a nuestros registros
+    records.new.set(key, debt);
+
+    // Si no esta guardada en el record, es porque la deuda es nueva
+    if (!records.old.has(key)) {
+
+      // Creamos la deuda
+      const createdDebt = await createDebt(debt);
+
+      console.log(debt);
+
+      // Agregamos la deuda al estudiante
+      const studentDocumentId = debt.student.documentId.number;
+      const addDebtToStudentResponse = await addDebtToStudentByDocumentId(studentDocumentId, createdDebt);
+    }
+
+  })
+
+  // Comparamos los registros para encontrar las deudas ya pagadas
+  records.old.forEach(async (oldDebt, oldDebtKey) => {
+    const studentDocumentId = oldDebt.documentId.number;
+    // Eliminamos cualquier deuda que ya no este registrada en ARCADAT
+    if (!records.new.has(oldDebtKey)) await deleteDebtFromStudentByDocumentId(studentDocumentId, oldDebt);
+  })
+
 }
 
 async function refreshCollections() {
   console.log('Start refreshing Collections..');
-  const parentsRefresh = await updateParentsCollection();
-  console.log(`${parentsRefresh.nUpserted + parentsRefresh.nMatched} Parents refreshed`);
-  const studentsRefresh = await updateStudentsCollection();
-  console.log(`${studentsRefresh.nUpserted + studentsRefresh.nMatched} Students refreshed.`);
-  const paymentsRefresh = await updatePaymentsCollection();
-  console.log(`${paymentsRefresh.nInserted} Payments added.`)
+  // const parentsRefresh = await updateParentsCollection();
+  // console.log(`${parentsRefresh.nUpserted + parentsRefresh.nMatched} Parents refreshed`);
+  // const studentsRefresh = await updateStudentsCollection();
+  // console.log(`${studentsRefresh.nUpserted + studentsRefresh.nMatched} Students refreshed.`);
+  // const paymentsRefresh = await updatePaymentsCollection();
+  // console.log(`${paymentsRefresh.nInserted} Payments added.`)
+  const debtsRefresh = await updateDebtsCollection();
   console.log('Done refreshing Collections.');
 }
 
