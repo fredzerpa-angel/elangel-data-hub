@@ -1,5 +1,4 @@
 const students = require('./students.mongo');
-const ArcadatApi = require('../../api/Arcadat/Arcadat.api');
 
 async function getAllStudents() {
   return await students.find({});
@@ -39,6 +38,18 @@ async function getStudentByDocumentId(documentId) {
   return await students.findOne({ documentId: { number: documentId } });
 }
 
+async function addDebtToStudentByDocumentId(documentId, debt) {
+  // Tomamos la data que queremos pasar de la deuda
+  const data = debt._id;
+  return await students.updateOne({ documentId: { number: documentId } }, { $addToSet: { debts: data } })
+}
+
+async function deleteDebtFromStudentByDocumentId(documentId, debt) {
+  // Tomamos el valor que removera del array Debts
+  const filter = debt._id;
+  return await students.updateOne({ documentId: { number: documentId } }, { $pull: { debts: filter } })
+}
+
 async function updateStudentByDocumentId(documentId, updateData) {
   return await students.findOneAndUpdate({ documentId: { number: documentId } }, updateData);
 }
@@ -60,4 +71,6 @@ module.exports = {
   getStudentByDocumentId,
   updateStudentByDocumentId,
   upsertStudentsByBundle,
+  addDebtToStudentByDocumentId,
+  deleteDebtFromStudentByDocumentId
 };
