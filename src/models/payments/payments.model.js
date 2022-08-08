@@ -63,7 +63,7 @@ async function getPaymentBySearch({ searchBy, value }) {
     },
   ];
 
-  // Busca todas las deudas relacionadas a un Estudiante o Cajero
+  // Busca todas los pagos relacionadas a un Estudiante o Cajero
   // Donde su Id este en el Array de Ids
   return await payments
     .find({
