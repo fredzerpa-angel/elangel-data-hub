@@ -158,30 +158,47 @@ async function getPayments() {
     const paymentWithSchema = Object.fromEntries(
       Object.entries(payment).map(([key, value]) => {
         const header = SCHEMA_MAP[key];
-        // Reemplazamos cualquier character que nosea numero del documentId 
-        if (header.includes('documentId.number')) value = Number(value.replace(/\D/gi, ''))
-
         return [header, value];
       })
     );
 
-    //  Añadimos propiedades faltantes a nuestro pago
-    paymentWithSchema['time.datetime'] =
-      paymentWithSchema['time.date'] + ' ' + paymentWithSchema['time.hour'];
-    paymentWithSchema['discount.convertionRate.rate'] =
-      paymentWithSchema['amount.convertionRate.rate'];
+    // Limpiamos los valores
+    paymentWithSchema['student.documentId.number'] = Number(paymentWithSchema['student.documentId.number'].replace(/\D/gi, ''));
+    paymentWithSchema['time.date'] = DateTime.fromFormat(paymentWithSchema['time.date'], 'yyyy/MM/dd').toISODate();
+    // Añadimos propiedades faltantes a nuestro pago
+    paymentWithSchema['time.datetime'] = paymentWithSchema['time.date'] + ' ' + paymentWithSchema['time.hour']
+    paymentWithSchema['discount.convertionRate.rate'] = paymentWithSchema['amount.convertionRate.rate'];
     paymentWithSchema['discount.usd'] = Number(
-      (
-        paymentWithSchema['discount.bs'] /
-        paymentWithSchema['amount.convertionRate.rate']
-      ).toFixed(2)
+      (paymentWithSchema['discount.bs'] / paymentWithSchema['amount.convertionRate.rate']).toFixed(2)
     );
 
     // Refactorizamos el Object para que asimile al Payments Schema
     return convertObjectStringToSchema(paymentWithSchema);
   });
 
-  return refactoredPaymentsSchema;
+  // Agregamos deudas unicas en el record
+  const uniquePaymentsMap = refactoredPaymentsSchema.reduce((uniquePayments, payment) => {
+    // Creamos una llave unica para identificar cada pago
+    const key = payment.concept + payment.billId + payment.student.documentId.number + payment.paymentHolder.refId;
+
+    // Buscamos cualquier pago repetida
+    if (uniquePayments.has(key)) {
+      // Si se repite la pago es porque es necesario sumar el monto
+      const amount = {
+        bs: uniquePayments.get(key).amount.bs + payment.amount.bs,
+        usd: uniquePayments.get(key).amount.usd + payment.amount.usd,
+        convertionRate: { ...payment.amount.convertionRate }
+      };
+      uniquePayments.set(key, { ...payment, amount })
+    } else {
+      uniquePayments.set(key, payment);
+    }
+    return uniquePayments;
+  }, new Map())
+
+  // Tomamos solo las pagos y no el key del Map
+  const uniquePayments = [...uniquePaymentsMap].map(([key, payment]) => payment);
+  return uniquePayments;
 }
 
 async function getPendingDebts() {
@@ -248,15 +265,14 @@ async function getPendingDebts() {
     // Transformamos las Objects Keys a las usadas en SCHEMA_MAP
     const debtWithSchema = Object.fromEntries(
       Object.entries(debt).map(([key, value]) => {
-        // Borramos cualquier valor no numerico de las cedulas
-        if (key === 'id_student') value = Number(value.replace(/\D/gi, ''));
-
         // Tomamos solamente la fecha del expiration_date
         if (key === 'expiration_date') return [SCHEMA_MAP[key], new Date(value.date)];
 
         return [SCHEMA_MAP[key], value];
       })
     );
+    // Borramos cualquier valor no numerico de las cedulas
+    debt['student.documentId.number'] = Number(debt['student.documentId.number'].replace(/\D/gi, ''));
 
     // Refactorizamos el Object para que asimile al Debts Schema
     return convertObjectStringToSchema(debtWithSchema);
