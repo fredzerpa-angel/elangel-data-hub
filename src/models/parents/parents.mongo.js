@@ -52,10 +52,12 @@ const parentSchema = new mongoose.Schema({
   },
   isParentAdmin: {
     type: Boolean,
+    default: false,
     required: false,
   },
   isParentAcademic: {
     type: Boolean,
+    default: false,
     required: false,
   },
 });
