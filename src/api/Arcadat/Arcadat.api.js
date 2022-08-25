@@ -86,7 +86,7 @@ async function getStudents() {
       const header = SCHEMA_MAP[headers[idx]];
 
       // Eliminamos cualquier character que no sea numero
-      if (header.includes('documentId.number')) data = data.replace(/\D/gi, '');
+      if (header.includes('documentId.number')) data = Number(data.replace(/\D/gi, ''));
 
       // Transformamos la fecha a una reconocida por el constructor Date de JS
       if (header === 'birthdate')
@@ -265,14 +265,16 @@ async function getPendingDebts() {
     // Transformamos las Objects Keys a las usadas en SCHEMA_MAP
     const debtWithSchema = Object.fromEntries(
       Object.entries(debt).map(([key, value]) => {
+        const header = SCHEMA_MAP[key]
         // Tomamos solamente la fecha del expiration_date
-        if (key === 'expiration_date') return [SCHEMA_MAP[key], new Date(value.date)];
+        if (key === 'expiration_date') return [header, new Date(value.date)];
 
-        return [SCHEMA_MAP[key], value];
+        return [header, value];
       })
     );
+
     // Borramos cualquier valor no numerico de las cedulas
-    debt['student.documentId.number'] = Number(debt['student.documentId.number'].replace(/\D/gi, ''));
+    debtWithSchema['student.documentId.number'] = Number(debtWithSchema['student.documentId.number'].replace(/\D/gi, ''));
 
     // Refactorizamos el Object para que asimile al Debts Schema
     return convertObjectStringToSchema(debtWithSchema);
@@ -347,7 +349,9 @@ async function getAcademicParents() {
 
         const header = SCHEMA_MAP[headers[idx]];
 
-        if (header.includes('documentId.number')) data = data.replace(/\D/gi, '');
+        // Borramos cualquier valor no numerico de las cedulas
+        if (header.includes('documentId.number')) data = Number(data.replace(/\D/gi, ''));
+        
 
         if (header === 'phones') {
           // Limpiamos y separamos los telefonos
@@ -404,6 +408,9 @@ async function getAcademicParents() {
     },
     []
   );
+
+  // Insertamos la propiedad de padre academico a cada padre
+  parentsWithSchema.forEach(parent => parent.isParentAcademic = true);
 
   // Retornamos la data de los estudiantes ya refactorizada
   return parentsWithSchema;

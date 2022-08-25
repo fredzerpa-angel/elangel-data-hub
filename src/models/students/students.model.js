@@ -40,25 +40,25 @@ async function getStudentByDocumentId(documentId) {
 
 async function addPaymentToStudentByDocumentId(documentId, payment) {
   // Tomamos la data que queremos pasar del pago
-  const data = payment._id;
+  const data = payment.id;
   return await students.updateOne({ documentId: { number: documentId } }, { $addToSet: { payments: data } })
 }
 
 async function deletePaymentFromStudentByDocumentId(documentId, payment) {
   // Tomamos el valor que removera del array Payments
-  const filter = payment._id;
+  const filter = payment.id;
   return await students.updateOne({ documentId: { number: documentId } }, { $pull: { payments: filter } })
 }
 
 async function addDebtToStudentByDocumentId(documentId, debt) {
   // Tomamos la data que queremos pasar de la deuda
-  const data = debt._id;
+  const data = debt.id;
   return await students.updateOne({ documentId: { number: documentId } }, { $addToSet: { debts: data } })
 }
 
 async function deleteDebtFromStudentByDocumentId(documentId, debt) {
   // Tomamos el valor que removera del array Debts
-  const filter = debt._id;
+  const filter = debt.id;
   return await students.updateOne({ documentId: { number: documentId } }, { $pull: { debts: filter } })
 }
 

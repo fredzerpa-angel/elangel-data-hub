@@ -38,6 +38,12 @@ async function getParentByDocumentId(documentId) {
   return await parents.findOne({ documentId: { number: documentId } });
 }
 
+async function addChildToParentByDocumentId(parentDocumentId, child) {
+  // Tomamos la data que queremos pasar del estudiante
+  const data = child.id;
+  return await parents.findOneAndUpdate({ documentId: { number: parentDocumentId } }, { $addToSet: { children: data } }, { new: true })
+}
+
 async function upsertParentsByBundle(bundle) {
   return await parents.upsertMany(bundle, {
     matchFields: ['documentId.number'], // Compara los docs mediante este campo
@@ -53,5 +59,6 @@ module.exports = {
   getParentById,
   getParentBySearch,
   getParentByDocumentId,
+  addChildToParentByDocumentId,
   upsertParentsByBundle,
 };

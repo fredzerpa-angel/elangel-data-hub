@@ -1,8 +1,7 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
-const upsertMany = require('@meanie/mongoose-upsert-many');
-require('dotenv').config()
 
-const MONGO_URL = process.env.MONGO_URL;
+const MONGODB_URI = process.env.MONGODB_URI;
 
 mongoose.connection.once('open', () => {
   console.log('MongoDB connection ready!');
@@ -15,8 +14,7 @@ mongoose.connection.once('close', () => {
 
 async function mongoConnect() {
   try {
-    mongoose.plugin(upsertMany); // ! Necesita estar antes que app.js (antes que los Routers)
-    await mongoose.connect(MONGO_URL);
+    mongoose.connect(MONGODB_URI);
   } catch (error) {
     throw new Error('Failed to connect to Mongo Atlas DB', error);
   }
