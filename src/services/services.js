@@ -36,7 +36,7 @@ async function updateStudentsCollection() {
   const studentsWithParentsLinks = currentStudents.map(async student => {
     const parentsEntries = Object.entries(student.parents);
     const parentsWithLinksEntries = parentsEntries.map(
-      async ([parentType, parentData]) => {
+      async ([parentType, parentData]) => {    
         const parent = await addChildToParentByDocumentId(parentData.documentId.number, student);
         return [parentType, parent?.id];
       }
@@ -57,8 +57,7 @@ async function updateStudentsCollection() {
   for (const studentLinked of studentsWithParentsLinks) {
     studentsLinkedWithParents.push(await studentLinked);
   }
-
-
+    
   return await upsertStudentsByBundle(studentsLinkedWithParents);
 }
 
@@ -158,16 +157,20 @@ async function updateDebtsCollection() {
 }
 
 async function refreshCollections() {
-  console.log('Start refreshing Collections..');
-  const parentsRefresh = await updateParentsCollection();
-  console.log(`${parentsRefresh.nUpserted} Parents added. ${parentsRefresh.nMatched} Parents refreshed`);
-  const studentsRefresh = await updateStudentsCollection();
-  console.log(`${studentsRefresh.nUpserted} Students added. ${studentsRefresh.nMatched} Students refreshed.`);
-  const paymentsRefresh = await updatePaymentsCollection();
-  console.log(`${paymentsRefresh.nInserted} Payments added. ${paymentsRefresh.total} total Payments.`)
-  const debtsRefresh = await updateDebtsCollection();
-  console.log(`${debtsRefresh.total} Debts pending.`)
-  console.log('Done refreshing Collections.');
+  try {
+    console.log('Start refreshing Collections..');
+    const parentsRefresh = await updateParentsCollection();
+    console.log(`${parentsRefresh.nUpserted} Parents added. ${parentsRefresh.nMatched} Parents refreshed`);
+    const studentsRefresh = await updateStudentsCollection();
+    console.log(`${studentsRefresh.nUpserted} Students added. ${studentsRefresh.nMatched} Students refreshed.`);
+    const paymentsRefresh = await updatePaymentsCollection();
+    console.log(`${paymentsRefresh.nInserted} Payments added. ${paymentsRefresh.total} total Payments.`)
+    const debtsRefresh = await updateDebtsCollection();
+    console.log(`${debtsRefresh.total} Debts pending.`)
+    console.log('Done refreshing Collections.');
+  } catch (err) {
+    console.log('Error refreshing the collections.', err.message);
+  }
 }
 
 module.exports = {
