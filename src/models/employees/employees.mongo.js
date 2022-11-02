@@ -3,7 +3,7 @@ const addressSchema = require('../schemas/addresses.schema');
 const documentsIdSchema = require('../schemas/documentsId.schema');
 const phonesSchema = require('../schemas/phones.schema');
 
-const studentSchema = new mongoose.Schema({
+const employeeSchema = new mongoose.Schema({
   // Data proveniente de Arcadat
   imageUrl: {
     type: String,
@@ -58,5 +58,5 @@ const studentSchema = new mongoose.Schema({
 
 });
 
-// Conecta studentSchema con "Students" colleccion
-module.exports = mongoose.model('Student', studentSchema);
+// Conecta employeeSchema con "Employees" collection
+module.exports = mongoose.model('Employee', employeeSchema);
