@@ -14,18 +14,6 @@ const studentSchema = new mongoose.Schema({
     required: false,
     unique: true,
   },
-  gradeLevelAttended: {
-    type: String,
-    required: false,
-  },
-  paymentPlan: {
-    type: String,
-    required: false,
-  },
-  discountPlan: {
-    type: String,
-    required: false,
-  },
   names: {
     type: String,
     required: false,
@@ -68,60 +56,6 @@ const studentSchema = new mongoose.Schema({
   },
   phones: phonesSchema,
 
-  parents: {
-    father: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Parent',
-      required: false,
-    },
-    mother: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Parent',
-      required: false,
-    },
-    admin: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Parent',
-      required: false,
-    },
-    academic: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Parent',
-      required: false,
-    },
-  },
-
-  // Domiciliación
-  directDebit: {
-    id: {
-      type: String,
-      required: false,
-    },
-    code: {
-      type: String,
-      required: false,
-    },
-    name: {
-      type: String,
-      required: false,
-    },
-    account: {
-      type: Number,
-      required: false,
-    },
-  },
-
-  // Nueva data
-  payments: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: 'Payment',
-    required: false,
-  },
-  debts: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: 'Debt',
-    required: false,
-  },
 });
 
 // Conecta studentSchema con "Students" colleccion
