@@ -6,6 +6,7 @@ const parentsRouter = require('./routes/parents/parents.router');
 const paymentsRouter = require('./routes/payments/payments.router');
 const studentsRouter = require('./routes/students/students.router');
 const debtsRouter = require('./routes/debts/debts.router');
+const eventsRouter = require('./routes/events/events.router');
 
 const app = express();
 // Transforma requests entrantes con datos tipo JSON
@@ -21,5 +22,6 @@ app.use('/students', studentsRouter);
 app.use('/parents', parentsRouter);
 app.use('/payments', paymentsRouter);
 app.use('/debts', debtsRouter);
+app.use('/events', eventsRouter);
 
 module.exports = app;
