@@ -15,7 +15,7 @@ const employeeSchema = new mongoose.Schema({
   },
   documentId: {
     type: documentsIdSchema,
-    required: false,
+    required: true,
     // Chequea que sean valores unicos si no son null
     index: {
       partialFilterExpression: { documentId: { number: { $type: 'number' } } },
