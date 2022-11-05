@@ -9,6 +9,10 @@ const employeeSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  type: {
+    type: String,
+    required: false,
+  },
   documentId: {
     type: documentsIdSchema,
     required: false,
