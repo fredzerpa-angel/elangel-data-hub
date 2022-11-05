@@ -493,9 +493,12 @@ async function getEmployees() {
     const { lastnames, names } = employeeWithHeaders;
     employeeWithHeaders.fullname = `${lastnames} ${names}`
 
+    const employeeRefactored = convertObjectStringToSchema(employeeWithHeaders);
+    // Verificamos que posea cedula, ya que es indispensable para indentificar al empleado
+    const hasDocumentId = Object.keys(employeeRefactored).includes('documentId');
     // Refactorizamos la data conviertiendo los Headers a una estructura Esquematica
-    result.push(convertObjectStringToSchema(employeeWithHeaders));
-
+    if (hasDocumentId) result.push(employeeRefactored);
+    
     return result;
   }, []);
 
