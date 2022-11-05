@@ -12,7 +12,11 @@ const employeeSchema = new mongoose.Schema({
   documentId: {
     type: documentsIdSchema,
     required: false,
-    unique: true,
+    // Chequea que sean valores unicos si no son null
+    index: {
+      partialFilterExpression: { documentId: { number: { $type: 'number' } } },
+      unique: true,
+    },
   },
   names: {
     type: String,
@@ -55,7 +59,6 @@ const employeeSchema = new mongoose.Schema({
     required: false,
   },
   phones: phonesSchema,
-
 });
 
 // Conecta employeeSchema con "Employees" collection
