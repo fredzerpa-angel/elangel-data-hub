@@ -351,7 +351,7 @@ async function getAcademicParents() {
 
         // Borramos cualquier valor no numerico de las cedulas
         if (header.includes('documentId.number')) data = Number(data.replace(/\D/gi, ''));
-        
+
 
         if (header === 'phones') {
           // Limpiamos y separamos los telefonos
@@ -416,9 +416,98 @@ async function getAcademicParents() {
   return parentsWithSchema;
 }
 
+async function getEmployees() {
+  // Fetch un archivo Excel - Ya que no existe un JSON Endpoint para la obtencion de los empleados
+  const options = {
+    url: 'rptxls/eGxzZGd0/?i=OTI',
+    responseType: 'arraybuffer',
+    transformResponse: [
+      data => {
+        // Transforma la data para poder leer caracteres especiales en el lexico español
+        const dataWithAccents = data.toString('latin1');
+        // Tranforma la data a buffer array otra vez
+        const arrayBuffer = new TextEncoder().encode(dataWithAccents).buffer;
+        return arrayBuffer;
+      },
+    ],
+  };
+
+  const { data } = await ArcadatClient(options);
+
+  // Convierte la data del archivo Excel a una estructura JSON
+  const parsedExcelData = xlsx.parse(data);
+
+  // Creamos un diccionario con las propiedades del Fetch y de Employee Schema
+  const SCHEMA_MAP = {
+    'Tipo de profesor': 'type',
+    'N° de identificación': 'documentId.number',
+    'Apellidos': 'lastnames',
+    'Nombres': 'names',
+    'Sexo': 'gender',
+    'Fecha de nacimiento': 'birthdate',
+    'Edad': 'age',
+    'Lugar de nacimiento': 'addressOfBirth.full',
+    'Dirección': 'addresses.full',
+    'Teléfonos': 'phones.secondary',
+    'Teléfono celular': 'phones.main',
+    'Correo electrónico': 'email',
+    'Estatus': 'status',
+  };
+
+  // Refactorizamos la respuesta de Axios y XLSX a que solo retorne la data de los empleados, y estos ya ligados a sus respectivos Headers
+  const result = parsedExcelData.reduce((result, data, i, arr) => {
+    // Evitamos los headers, ya que solo nos interesa la data de los empleados
+    const headersIndex = 1;
+    const headers = arr[headersIndex].data[0];
+    if (i <= headersIndex) return result;
+
+    const employeeData = data.data[0];
+    // Unimos la data de los empleados con sus respectivos Headers
+    const employeeWithHeaders = employeeData.reduce((employee, data, idx) => {
+      // Eliminamos caracteres especiales innecesarios en nuestra data
+      const specialCharacters = "'-";
+      const findSpecialCharacters = new RegExp(`[${specialCharacters}]`, 'gi');
+      // En este caso solo eliminamos estos characteres si la data esta sucia
+      data = data.length > 1 ? data : data.replace(findSpecialCharacters, '');
+      data = data.replace(/no posee/gi, '');
+
+      const header = SCHEMA_MAP[headers[idx]];
+
+      // Formateamos el tipo de data
+      // Eliminamos cualquier character que no sea numero
+      if (header.includes('documentId.number')) data = Number(data.replace(/\D/gi, ''));
+      // Transformamos la fecha a una reconocida por el constructor Date de JS
+      if (header === 'birthdate')
+        data = DateTime.fromFormat(data, 'dd/MM/yyyy').toJSDate();
+
+
+      return data
+        ? {
+          ...employee,
+          [header]: data,
+        }
+        : employee;
+    }, {});
+
+    // Agregamos Fullname ya que no viene por defecto en Arcadat
+    const { lastnames, names } = employeeWithHeaders;
+    employeeWithHeaders.fullname = `${lastnames} ${names}`
+
+    // Refactorizamos la data conviertiendo los Headers a una estructura Esquematica
+    result.push(convertObjectStringToSchema(employeeWithHeaders));
+
+    return result;
+  }, []);
+
+  // Retornamos la data de los estudiantes ya refactorizada
+  return result;
+
+}
+
 module.exports = {
   getStudents,
   getPayments,
   getPendingDebts,
   getAcademicParents,
+  getEmployees
 };
