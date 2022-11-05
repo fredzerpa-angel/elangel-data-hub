@@ -62,7 +62,14 @@ const employeeSchema = new mongoose.Schema({
     type: [addressSchema],
     required: false,
   },
-  phones: phonesSchema,
+  phones: {
+    type: phonesSchema,
+    required: false,
+  },
+  status: {
+    type: String,
+    required: false,
+  }
 });
 
 // Conecta employeeSchema con "Employees" collection
