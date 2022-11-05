@@ -44,7 +44,7 @@ async function updateEmployeeByDocumentId(documentId, updateData) {
 
 async function upsertEmployeesByBundle(bundle) {
   return await employees.upsertMany(bundle, {
-    matchFields: ['fullname'], // Compara los docs mediante este campo
+    matchFields: ['documentId.number'], // Compara los docs mediante este campo
     ensureModel: true, // Valida la data por el Schema
   });
 }
