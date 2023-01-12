@@ -110,11 +110,14 @@ async function getStudents() {
 }
 
 async function getPayments() {
+  // * El endpoint de los pagos toma como parametos 'year_init' y 'year_end'
+  // * Retorna los pagos tomando encuenta este rango filtrandolos por 'payment_date'
+
   // Creamos la data de un Formulario para hacer un Fetch Post
   var form = new URLSearchParams();
   form.append('o', '1');
-  form.append('year_init', '2021');
-  form.append('year_end', '2022');
+  form.append('year_init', '2020'); // 2020 es el año mas antiguo seleccionable
+  form.append('year_end', DateTime.now().year); // Hasta el año actual
 
   // Usamos el Endpoint de Alberto para obtener los pagos registrados en Arcadat
   const config = {
@@ -202,11 +205,16 @@ async function getPayments() {
 }
 
 async function getPendingDebts() {
+  // * El endpoint de las deudas toma como paremetros 'year_init' y 'year_end' ...
+  // * ... Estos parametos son irrelevantes ya que siempre retorna las deudas activas
+  // * Pero es necesario agregar estos parametros para poder realizar la peticion
+
+
   // Creamos la data de un Formulario para hacer un Fetch Post
   var form = new URLSearchParams();
   form.append('o', '2');
-  form.append('year_init', '2021');
-  form.append('year_end', '2022');
+  form.append('year_init', DateTime.now().year); // El año es irrelevante siempre que sea mayor al 2019
+  form.append('year_end', DateTime.now().year); // El año es irrelevante siempre que sea mayor al 2019
 
   // Usamos el Endpoint de Alberto para obtener las deudas pendientes registrados en Arcadat
   const config = {
@@ -498,7 +506,7 @@ async function getEmployees() {
     const hasDocumentId = Object.keys(employeeRefactored).includes('documentId');
     // Refactorizamos la data conviertiendo los Headers a una estructura Esquematica
     if (hasDocumentId) result.push(employeeRefactored);
-    
+
     return result;
   }, []);
 
