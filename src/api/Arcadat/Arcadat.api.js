@@ -10,7 +10,7 @@ const ArcadatClient = axios.create({
 async function getStudents() {
   // Fetch un archivo Excel - Ya que no existe un JSON Endpoint para la obtencion de estudiantes
   const options = {
-    url: 'rptxls/eGxzZGdzYQ/?p=NjcyNw',
+    url: 'rptxls/eGxzZGdzYQ/?p=Njk1NA',
     responseType: 'arraybuffer',
     transformResponse: [
       data => {
@@ -313,7 +313,7 @@ async function getPendingDebts() {
 async function getAcademicParents() {
   // Fetch un archivo Excel - Ya que no existe un JSON Endpoint para la obtencion de padres academicos
   const options = {
-    url: 'rptxls/eGxzZGdw/?p=NjcyNw',
+    url: 'rptxls/eGxzZGdw/?p=Njk1NA',
     responseType: 'arraybuffer',
     transformResponse: [
       data => {
