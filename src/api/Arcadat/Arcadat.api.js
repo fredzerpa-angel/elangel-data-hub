@@ -540,6 +540,35 @@ async function getAdministrativeParents() {
   return parents;
 }
 
+// Unimos ambos tipos de padres Academicos y Administrativos
+// Retornamos todos los padres (siendo estos unicos, no se repiten)
+async function getParents() {
+  const academicParents = await getAcademicParents();
+  const administrativeParents = await getAdministrativeParents();
+
+  // Unimos todos los padres, pero algunos padres son tanto administrativos como academicos
+  const allParents = [...academicParents, ...administrativeParents];
+
+  // Eliminamos cualquier padre repetido
+  const uniqueParents = allParents.reduce((parentsMap, parent) => {
+    const parentKey = parent.documentId.number;
+
+    if (parentsMap.has(parentKey)) {
+      // Si ya existe, agregamos cualquier propiedad faltante (Si y solo si las propiedades repetidas tienen el mismo valor)
+      const prevParentData = parentsMap.get(parentKey);
+      parentsMap.set(parentKey, { ...prevParentData, ...parent })
+    } else {
+      // Si aun no existe, lo agregamos al diccionario
+      parentsMap.set(parentKey, parent);
+    }
+
+    return parentsMap;
+  }, new Map())
+
+  // Retornamos un Array con los Parents, en vez del Map
+  return [...uniqueParents.values()];
+}
+
 async function getEmployees() {
   // Fetch un archivo Excel - Ya que no existe un JSON Endpoint para la obtencion de los empleados
   const options = {
@@ -640,5 +669,6 @@ module.exports = {
   getPendingDebts,
   getAcademicParents,
   getAdministrativeParents,
+  getParents,
   getEmployees,
 };
