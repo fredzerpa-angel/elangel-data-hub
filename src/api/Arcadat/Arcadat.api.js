@@ -10,7 +10,10 @@ const ArcadatClient = axios.create({
 async function getStudents() {
   // Fetch un archivo Excel - Ya que no existe un JSON Endpoint para la obtencion de estudiantes
   const options = {
-    url: 'rptxls/eGxzZGdzYQ/?p=Njk1NA',
+    url: 'rptxls/eGxzZGdzYQ',
+    params: {
+      p: 'Njk1NA', // Propiedad de busqueda durante el periodo escolar 2022-2023
+    },
     responseType: 'arraybuffer',
     transformResponse: [
       data => {
@@ -313,7 +316,10 @@ async function getPendingDebts() {
 async function getAcademicParents() {
   // Fetch un archivo Excel - Ya que no existe un JSON Endpoint para la obtencion de padres academicos
   const options = {
-    url: 'rptxls/eGxzZGdw/?p=Njk1NA',
+    url: 'rptxls/eGxzZGdw',
+    params: {
+      p: 'Njk1NA', // Propiedad de busqueda durante el periodo escolar 2022-2023
+    },
     responseType: 'arraybuffer',
     transformResponse: [
       data => {
@@ -340,7 +346,8 @@ async function getAcademicParents() {
     'Correo electrónico': 'email',
   };
 
-  // Refactorizamos la respuesta de Axios y XLSX a que solo retorne la data de los padres, y estos ya ligados a sus respectivos Headers
+  // Refactorizamos la respuesta de Axios y XLSX a que solo retorne la data de los padres... 
+  // ... y estos ya ligados a sus respectivos Headers
   const parentsAndChildrenWithSchema = parsedExcelData.reduce(
     (result, data, i, arr) => {
       // Evitamos los headers, ya que solo nos interesa la data de los padres
@@ -348,9 +355,14 @@ async function getAcademicParents() {
       const headers = arr[headersIndex].data[0];
       if (i <= headersIndex) return result;
 
-      const parentData = data.data[0];
+      const parsedData = data.data[0];
+
+      // La propiedad 'Tipo' de los hijos esta vacia, por lo que es necesario agregar 'HIJO' ... 
+      // ... como el primer valor del array o tendra errores durante el enlace entre padre-hijo
+      if (!parsedData.includes('REPRESENTANTE')) parsedData.unshift('HIJO');
+
       // Unimos la data de los padres con sus respectivos Headers
-      const dataWithSchema = parentData.reduce((parent, data, idx, arr) => {
+      const dataWithSchema = parsedData.reduce((schemedData, data, idx) => {
         // Eliminamos data innecesaria
         data = data.replace(/TELÉFONOS: /gi, '');
         data = data.replace(/no posee/gi, '');
@@ -368,27 +380,20 @@ async function getAcademicParents() {
             .map(num => num.trim())
             .filter(num => num);
 
-          return data.length > 1
-            ? {
-              ...parent,
-              // Telefono celular
-              'phones.main': data[1],
-              // Telefono fijo
-              'phones.secondary': data[0],
-            }
-            : {
-              ...parent,
-              // Telefono celular
-              'phones.main': data[0],
-            };
+          // Existen 2 tipos de telefonos, donde si existe un segundo, es el tlf celular
+          return {
+            ...schemedData,
+            // Telefono celular
+            'phones.main': data.at(-1),
+            // Telefono fijo
+            'phones.secondary': data.at(-2),
+          }
         }
 
-        return data
-          ? {
-            ...parent,
-            [header]: data,
-          }
-          : parent;
+        return {
+          ...schemedData,
+          [header]: data,
+        }
       }, {});
 
       // Refactorizamos la data conviertiendo los Headers a una estructura Esquematica
@@ -399,13 +404,14 @@ async function getAcademicParents() {
     []
   );
 
-  const parentsWithSchema = parentsAndChildrenWithSchema.reduce(
+  // Asociamos los hijos dentro de los padres en su propiedad 'children:Array[]' 
+  const parents = parentsAndChildrenWithSchema.reduce(
     (parentsCollection, data, idx, arr) => {
       const isParent = !data.type.toLowerCase().includes('hijo');
-      delete data.type;
+      delete data.type; // Esta propiedad es innecesaria
       if (isParent) {
         // Agregamos al padre
-        parentsCollection.push({ ...data, children: [] });
+        parentsCollection.push({ ...data, children: [], isParentAcademic: true });
       } else {
         delete data.phones;
         // Agregamos el hijo/a al ultimo padre agregado
@@ -417,17 +423,130 @@ async function getAcademicParents() {
     []
   );
 
-  // Insertamos la propiedad de padre academico a cada padre
-  parentsWithSchema.forEach(parent => parent.isParentAcademic = true);
+  return parents;
+}
 
-  // Retornamos la data de los estudiantes ya refactorizada
-  return parentsWithSchema;
+async function getAdministrativeParents() {
+  // Fetch un archivo Excel - Ya que no existe un JSON Endpoint para la obtencion de padres academicos
+  const options = {
+    url: 'rptxls/eGxzZGdw',
+    params: {
+      p: 'Njk1NA', // Propiedad de busqueda durante el periodo escolar 2022-2023
+      t: 'PWn',
+    },
+    responseType: 'arraybuffer',
+    transformResponse: [
+      data => {
+        // Convert data to be able to read accents and special characters from spanish lexic
+        const dataWithAccents = data.toString('latin1');
+        // Return it as a buffer, because XLSX package use buffers
+        const arrayBuffer = new TextEncoder().encode(dataWithAccents).buffer;
+        return arrayBuffer;
+      },
+    ],
+  };
+
+  const { data } = await ArcadatClient(options);
+
+  // Convierte la data del archivo Excel a una estructura JSON
+  const parsedExcelData = xlsx.parse(data);
+
+  // Creamos un diccionario con las propiedades del Fetch y de Parents Schema
+  const SCHEMA_MAP = {
+    Tipo: 'type',
+    Identificador: 'documentId.number',
+    'Apellidos y Nombres': 'fullname',
+    'Teléfonos/Nivel que cursa': 'phones',
+    'Correo electrónico': 'email',
+  };
+
+  // Refactorizamos la respuesta de Axios y XLSX a que solo retorne la data de los padres... 
+  // ... y estos ya ligados a sus respectivos Headers
+  const parentsAndChildrenWithSchema = parsedExcelData.reduce(
+    (result, data, i, arr) => {
+      // Evitamos los headers, ya que solo nos interesa la data de los padres
+      const headersIndex = 1;
+      const headers = arr[headersIndex].data[0];
+      if (i <= headersIndex) return result;
+
+      const parsedData = data.data[0];
+
+      // La propiedad 'Tipo' de los hijos esta vacia, por lo que es necesario agregar 'HIJO' ... 
+      // ... como el primer valor del array o tendra errores durante el enlace entre padre-hijo
+      if (!parsedData.includes('REPRESENTANTE')) parsedData.unshift('HIJO');
+
+      // Unimos la data de los padres con sus respectivos Headers
+      const dataWithSchema = parsedData.reduce((schemedData, data, idx) => {
+        // Eliminamos data innecesaria
+        data = data.replace(/TELÉFONOS: /gi, '');
+        data = data.replace(/no posee/gi, '');
+
+        const header = SCHEMA_MAP[headers[idx]];
+
+        // Borramos cualquier valor no numerico de las cedulas
+        if (header.includes('documentId.number')) data = Number(data.replace(/\D/gi, ''));
+
+
+        if (header === 'phones') {
+          // Limpiamos y separamos los telefonos
+          data = data
+            .split('.')
+            .map(num => num.trim())
+            .filter(num => num);
+
+          // Existen 2 tipos de telefonos, donde si existe un segundo, es el tlf celular
+          return {
+            ...schemedData,
+            // Telefono celular
+            'phones.main': data.at(-1),
+            // Telefono fijo
+            'phones.secondary': data.at(-2),
+          }
+        }
+
+        return {
+          ...schemedData,
+          [header]: data,
+        }
+      }, {});
+
+      // Refactorizamos la data conviertiendo los Headers a una estructura Esquematica
+      result.push(convertObjectStringToSchema(dataWithSchema));
+
+      return result;
+    },
+    []
+  );
+
+  // Asociamos los hijos dentro de los padres en su propiedad 'children:Array[]' 
+  const parents = parentsAndChildrenWithSchema.reduce(
+    (parentsCollection, data, idx, arr) => {
+      const isParent = !data.type.toLowerCase().includes('hijo');
+      delete data.type; // Esta propiedad es innecesaria
+      if (isParent) {
+        // Agregamos al padre
+        parentsCollection.push({ ...data, children: [], isParentAdministrative: true });
+      } else {
+        delete data.phones;
+        // Agregamos el hijo/a al ultimo padre agregado
+        parentsCollection.at(-1).children.push(data);
+      }
+
+      return parentsCollection;
+    },
+    []
+  );
+
+  return parents;
 }
 
 async function getEmployees() {
   // Fetch un archivo Excel - Ya que no existe un JSON Endpoint para la obtencion de los empleados
   const options = {
-    url: 'rptxls/eGxzZGd0/?i=OTI',
+    url: 'rptxls/eGxzZGd0',
+    params: {
+      i: 'OTI',
+    },
     responseType: 'arraybuffer',
     transformResponse: [
       data => {
@@ -520,5 +639,6 @@ module.exports = {
   getPayments,
   getPendingDebts,
   getAcademicParents,
-  getEmployees
+  getAdministrativeParents,
+  getEmployees,
 };
