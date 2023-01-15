@@ -11,7 +11,7 @@ const employeesRouter = require('./routes/employees/employees.router');
 
 const app = express();
 // Transforma requests entrantes con datos tipo JSON
-app.use(express.json({limit: '50mb'}));
+app.use(express.json({ limit: '50mb' }));
 // Transforma requests entrantes con datos tipo Form
 app.use(
   express.urlencoded({
