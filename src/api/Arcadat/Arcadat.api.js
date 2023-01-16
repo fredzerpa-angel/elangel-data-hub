@@ -104,7 +104,8 @@ async function getStudents() {
     }, {});
 
     // Refactorizamos la data conviertiendo los Headers a una estructura Esquematica
-    schemedStudents.push(convertObjectStringToSchema(stringSchemedStudent));
+    // Agregamos que esta activo ya que ARCADAT solo retorna los estudiantes cursantes
+    schemedStudents.push(convertObjectStringToSchema({ ...stringSchemedStudent, isActive: true }));
 
     return schemedStudents;
   }, []);
