@@ -5,6 +5,7 @@ const { getAllDebts, createDebt } = require('../models/debts/debts.model');
 const { upsertParentsByBundle, getParentByDocumentId, addChildToParentByDocumentId } = require('../models/parents/parents.model');
 const { getAllPayments, updatePayment, createPaymentsByBundle } = require('../models/payments/payments.model');
 const { addDebtToStudentByDocumentId, deleteDebtFromStudentByDocumentId, addPaymentToStudentByDocumentId, upsertStudentsByBundle, getAllStudents, getStudentByDocumentId } = require('../models/students/students.model');
+const { upsertEmployeesByBundle } = require('../models/employees/employees.model');
 
 
 async function updateParentsCollection() {
@@ -156,17 +157,25 @@ async function updateDebtsCollection() {
 
 }
 
+async function updateEmployeesCollection() {
+  const currentEmployees = await ArcadatApi.getEmployees();
+
+  return await upsertEmployeesByBundle(currentEmployees);
+}
+
 async function refreshCollections() {
   try {
     console.log('Start refreshing Collections..');
     const parentsRefresh = await updateParentsCollection();
-    console.log(`${parentsRefresh.nUpserted} Parents added. ${parentsRefresh.nMatched} Parents refreshed`);
+    console.log(`${parentsRefresh.nUpserted} Parents added. ${parentsRefresh.nMatched} Parents updated.`);
     const studentsRefresh = await updateStudentsCollection();
-    console.log(`${studentsRefresh.nUpserted} Students added. ${studentsRefresh.nMatched} Students refreshed.`);
+    console.log(`${studentsRefresh.nUpserted} Students added. ${studentsRefresh.nMatched} Students updated.`);
     const paymentsRefresh = await updatePaymentsCollection();
     console.log(`${paymentsRefresh.nInserted} Payments added. ${paymentsRefresh.total} total Payments.`)
     const debtsRefresh = await updateDebtsCollection();
     console.log(`${debtsRefresh.total} Debts pending.`)
+    const employeesRefresh = await updateEmployeesCollection();
+    console.log(`${employeesRefresh.nUpserted} Employees added. ${employeesRefresh.nMatched} Employees updated.`);
     console.log('Done refreshing Collections.');
   } catch (err) {
     console.log('Error refreshing the collections.', err.message);
