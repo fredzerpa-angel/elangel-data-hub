@@ -70,15 +70,15 @@ async function getStudents() {
   };
 
   // Refactorizamos la respuesta de Axios y XLSX a que solo retorne la data de los estudiantes, y estos ya ligados a sus respectivos Headers
-  const result = parsedExcelData.reduce((result, data, i, arr) => {
+  const schemedStudents = parsedExcelData.reduce((schemedStudents, data, i, arr) => {
     // Evitamos los headers, ya que solo nos interesa la data de los estudiantes
     const headersIndex = 1;
     const headers = arr[headersIndex].data[0];
-    if (i <= headersIndex) return result;
+    if (i <= headersIndex) return schemedStudents;
 
     const studentData = data.data[0];
     // Unimos la data de los estudiantes con sus respectivos Headers
-    const studentWithHeaders = studentData.reduce((student, data, idx) => {
+    const stringSchemedStudent = studentData.reduce((schemedData, data, idx) => {
       // Eliminamos caracteres especiales innecesarios en nuestra data
       const specialCharacters = "'-";
       const findSpecialCharacters = new RegExp(`[${specialCharacters}]`, 'gi');
@@ -92,24 +92,25 @@ async function getStudents() {
       if (header.includes('documentId.number')) data = Number(data.replace(/\D/gi, ''));
 
       // Transformamos la fecha a una reconocida por el constructor Date de JS
-      if (header === 'birthdate')
-        data = DateTime.fromFormat(data, 'dd/MM/yyyy').toJSDate();
+      if (header === 'birthdate') data = DateTime.fromFormat(data, 'dd/MM/yyyy').toJSDate();
+
+      // Si despues de validar la data, esta es un campo vacio entonces no la agregamos
       return data
         ? {
-          ...student,
+          ...schemedData,
           [header]: data,
         }
-        : student;
+        : schemedData;
     }, {});
 
     // Refactorizamos la data conviertiendo los Headers a una estructura Esquematica
-    result.push(convertObjectStringToSchema(studentWithHeaders));
+    schemedStudents.push(convertObjectStringToSchema(stringSchemedStudent));
 
-    return result;
+    return schemedStudents;
   }, []);
 
   // Retornamos la data de los estudiantes ya refactorizada
-  return result;
+  return schemedStudents;
 }
 
 async function getPayments() {
@@ -348,7 +349,7 @@ async function getAcademicParents() {
 
   // Refactorizamos la respuesta de Axios y XLSX a que solo retorne la data de los padres... 
   // ... y estos ya ligados a sus respectivos Headers
-  const parentsAndChildrenWithSchema = parsedExcelData.reduce(
+  const schemedParents = parsedExcelData.reduce(
     (result, data, i, arr) => {
       // Evitamos los headers, ya que solo nos interesa la data de los padres
       const headersIndex = 1;
@@ -362,7 +363,7 @@ async function getAcademicParents() {
       if (!parsedData.includes('REPRESENTANTE')) parsedData.unshift('HIJO');
 
       // Unimos la data de los padres con sus respectivos Headers
-      const dataWithSchema = parsedData.reduce((schemedData, data, idx) => {
+      const stringSchemedParent = parsedData.reduce((schemedData, data, idx) => {
         // Eliminamos data innecesaria
         data = data.replace(/TELÉFONOS: /gi, '');
         data = data.replace(/no posee/gi, '');
@@ -390,14 +391,18 @@ async function getAcademicParents() {
           }
         }
 
-        return {
-          ...schemedData,
-          [header]: data,
-        }
+        // Si despues de validar la data, esta es un campo vacio entonces no la agregamos
+        return data
+          ?
+          {
+            ...schemedData,
+            [header]: data,
+          }
+          : schemedData
       }, {});
 
       // Refactorizamos la data conviertiendo los Headers a una estructura Esquematica
-      result.push(convertObjectStringToSchema(dataWithSchema));
+      result.push(convertObjectStringToSchema(stringSchemedParent));
 
       return result;
     },
@@ -405,7 +410,7 @@ async function getAcademicParents() {
   );
 
   // Asociamos los hijos dentro de los padres en su propiedad 'children:Array[]' 
-  const parents = parentsAndChildrenWithSchema.reduce(
+  const parents = schemedParents.reduce(
     (parentsCollection, data, idx, arr) => {
       const isParent = !data.type.toLowerCase().includes('hijo');
       delete data.type; // Esta propiedad es innecesaria
@@ -462,7 +467,7 @@ async function getAdministrativeParents() {
 
   // Refactorizamos la respuesta de Axios y XLSX a que solo retorne la data de los padres... 
   // ... y estos ya ligados a sus respectivos Headers
-  const parentsAndChildrenWithSchema = parsedExcelData.reduce(
+  const schemedParents = parsedExcelData.reduce(
     (result, data, i, arr) => {
       // Evitamos los headers, ya que solo nos interesa la data de los padres
       const headersIndex = 1;
@@ -476,7 +481,7 @@ async function getAdministrativeParents() {
       if (!parsedData.includes('REPRESENTANTE')) parsedData.unshift('HIJO');
 
       // Unimos la data de los padres con sus respectivos Headers
-      const dataWithSchema = parsedData.reduce((schemedData, data, idx) => {
+      const stringSchemedParent = parsedData.reduce((schemedData, data, idx) => {
         // Eliminamos data innecesaria
         data = data.replace(/TELÉFONOS: /gi, '');
         data = data.replace(/no posee/gi, '');
@@ -504,14 +509,18 @@ async function getAdministrativeParents() {
           }
         }
 
-        return {
-          ...schemedData,
-          [header]: data,
-        }
+        // Si despues de validar la data, esta es un campo vacio entonces no la agregamos
+        return data
+          ?
+          {
+            ...schemedData,
+            [header]: data,
+          }
+          : schemedData
       }, {});
 
       // Refactorizamos la data conviertiendo los Headers a una estructura Esquematica
-      result.push(convertObjectStringToSchema(dataWithSchema));
+      result.push(convertObjectStringToSchema(stringSchemedParent));
 
       return result;
     },
@@ -519,7 +528,7 @@ async function getAdministrativeParents() {
   );
 
   // Asociamos los hijos dentro de los padres en su propiedad 'children:Array[]' 
-  const parents = parentsAndChildrenWithSchema.reduce(
+  const parents = schemedParents.reduce(
     (parentsCollection, data, idx, arr) => {
       const isParent = !data.type.toLowerCase().includes('hijo');
       delete data.type; // Esta propiedad es innecesaria
@@ -611,7 +620,7 @@ async function getEmployees() {
   };
 
   // Refactorizamos la respuesta de Axios y XLSX a que solo retorne la data de los empleados, y estos ya ligados a sus respectivos Headers
-  const result = parsedExcelData.reduce((result, data, i, arr) => {
+  const schemedEmployees = parsedExcelData.reduce((result, data, i, arr) => {
     // Evitamos los headers, ya que solo nos interesa la data de los empleados
     const headersIndex = 1;
     const headers = arr[headersIndex].data[0];
@@ -619,7 +628,7 @@ async function getEmployees() {
 
     const employeeData = data.data[0];
     // Unimos la data de los empleados con sus respectivos Headers
-    const employeeWithHeaders = employeeData.reduce((employee, data, idx) => {
+    const stringSchemedEmployee = employeeData.reduce((employee, data, idx) => {
       // Eliminamos caracteres especiales innecesarios en nuestra data
       const specialCharacters = "'-";
       const findSpecialCharacters = new RegExp(`[${specialCharacters}]`, 'gi');
@@ -633,10 +642,9 @@ async function getEmployees() {
       // Eliminamos cualquier character que no sea numero
       if (header.includes('documentId.number')) data = Number(data.replace(/\D/gi, ''));
       // Transformamos la fecha a una reconocida por el constructor Date de JS
-      if (header === 'birthdate')
-        data = DateTime.fromFormat(data, 'dd/MM/yyyy').toJSDate();
+      if (header === 'birthdate') data = DateTime.fromFormat(data, 'dd/MM/yyyy').toJSDate();
 
-
+      // Si despues de validar la data, esta es un campo vacio entonces no la agregamos
       return data
         ? {
           ...employee,
@@ -646,20 +654,20 @@ async function getEmployees() {
     }, {});
 
     // Agregamos Fullname ya que no viene por defecto en Arcadat
-    const { lastnames, names } = employeeWithHeaders;
-    employeeWithHeaders.fullname = `${lastnames} ${names}`
+    const { lastnames, names } = stringSchemedEmployee;
+    stringSchemedEmployee.fullname = `${lastnames} ${names}`
 
-    const employeeRefactored = convertObjectStringToSchema(employeeWithHeaders);
+    const schemedEmployee = convertObjectStringToSchema(stringSchemedEmployee);
     // Verificamos que posea cedula, ya que es indispensable para indentificar al empleado
-    const hasDocumentId = Object.keys(employeeRefactored).includes('documentId');
+    const hasDocumentId = Object.keys(schemedEmployee).includes('documentId');
     // Refactorizamos la data conviertiendo los Headers a una estructura Esquematica
-    if (hasDocumentId) result.push(employeeRefactored);
+    if (hasDocumentId) result.push(schemedEmployee);
 
     return result;
   }, []);
 
   // Retornamos la data de los estudiantes ya refactorizada
-  return result;
+  return schemedEmployees;
 
 }
 
