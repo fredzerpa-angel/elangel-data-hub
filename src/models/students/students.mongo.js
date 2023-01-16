@@ -121,6 +121,10 @@ const studentSchema = new mongoose.Schema({
     ref: 'Debt',
     required: false,
   },
+  isActive: {
+    type: Boolean,
+    required: false
+  }
 });
 
 // Conecta studentSchema con "Students" colleccion
