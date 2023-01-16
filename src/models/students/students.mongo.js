@@ -12,7 +12,6 @@ const studentSchema = new mongoose.Schema({
   documentId: {
     type: documentsIdSchema,
     required: false,
-    unique: true,
   },
   gradeLevelAttended: {
     type: String,

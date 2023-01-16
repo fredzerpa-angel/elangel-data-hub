@@ -8,7 +8,6 @@ const parentSchema = new mongoose.Schema({
   documentId: {
     type: documentsIdSchema,
     required: false,
-    unique: true,
   },
   names: {
     type: String,
