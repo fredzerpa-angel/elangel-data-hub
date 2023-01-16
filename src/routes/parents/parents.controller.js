@@ -11,17 +11,9 @@ async function httpGetAllParents(req, res) {
   const { search } = req.query;
 
   // TODO: Implementar las validaciones
-  let response;
-
   try {
     // Si hubo una consulta entonces buscar por consulta
-    if (search) {
-      response = await getParentBySearch(search);
-    } else {
-      // Si no hubo consulta entonces retorna todos los estudiantes
-      response = await getAllParents();
-    }
-
+    const response = search ? await getParentBySearch(search) : await getAllParents();
     return res.status(200).json(response);
   } catch (error) {
     return res.status(502).json({

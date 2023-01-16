@@ -12,18 +12,10 @@ async function httpGetAllStudents(req, res) {
   const { search } = req.query;
 
   // TODO: Implementar las validaciones
-  let response;
-
   try {
-    // Si hubo una consulta entonces buscar por consulta
-    if (search) {
-      response = await getStudentBySearch(search);
-    } else {
-      // Si no hubo consulta entonces retorna todos los estudiantes
-      response = await getAllStudents();
-    }
-
+    const response = search ? await getStudentBySearch(search) : await getAllStudents();
     return res.status(200).json(response);
+
   } catch (error) {
     return res.status(502).json({
       code: 502, // Base de Datos tiro un error

@@ -12,17 +12,9 @@ async function httpGetAllEmployees(req, res) {
   const { search } = req.query;
 
   // TODO: Implementar las validaciones
-  let response;
-
   try {
     // Si hubo una consulta entonces buscar por consulta
-    if (search) {
-      response = await getEmployeeBySearch(search);
-    } else {
-      // Si no hubo consulta entonces retorna todos los estudiantes
-      response = await getAllEmployees();
-    }
-
+    const response = response ? await getEmployeeBySearch(search) : await getAllEmployees();
     return res.status(200).json(response);
   } catch (error) {
     return res.status(502).json({
