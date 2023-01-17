@@ -68,7 +68,7 @@ async function updateStudentByDocumentId(documentId, updateData) {
 
 async function upsertStudentsByBundle(bundle) {
   return await students.upsertMany(bundle, {
-    matchFields: ['fullname'], // Compara los docs mediante este campo
+    matchFields: ['_id'], // Compara los docs mediante este campo
     ensureModel: true, // Valida la data por el Schema
   });
 }
