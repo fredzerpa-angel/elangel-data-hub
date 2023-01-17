@@ -67,7 +67,7 @@ async function refreshCollections() {
     console.log('Starting refreshing Collections..');
     const studentsRefresh = await updateStudentsCollection();
     console.log(`
-    Students
+    Collection: Students
       ${studentsRefresh.nUpserted} added. 
       ${studentsRefresh.nMatched} checked. 
       ${studentsRefresh.nModified} updated.
@@ -79,7 +79,13 @@ async function refreshCollections() {
 
     // const debtsRefresh = await updateDebtsCollection();
 
-    // const employeesRefresh = await updateEmployeesCollection();
+    const employeesRefresh = await updateEmployeesCollection();
+    console.log(`
+    Collection: Employees
+      ${employeesRefresh.nUpserted} added. 
+      ${employeesRefresh.nMatched} checked. 
+      ${employeesRefresh.nModified} updated.
+    `);
 
     console.log('Done refreshing Collections.');
   } catch (err) {
