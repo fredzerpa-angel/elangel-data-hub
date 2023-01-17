@@ -2,7 +2,7 @@ const payments = require('./payments.mongo');
 const { getStudentBySearch } = require('../students/students.model');
 
 async function getAllPayments() {
-  return await payments.find({});
+  return await payments.find().lean();
 }
 
 async function createPayment(paymentData) {
@@ -69,7 +69,7 @@ async function getPaymentBySearch({ searchBy, value }) {
     .find({
       [searchBy]: { $in: ids },
     })
-    .populate(populateConfig);
+    .populate(populateConfig).lean();
 }
 
 async function createPaymentsByBundle(bundle) {

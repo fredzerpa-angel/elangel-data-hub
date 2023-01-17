@@ -1,7 +1,7 @@
 const students = require('./students.mongo');
 
 async function getAllStudents() {
-  return await students.find({});
+  return await students.find().lean();
 }
 
 async function createStudent(studentData) {
@@ -31,7 +31,7 @@ async function getStudentBySearch(search) {
     .or([
       { fullname: new RegExp(search, 'gi') },
       { documentId: new RegExp(search, 'gi') },
-    ]);
+    ]).lean();
 }
 
 async function getStudentByDocumentId(documentId) {

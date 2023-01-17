@@ -3,7 +3,7 @@ const { getStudentBySearch } = require('../students/students.model');
 const { getParentBySearch } = require('../parents/parents.model');
 
 async function getAllDebts() {
-  return await debts.find({});
+  return await debts.find().lean();
 }
 
 async function createDebt(debtData) {
@@ -73,7 +73,8 @@ async function getDebtBySearch({ searchBy, value }) {
     .find({
       [searchBy]: { $in: ids },
     })
-    .populate(populateConfig);
+    .populate(populateConfig)
+    .lean();
 }
 
 module.exports = {

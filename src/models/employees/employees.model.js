@@ -1,7 +1,7 @@
 const employees = require('./employees.mongo');
 
 async function getAllEmployees() {
-  return await employees.find({});
+  return await employees.find().lean();
 }
 
 async function createEmployee(employeeData) {
@@ -31,7 +31,7 @@ async function getEmployeeBySearch(search) {
     .or([
       { fullname: new RegExp(search, 'gi') },
       { documentId: new RegExp(search, 'gi') },
-    ]);
+    ]).lean();
 }
 
 async function getEmployeeByDocumentId(documentId) {

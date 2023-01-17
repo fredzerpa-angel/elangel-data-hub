@@ -1,7 +1,7 @@
 const parents = require('./parents.mongo');
 
 async function getAllParents() {
-  return await parents.find({});
+  return await parents.find().lean();
 }
 
 async function createParent(parentData) {
@@ -31,7 +31,7 @@ async function getParentBySearch(search) {
     .or([
       { fullname: new RegExp(search, 'gi') },
       { documentId: new RegExp(search, 'gi') },
-    ]);
+    ]).lean();
 }
 
 async function getParentByDocumentId(documentId) {

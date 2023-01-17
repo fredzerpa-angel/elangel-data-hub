@@ -1,7 +1,7 @@
 const events = require('./events.mongo');
 
 async function getAllEvents() {
-  return await events.find();
+  return await events.find().lean();
 }
 
 async function createEvent(eventData) {
@@ -32,7 +32,7 @@ async function getEventBySearch(search) {
       { type: new RegExp(search, 'gi') },
       { name: new RegExp(search, 'gi') },
       { organization: new RegExp(search, 'gi') },
-    ]);
+    ]).lean();
 }
 
 module.exports = {
