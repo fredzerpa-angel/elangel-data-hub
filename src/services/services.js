@@ -1,16 +1,44 @@
-const { DateTime } = require('luxon');
 const ArcadatApi = require('../api/Arcadat/Arcadat.api');
-const { getAllDebts, createDebt } = require('../models/debts/debts.model');
+const { getAllDebts } = require('../models/debts/debts.model');
 const { upsertParentsByBundle } = require('../models/parents/parents.model');
-const { getAllPayments, updatePayment, createPaymentsByBundle } = require('../models/payments/payments.model');
-const { addDebtToStudentByDocumentId, deleteDebtFromStudentByDocumentId, addPaymentToStudentByDocumentId, upsertStudentsByBundle, getAllStudents } = require('../models/students/students.model');
+const { getAllPayments } = require('../models/payments/payments.model');
+const { upsertStudentsByBundle, getAllStudents } = require('../models/students/students.model');
 const { upsertEmployeesByBundle } = require('../models/employees/employees.model');
-const { MOCKUP_ARCADAT_API_STUDENTS, MOCKUP_MONGO_DB_STUDENTS } = require('./mockup');
-
 
 async function updateStudentsCollection() {
   const currentStudents = await ArcadatApi.getStudents();
   const oldStudents = await getAllStudents();
+
+  // isActive es falso, ya que no sabemos si sigue activo o no hasta que se verifique con Arcadat API
+  const INITIAL_STUDENTS_DATA = oldStudents.map(student => ({ ...student, isActive: false }));
+
+  // Esta variable contendra todos los estudiantes de manera unica ...
+  // ... registrando los estudiantes no cursantes actualmente como no activos
+  // ... es necesario debido al propenso cambio de cedula y/o nombre del estudiante ...
+  // ... ocasianando duplicacion en la creacion de documentos.
+  const studentsUpdatedData = currentStudents.reduce((studentsUpdatedData, studentCurrentData) => {
+    // Buscamos si el estudiante ya fue registrado. El nombre o su cedula es propenso a cambios
+    const { studentFound, studentFoundIndex } = studentsUpdatedData.reduce((state, student, idx) => {
+      // ! Esta validacion solo aplica si tanto la propiedad 'fullname' como 'documentId.number' no han cambiado al mismo tiempo
+      const isSameStudent = (student?.fullname === studentCurrentData.fullname) || (student?.documentId?.number === studentCurrentData.documentId.number)
+      if (isSameStudent) {
+        state.studentFound = student;
+        state.studentFoundIndex = idx;
+      }
+      return state;
+    }, { studentFound: null, studentFoundIndex: undefined });
+
+    // Si existe lo actualizamos, si no existe lo agregamos
+    studentFound ?
+      studentsUpdatedData.splice(studentFoundIndex, 1, { ...studentFound, ...studentCurrentData })
+      :
+      studentsUpdatedData.push(studentCurrentData)
+
+    return studentsUpdatedData;
+  }, INITIAL_STUDENTS_DATA)
+
+  const response = await upsertStudentsByBundle(studentsUpdatedData);
+  return response;
 }
 
 async function updateParentsCollection() {
@@ -37,11 +65,22 @@ async function updateEmployeesCollection() {
 async function refreshCollections() {
   try {
     console.log('Starting refreshing Collections..');
-    // const studentsRefresh = await updateStudentsCollection();
+    const studentsRefresh = await updateStudentsCollection();
+    console.log(`
+    Students
+      ${studentsRefresh.nUpserted} added. 
+      ${studentsRefresh.nMatched} checked. 
+      ${studentsRefresh.nModified} updated.
+    `);
+
     // const parentsRefresh = await updateParentsCollection();
+
     // const paymentsRefresh = await updatePaymentsCollection();
+
     // const debtsRefresh = await updateDebtsCollection();
+
     // const employeesRefresh = await updateEmployeesCollection();
+
     console.log('Done refreshing Collections.');
   } catch (err) {
     console.log('Error refreshing the collections.', err.message);
