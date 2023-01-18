@@ -6,8 +6,7 @@ const { upsertStudentsByBundle, getAllStudents } = require('../models/students/s
 const { upsertEmployeesByBundle } = require('../models/employees/employees.model');
 
 async function updateStudentsCollection() {
-  const currentStudents = await ArcadatApi.getStudents();
-  const oldStudents = await getAllStudents();
+  const [currentStudents, oldStudents] = await Promise.all([ArcadatApi.getStudents(), getAllStudents()]);
 
   // isActive es falso, ya que no sabemos si sigue activo o no hasta que se verifique con Arcadat API
   const INITIAL_STUDENTS_DATA = oldStudents.map(student => ({ ...student, isActive: false }));
@@ -42,9 +41,9 @@ async function updateStudentsCollection() {
 }
 
 async function updateParentsCollection() {
-  // TODO: Agregar Padres Administrativos
-  const currentAcademicParents = await ArcadatApi.getAcademicParents();
-  return await upsertParentsByBundle(currentAcademicParents);
+  const currentParents = await ArcadatApi.getParents();
+
+  return await upsertParentsByBundle(currentParents);
 }
 
 async function updatePaymentsCollection() {
@@ -65,6 +64,7 @@ async function updateEmployeesCollection() {
 async function refreshCollections() {
   try {
     console.log('Starting refreshing Collections..');
+
     const studentsRefresh = await updateStudentsCollection();
     console.log(`
     Collection: Students
@@ -73,7 +73,13 @@ async function refreshCollections() {
       ${studentsRefresh.nModified} updated.
     `);
 
-    // const parentsRefresh = await updateParentsCollection();
+    const parentsRefresh = await updateParentsCollection();
+    console.log(`
+    Collection: Parents
+      ${parentsRefresh.nUpserted} added. 
+      ${parentsRefresh.nMatched} checked. 
+      ${parentsRefresh.nModified} updated.
+    `);
 
     // const paymentsRefresh = await updatePaymentsCollection();
 
