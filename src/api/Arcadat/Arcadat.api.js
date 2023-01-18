@@ -205,7 +205,7 @@ async function getPayments() {
   }, new Map())
 
   // Tomamos solo las pagos y no el key del Map
-  const uniquePayments = [...uniquePaymentsMap].map(([key, payment]) => payment);
+  const uniquePayments = [...uniquePaymentsMap.values()];
   return uniquePayments;
 }
 
@@ -311,7 +311,7 @@ async function getPendingDebts() {
   }, new Map())
 
   // Tomamos solo las deudas y no el key del Map
-  const uniqueDebts = [...uniqueDebtsMap].map(([key, debt]) => debt);
+  const uniqueDebts = [...uniqueDebtsMap.values()];
   return uniqueDebts;
 }
 
