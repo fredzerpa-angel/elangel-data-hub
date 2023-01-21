@@ -77,6 +77,13 @@ async function getDebtBySearch({ searchBy, value }) {
     .lean();
 }
 
+async function upsertDebtsByBundle(bundle) {
+  return await debts.upsertMany(bundle, {
+    matchFields: ['schoolTerm', 'student.fullname', 'concept'], // Compara los docs mediante este campo
+    ensureModel: true, // Valida la data por el Schema
+  });
+}
+
 module.exports = {
   getAllDebts,
   createDebt,
@@ -84,4 +91,5 @@ module.exports = {
   deleteDebt,
   getDebtById,
   getDebtBySearch,
+  upsertDebtsByBundle,
 };

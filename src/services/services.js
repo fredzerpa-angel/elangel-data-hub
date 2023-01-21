@@ -1,15 +1,20 @@
 const ArcadatApi = require('../api/Arcadat/Arcadat.api');
-const { getAllDebts } = require('../models/debts/debts.model');
+const { getAllDebts, upsertDebtsByBundle } = require('../models/debts/debts.model');
 const { upsertParentsByBundle } = require('../models/parents/parents.model');
 const { getAllPayments } = require('../models/payments/payments.model');
 const { upsertStudentsByBundle, getAllStudents } = require('../models/students/students.model');
 const { upsertEmployeesByBundle } = require('../models/employees/employees.model');
+const { DateTime } = require('luxon');
 
 async function updateStudentsCollection() {
   const [currentStudents, oldStudents] = await Promise.all([ArcadatApi.getStudents(), getAllStudents()]);
 
-  // isActive es falso, ya que no sabemos si sigue activo o no hasta que se verifique con Arcadat API
-  const INITIAL_STUDENTS_DATA = oldStudents.map(student => ({ ...student, isActive: false }));
+  // Creamos un valor inicial de los Estudiantes en la BD para enlazarlas con las estudiantes Activos en Arcadat
+  const INITIAL_STUDENTS_DATA = oldStudents.map(student => {
+    // isActive es falso, ya que no sabemos si sigue activo o no hasta que se verifique con Arcadat API
+    student.isActive = false;
+    return student;
+  });
 
   // Esta variable contendra todos los estudiantes de manera unica ...
   // ... registrando los estudiantes no cursantes actualmente como no activos
@@ -52,8 +57,33 @@ async function updatePaymentsCollection() {
 }
 
 async function updateDebtsCollection() {
-  const currentDebts = await ArcadatApi.getPendingDebts();
-  const oldDebts = await getAllDebts();
+  const [currentDebts, oldDebts] = await Promise.all([ArcadatApi.getPendingDebts(), getAllDebts()]);
+
+
+  // Creamos un valor inicial de las deudas traidas de la BD para enlazarlas con las deudas pendientes en Arcadat
+  const DEBTS_MAP = new Map(oldDebts?.map(debt => {
+    debt.status.pending = false; // Ya que no sabemos si aun sigue vigente
+    // Creamos una llave unica para identificar cada deuda
+    const key = debt.schoolTerm + debt.student.fullname + debt.concept;
+    return [key, debt];
+  }));
+
+  // Buscamos todas las deudas 
+  const debtsDataUpdated = [...currentDebts.reduce((updatedDebts, debt) => {
+
+    debt.status.pending = true; // Ya que aun sigue vigente
+
+    // Creamos una llave unica para identificar cada deuda
+    const key = debt.schoolTerm + debt.student.fullname + debt.concept;
+
+    // Agregamos/actualizamos las deudas vigentes
+    updatedDebts.set(key, debt);
+
+    return updatedDebts;
+  }, DEBTS_MAP).values()]
+
+
+  return await upsertDebtsByBundle(debtsDataUpdated);
 }
 
 async function updateEmployeesCollection() {
@@ -83,7 +113,13 @@ async function refreshCollections() {
 
     // const paymentsRefresh = await updatePaymentsCollection();
 
-    // const debtsRefresh = await updateDebtsCollection();
+    const debtsRefresh = await updateDebtsCollection();
+    console.log(`
+    Collection: Debts
+      ${debtsRefresh.nUpserted} added. 
+      ${debtsRefresh.nMatched} checked. 
+      ${debtsRefresh.nModified} updated.
+    `);
 
     const employeesRefresh = await updateEmployeesCollection();
     console.log(`
