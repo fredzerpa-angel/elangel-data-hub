@@ -294,7 +294,7 @@ async function getPendingDebts() {
   const uniqueDebtsMap = refactoredDebtsSchema.reduce((uniqueDebts, debt) => {
     // Creamos una llave unica para identificar cada deuda
     const key = debt.schoolTerm + debt.student.fullname + debt.concept + debt.status.issuedAt;
-    debt.status.lastUpdate = DateTime.now().toJSDate(); // Agregamos fecha de actualizacion ya que estamos viendo la deuda otra vez
+    
     // Buscamos cualquier deuda repetida
     if (uniqueDebts.has(key)) {
       // Si se repite la deuda es porque es necesario sumar el monto
