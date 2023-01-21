@@ -7,6 +7,13 @@ const ArcadatClient = axios.create({
   baseURL: 'https://www.arcadat.com/apps/',
 });
 
+// Arcadat no provee el tipo de documento de identidad, por lo que lo calculamos
+const getDocumentIdType = (documentIdNumber) => {
+  if (isNaN(Number(documentIdNumber))) return 'Pasaporte';
+
+  return documentIdNumber.length > 8 ? 'Cedula Escolar' : 'Cedula';
+}
+
 async function getStudents() {
   // Fetch un archivo Excel - Ya que no existe un JSON Endpoint para la obtencion de estudiantes
   const options = {
@@ -88,9 +95,6 @@ async function getStudents() {
 
       const header = SCHEMA_MAP[headers[idx]];
 
-      // Eliminamos cualquier character que no sea numero
-      if (header.includes('documentId.number')) data = Number(data.replace(/\D/gi, ''));
-
       // Transformamos la fecha a una reconocida por el constructor Date de JS
       if (header === 'birthdate') data = DateTime.fromFormat(data, 'dd/MM/yyyy').toJSDate();
 
@@ -102,6 +106,9 @@ async function getStudents() {
         }
         : schemedData;
     }, {});
+
+    // Agregamos el tipo de documento de identidad, es Cedula, Cedula Escolar o Pasaporte
+    stringSchemedStudent['documentId.type'] = getDocumentIdType(stringSchemedStudent['documentId.number']);
 
     // Refactorizamos la data conviertiendo los Headers a una estructura Esquematica
     // Agregamos que esta activo ya que ARCADAT solo retorna los estudiantes cursantes
@@ -284,7 +291,6 @@ async function getPendingDebts() {
         return [header, value];
       })
     );
-
     // Refactorizamos el Object para que asimile al Debts Schema
     return convertObjectStringToSchema(debtWithSchema);
   });
@@ -294,7 +300,7 @@ async function getPendingDebts() {
   const uniqueDebtsMap = refactoredDebtsSchema.reduce((uniqueDebts, debt) => {
     // Creamos una llave unica para identificar cada deuda
     const key = debt.schoolTerm + debt.student.fullname + debt.concept + debt.status.issuedAt;
-    
+
     // Buscamos cualquier deuda repetida
     if (uniqueDebts.has(key)) {
       // Si se repite la deuda es porque es necesario sumar el monto
@@ -365,7 +371,6 @@ async function getAcademicParents() {
         data = data.replace(/no posee/gi, '');
 
         const header = SCHEMA_MAP[headers[idx]];
-
 
         if (header === 'phones') {
           // Limpiamos y separamos los telefonos
@@ -627,7 +632,7 @@ async function getEmployees() {
       data = data.replace(/no posee/gi, '');
 
       const header = SCHEMA_MAP[headers[idx]];
-      
+
       // Transformamos la fecha a una reconocida por el constructor Date de JS
       if (header === 'birthdate') data = DateTime.fromFormat(data, 'dd/MM/yyyy').toJSDate();
 
