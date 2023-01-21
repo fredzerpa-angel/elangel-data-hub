@@ -9,9 +9,9 @@ const documentsIdSchema = new mongoose.Schema({
   },
   // Numero de la Cedula o Pasaporte
   number: {
-    type: Number,
+    type: String,
     required: true,
-    unique: true,
+    // unique: true,
   },
 });
 
