@@ -261,7 +261,6 @@ async function getPendingDebts() {
   // Tomamos solo las deudas con conceptos actualizados
   const allowedDebts = debts.filter(debt => ALLOWED_DEBTS_CONCEPTS.includes(debt.concept));
 
-
   // Creamos un diccionario con las propiedades del Fetch y de Debts Schema
   const SCHEMA_MAP = {
     period: 'schoolTerm',
@@ -285,9 +284,6 @@ async function getPendingDebts() {
         return [header, value];
       })
     );
-
-    // Borramos cualquier valor no numerico de las cedulas
-    debtWithSchema['student.documentId.number'] = Number(debtWithSchema['student.documentId.number'].replace(/\D/gi, ''));
 
     // Refactorizamos el Object para que asimile al Debts Schema
     return convertObjectStringToSchema(debtWithSchema);
@@ -369,9 +365,6 @@ async function getAcademicParents() {
         data = data.replace(/no posee/gi, '');
 
         const header = SCHEMA_MAP[headers[idx]];
-
-        // Borramos cualquier valor no numerico de las cedulas
-        if (header.includes('documentId.number')) data = Number(data.replace(/\D/gi, ''));
 
 
         if (header === 'phones') {
@@ -487,9 +480,6 @@ async function getAdministrativeParents() {
         data = data.replace(/no posee/gi, '');
 
         const header = SCHEMA_MAP[headers[idx]];
-
-        // Borramos cualquier valor no numerico de las cedulas
-        if (header.includes('documentId.number')) data = Number(data.replace(/\D/gi, ''));
 
 
         if (header === 'phones') {
@@ -637,10 +627,7 @@ async function getEmployees() {
       data = data.replace(/no posee/gi, '');
 
       const header = SCHEMA_MAP[headers[idx]];
-
-      // Formateamos el tipo de data
-      // Eliminamos cualquier character que no sea numero
-      if (header.includes('documentId.number')) data = Number(data.replace(/\D/gi, ''));
+      
       // Transformamos la fecha a una reconocida por el constructor Date de JS
       if (header === 'birthdate') data = DateTime.fromFormat(data, 'dd/MM/yyyy').toJSDate();
 
