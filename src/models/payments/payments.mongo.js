@@ -60,10 +60,7 @@ const paymentSchema = new mongoose.Schema({
       type: String,
       required: false,
     },
-    documentId: {
-      type: String,
-      required: false,
-    },
+    documentId: documentsIdSchema,
   },
   student: {
     documentId: documentsIdSchema,
