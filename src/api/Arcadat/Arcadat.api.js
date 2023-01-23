@@ -154,7 +154,7 @@ async function getPayments() {
     payment_date: 'time.date',
     payment_hour: 'time.hour',
     name_user: 'cashier.fullname',
-    id_payment_holder: 'paymentHolder.refId',
+    id_payment_holder: 'paymentHolder.documentId',
     payment_holder: 'paymentHolder.fullname',
     'amount bs': 'amount.bs',
     'amount USD': 'amount.usd',

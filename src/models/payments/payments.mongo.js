@@ -60,7 +60,7 @@ const paymentSchema = new mongoose.Schema({
       type: String,
       required: false,
     },
-    refId: {
+    documentId: {
       type: String,
       required: false,
     },
