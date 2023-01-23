@@ -8,7 +8,7 @@ const ArcadatClient = axios.create({
 });
 
 // Arcadat no provee el tipo de documento de identidad, por lo que lo calculamos
-const getDocumentIdType = (documentIdNumber) => {
+const getStudentDocumentIdType = (documentIdNumber) => {
   if (isNaN(Number(documentIdNumber))) return 'Pasaporte';
 
   return documentIdNumber.length > 8 ? 'Cedula Escolar' : 'Cedula';
@@ -108,7 +108,7 @@ async function getStudents() {
     }, {});
 
     // Agregamos el tipo de documento de identidad, es Cedula, Cedula Escolar o Pasaporte
-    stringSchemedStudent['documentId.type'] = getDocumentIdType(stringSchemedStudent['documentId.number']);
+    stringSchemedStudent['documentId.type'] = getStudentDocumentIdType(stringSchemedStudent['documentId.number']);
 
     // Refactorizamos la data conviertiendo los Headers a una estructura Esquematica
     // Agregamos que esta activo ya que ARCADAT solo retorna los estudiantes cursantes
@@ -178,7 +178,7 @@ async function getPayments() {
     );
 
     // Limpiamos los valores
-    paymentWithSchema['student.documentId.type'] = getDocumentIdType(paymentWithSchema['student.documentId.number']);
+    paymentWithSchema['student.documentId.type'] = getStudentDocumentIdType(paymentWithSchema['student.documentId.number']);
     paymentWithSchema['time.date'] = DateTime.fromFormat(paymentWithSchema['time.date'], 'yyyy/MM/dd').toISODate();
     // Añadimos propiedades faltantes a nuestro pago
     paymentWithSchema['time.datetime'] = paymentWithSchema['time.date'] + ' ' + paymentWithSchema['time.hour']
