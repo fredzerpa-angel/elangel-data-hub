@@ -8,10 +8,19 @@ const ArcadatClient = axios.create({
 });
 
 // Arcadat no provee el tipo de documento de identidad, por lo que lo calculamos
-const getStudentDocumentIdType = (documentIdNumber) => {
-  if (isNaN(Number(documentIdNumber))) return 'Pasaporte';
+const getDocumentIdType = {
+  student: (documentIdNumber) => {
+    if (isNaN(Number(documentIdNumber))) return 'Pasaporte';
 
-  return documentIdNumber.length > 8 ? 'Cedula Escolar' : 'Cedula';
+    return documentIdNumber.length > 8 ? 'Cedula Escolar' : 'Cedula';
+  },
+
+  paymentHolder: (documentIdNumber) => {
+    if (Number(documentIdNumber)) return 'Cedula';
+
+    // Usando RegEx podemos verificar si es un RIF ("J-" o "J" seguido de numeros)
+    return documentIdNumber.match(/^J-?[1-9]+/i) ? 'RIF' : 'Pasaporte';
+  },
 }
 
 async function getStudents() {
@@ -108,7 +117,7 @@ async function getStudents() {
     }, {});
 
     // Agregamos el tipo de documento de identidad, es Cedula, Cedula Escolar o Pasaporte
-    stringSchemedStudent['documentId.type'] = getStudentDocumentIdType(stringSchemedStudent['documentId.number']);
+    stringSchemedStudent['documentId.type'] = getDocumentIdType.student(stringSchemedStudent['documentId.number']);
 
     // Refactorizamos la data conviertiendo los Headers a una estructura Esquematica
     // Agregamos que esta activo ya que ARCADAT solo retorna los estudiantes cursantes
@@ -154,7 +163,7 @@ async function getPayments() {
     payment_date: 'time.date',
     payment_hour: 'time.hour',
     name_user: 'cashier.fullname',
-    id_payment_holder: 'paymentHolder.documentId',
+    id_payment_holder: 'paymentHolder.documentId.number',
     payment_holder: 'paymentHolder.fullname',
     'amount bs': 'amount.bs',
     'amount USD': 'amount.usd',
@@ -178,10 +187,17 @@ async function getPayments() {
     );
 
     // Limpiamos los valores
-    paymentWithSchema['student.documentId.type'] = getStudentDocumentIdType(paymentWithSchema['student.documentId.number']);
-    paymentWithSchema['time.date'] = DateTime.fromFormat(paymentWithSchema['time.date'], 'yyyy/MM/dd').toISODate();
+    const paymentDateTime = DateTime.fromFormat(paymentWithSchema['time.date'] + ' ' + paymentWithSchema['time.hour'], 'yyyy/MM/dd TT');
+    paymentWithSchema['time.date'] = paymentDateTime.toFormat('D');
+    paymentWithSchema['time.hour'] = paymentDateTime.toFormat('tt');
+    paymentWithSchema['time.datetime'] = paymentDateTime.toFormat('F');
+    paymentWithSchema['isCredit'] = Boolean(paymentWithSchema['isCredit']);
+    paymentWithSchema['canceled'] = Boolean(paymentWithSchema['canceled']);
     // Añadimos propiedades faltantes a nuestro pago
-    paymentWithSchema['time.datetime'] = paymentWithSchema['time.date'] + ' ' + paymentWithSchema['time.hour']
+    paymentWithSchema['student.documentId.type'] = getDocumentIdType.student(paymentWithSchema['student.documentId.number']);
+    paymentWithSchema['paymentHolder.documentId.type'] = getDocumentIdType.paymentHolder(paymentWithSchema['paymentHolder.documentId.number']);
+    paymentWithSchema['amount.convertionRate.date'] = paymentWithSchema['time.date'];
+    paymentWithSchema['discount.convertionRate.date'] = paymentWithSchema['time.date'];
     paymentWithSchema['discount.convertionRate.rate'] = paymentWithSchema['amount.convertionRate.rate'];
     paymentWithSchema['discount.usd'] = Number(
       (paymentWithSchema['discount.bs'] / paymentWithSchema['amount.convertionRate.rate']).toFixed(2)
