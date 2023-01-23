@@ -178,7 +178,7 @@ async function getPayments() {
     );
 
     // Limpiamos los valores
-    paymentWithSchema['student.documentId.number'] = Number(paymentWithSchema['student.documentId.number'].replace(/\D/gi, ''));
+    paymentWithSchema['student.documentId.type'] = getDocumentIdType(paymentWithSchema['student.documentId.number']);
     paymentWithSchema['time.date'] = DateTime.fromFormat(paymentWithSchema['time.date'], 'yyyy/MM/dd').toISODate();
     // Añadimos propiedades faltantes a nuestro pago
     paymentWithSchema['time.datetime'] = paymentWithSchema['time.date'] + ' ' + paymentWithSchema['time.hour']
