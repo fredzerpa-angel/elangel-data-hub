@@ -210,7 +210,7 @@ async function getPayments() {
   // Agregamos deudas unicas en el record
   const uniquePaymentsMap = refactoredPaymentsSchema.reduce((uniquePayments, payment) => {
     // Creamos una llave unica para identificar cada pago
-    const key = payment.concept + payment.billId + payment.student.documentId.number + payment.paymentHolder.refId;
+    const key = payment.concept + payment.billId + payment.student.documentId.number;
 
     // Buscamos cualquier pago repetida
     if (uniquePayments.has(key)) {

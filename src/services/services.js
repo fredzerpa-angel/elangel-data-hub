@@ -1,7 +1,7 @@
 const ArcadatApi = require('../api/Arcadat/Arcadat.api');
 const { getAllDebts, upsertDebtsByBundle } = require('../models/debts/debts.model');
 const { upsertParentsByBundle } = require('../models/parents/parents.model');
-const { getAllPayments } = require('../models/payments/payments.model');
+const { upsertPaymentsByBundle } = require('../models/payments/payments.model');
 const { upsertStudentsByBundle, getAllStudents } = require('../models/students/students.model');
 const { upsertEmployeesByBundle } = require('../models/employees/employees.model');
 const { DateTime } = require('luxon');
@@ -52,8 +52,9 @@ async function updateParentsCollection() {
 }
 
 async function updatePaymentsCollection() {
-  const currentPayments = await ArcadatApi.getPayments();
-  const oldPayments = await getAllPayments();
+  const payments = await ArcadatApi.getPayments();
+
+  return await upsertPaymentsByBundle(payments);
 }
 
 async function updateDebtsCollection() {
@@ -111,7 +112,13 @@ async function refreshCollections() {
       ${parentsRefresh.nModified} updated.
     `);
 
-    // const paymentsRefresh = await updatePaymentsCollection();
+    const paymentsRefresh = await updatePaymentsCollection();
+    console.log(`
+    Collection: Payments
+      ${paymentsRefresh.nUpserted} added. 
+      ${paymentsRefresh.nMatched} checked. 
+      ${paymentsRefresh.nModified} updated.
+    `);
 
     const debtsRefresh = await updateDebtsCollection();
     console.log(`

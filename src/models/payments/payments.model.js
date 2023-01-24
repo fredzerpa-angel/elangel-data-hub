@@ -72,8 +72,11 @@ async function getPaymentBySearch({ searchBy, value }) {
     .populate(populateConfig).lean();
 }
 
-async function createPaymentsByBundle(bundle) {
-  return await payments.insertMany(bundle, { lean: true });
+async function upsertPaymentsByBundle(bundle) {
+  return await payments.upsertMany(bundle, {
+    matchFields: ['concept', 'billId', 'student.documentId.number'], // Compara los docs mediante este campo
+    ensureModel: true, // Valida la data por el Schema
+  });
 }
 
 module.exports = {
@@ -83,5 +86,5 @@ module.exports = {
   deletePayment,
   getPaymentById,
   getPaymentBySearch,
-  createPaymentsByBundle
+  upsertPaymentsByBundle
 };
