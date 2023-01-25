@@ -9,7 +9,7 @@ const { DateTime } = require('luxon');
 async function updateStudentsCollection() {
   const [currentStudents, oldStudents] = await Promise.all([ArcadatApi.getStudents(), getAllStudents()]);
 
-  // Creamos un valor inicial de los Estudiantes en la BD para enlazarlas con las estudiantes Activos en Arcadat
+  // Creamos un valor inicial de los Estudiantes en la BD para enlazarlas con los estudiantes Activos en Arcadat
   const INITIAL_STUDENTS_DATA = oldStudents.map(student => {
     // isActive es falso, ya que no sabemos si sigue activo o no hasta que se verifique con Arcadat API
     student.isActive = false;
@@ -41,8 +41,7 @@ async function updateStudentsCollection() {
     return studentsUpdatedData;
   }, INITIAL_STUDENTS_DATA)
 
-  const response = await upsertStudentsByBundle(studentsUpdatedData);
-  return response;
+  return await upsertStudentsByBundle(studentsUpdatedData);
 }
 
 async function updateParentsCollection() {
@@ -77,8 +76,6 @@ async function updateDebtsCollection() {
   // Buscamos todas las deudas 
   const debtsDataUpdated = [...currentDebts.reduce((updatedDebts, debt) => {
 
-    debt.status.pending = true; // Ya que aun sigue vigente
-
     // Creamos una llave unica para identificar cada deuda
     const key = debt.schoolTerm + debt.student.fullname + debt.concept;
 
@@ -97,49 +94,33 @@ async function updateEmployeesCollection() {
   return await upsertEmployeesByBundle(currentEmployees);
 }
 
+const refreshedCollectionMessage = (collectionName='', refreshResponse={}) => {
+  console.log(`
+  Collection: ${collectionName}
+    ${refreshResponse?.nUpserted} added. 
+    ${refreshResponse?.nMatched} checked. 
+    ${refreshResponse?.nModified} updated.
+  `);
+}
+
 async function refreshCollections() {
   try {
     console.log('Starting refreshing Collections..');
 
     const studentsRefresh = await updateStudentsCollection();
-    console.log(`
-    Collection: Students
-      ${studentsRefresh.nUpserted} added. 
-      ${studentsRefresh.nMatched} checked. 
-      ${studentsRefresh.nModified} updated.
-    `);
+    refreshedCollectionMessage('Students', studentsRefresh);
 
     const parentsRefresh = await updateParentsCollection();
-    console.log(`
-    Collection: Parents
-      ${parentsRefresh.nUpserted} added. 
-      ${parentsRefresh.nMatched} checked. 
-      ${parentsRefresh.nModified} updated.
-    `);
+    refreshedCollectionMessage('parents', parentsRefresh);
 
     const paymentsRefresh = await updatePaymentsCollection();
-    console.log(`
-    Collection: Payments
-      ${paymentsRefresh.nUpserted} added. 
-      ${paymentsRefresh.nMatched} checked. 
-      ${paymentsRefresh.nModified} updated.
-    `);
+    refreshedCollectionMessage('payments', paymentsRefresh);
 
     const debtsRefresh = await updateDebtsCollection();
-    console.log(`
-    Collection: Debts
-      ${debtsRefresh.nUpserted} added. 
-      ${debtsRefresh.nMatched} checked. 
-      ${debtsRefresh.nModified} updated.
-    `);
+    refreshedCollectionMessage('debts', debtsRefresh);
 
     const employeesRefresh = await updateEmployeesCollection();
-    console.log(`
-    Collection: Employees
-      ${employeesRefresh.nUpserted} added. 
-      ${employeesRefresh.nMatched} checked. 
-      ${employeesRefresh.nModified} updated.
-    `);
+    refreshedCollectionMessage('employees', employeesRefresh);
 
     console.log('Done refreshing Collections.');
   } catch (err) {
