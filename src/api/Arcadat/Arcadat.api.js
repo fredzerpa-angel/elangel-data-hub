@@ -307,6 +307,9 @@ async function getPendingDebts() {
         return [header, value];
       })
     );
+
+    debtWithSchema['status.pending'] = true;
+
     // Refactorizamos el Object para que asimile al Debts Schema
     return convertObjectStringToSchema(debtWithSchema);
   });
