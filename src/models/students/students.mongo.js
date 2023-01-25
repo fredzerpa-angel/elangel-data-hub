@@ -68,27 +68,30 @@ const studentSchema = new mongoose.Schema({
   },
   phones: phonesSchema,
 
-  parents: {
-    father: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Parent',
-      required: false,
+  familyMembers: {
+    parents: {
+      father: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Parent',
+        required: false,
+      },
+      mother: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Parent',
+        required: false,
+      },
+      admin: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Parent',
+        required: false,
+      },
+      academic: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Parent',
+        required: false,
+      },
     },
-    mother: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Parent',
-      required: false,
-    },
-    admin: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Parent',
-      required: false,
-    },
-    academic: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Parent',
-      required: false,
-    },
+    siblings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Student' }],
   },
 
   // Domiciliación
@@ -111,17 +114,6 @@ const studentSchema = new mongoose.Schema({
     },
   },
 
-  // Nueva data
-  payments: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: 'Payment',
-    required: false,
-  },
-  debts: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: 'Debt',
-    required: false,
-  },
   isActive: {
     type: Boolean,
     required: false

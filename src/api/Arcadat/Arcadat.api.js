@@ -64,21 +64,21 @@ async function getStudents() {
     Teléfonos: 'phones.secondary',
     'Teléfono celular': 'phones.main',
     'Correo electrónico': 'email',
-    'Identificador padre': 'parents.father.documentId.number',
-    'Apellidos y nombres del padre': 'parents.father.fullname',
-    'Teléfonos padre': 'parents.father.phones.secondary',
-    'Teléfono celular padre': 'parents.father.phones.main',
-    'Correo electrónico padre': 'parents.father.email',
-    'Identificador madre': 'parents.mother.documentId.number',
-    'Apellidos y nombres de la madre': 'parents.mother.fullname',
-    'Teléfonos madre': 'parents.mother.phones.secondary',
-    'Teléfono celular madre': 'parents.mother.phones.main',
-    'Correo electrónico madre': 'parents.mother.email',
-    'Identificador representante': 'parents.admin.documentId.number',
-    'Apellidos y nombres Representante': 'parents.admin.fullname',
-    'Teléfonos representante': 'parents.admin.phones.secondary',
-    'Teléfono celular representante': 'parents.admin.phones.main',
-    'Correo electrónico representante': 'parents.admin.email',
+    'Identificador padre': 'familyMembers.parents.father.documentId.number',
+    'Apellidos y nombres del padre': 'familyMembers.parents.father.fullname',
+    'Teléfonos padre': 'familyMembers.parents.father.phones.secondary',
+    'Teléfono celular padre': 'familyMembers.parents.father.phones.main',
+    'Correo electrónico padre': 'familyMembers.parents.father.email',
+    'Identificador madre': 'familyMembers.parents.mother.documentId.number',
+    'Apellidos y nombres de la madre': 'familyMembers.parents.mother.fullname',
+    'Teléfonos madre': 'familyMembers.parents.mother.phones.secondary',
+    'Teléfono celular madre': 'familyMembers.parents.mother.phones.main',
+    'Correo electrónico madre': 'familyMembers.parents.mother.email',
+    'Identificador representante': 'familyMembers.parents.admin.documentId.number',
+    'Apellidos y nombres Representante': 'familyMembers.parents.admin.fullname',
+    'Teléfonos representante': 'familyMembers.parents.admin.phones.secondary',
+    'Teléfono celular representante': 'familyMembers.parents.admin.phones.main',
+    'Correo electrónico representante': 'familyMembers.parents.admin.email',
     'Codigo de afiliado domiciliacion': 'directDebit.affiliatedCode',
     'Id afiliado domiciliacion': 'directDebit.id',
     'Nombre afiliado domiciliacion': 'directDebit.name',
@@ -430,7 +430,15 @@ async function getAcademicParents() {
       delete data.type; // Esta propiedad es innecesaria
       if (isParent) {
         // Agregamos al padre
-        parentsCollection.push({ ...data, children: [], isParentAcademic: true });
+        parentsCollection.push({ 
+          ...data, 
+          documentId: {
+            ...data.documentId, 
+            type: getDocumentIdType.paymentHolder(data.documentId.number)
+          }, 
+          children: [], 
+          isParentAcademic: true 
+        });
       } else {
         delete data.phones;
         // Agregamos el hijo/a al ultimo padre agregado
@@ -545,7 +553,15 @@ async function getAdministrativeParents() {
       delete data.type; // Esta propiedad es innecesaria
       if (isParent) {
         // Agregamos al padre
-        parentsCollection.push({ ...data, children: [], isParentAdministrative: true });
+        parentsCollection.push({ 
+          ...data, 
+          documentId: {
+            ...data.documentId, 
+            type: getDocumentIdType.paymentHolder(data.documentId.number)
+          }, 
+          children: [], 
+          isParentAcademic: true 
+        });
       } else {
         delete data.phones;
         // Agregamos el hijo/a al ultimo padre agregado
