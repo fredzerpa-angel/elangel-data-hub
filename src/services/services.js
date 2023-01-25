@@ -54,7 +54,12 @@ async function updateParentsCollection() {
 async function updatePaymentsCollection() {
   const payments = await ArcadatApi.getPayments();
 
-  return await upsertPaymentsByBundle(payments);
+  const filterDate = DateTime.now().minus({ days: 30 }); // Buscamos los pagos con un maximo de 30 dias de antiguedad
+  const paymentsFilteredByDate = payments.filter(({ time: { date } }) => (
+    DateTime.fromFormat(date, 'D').diff(filterDate, 'days').as('days') >= 0
+  ));
+
+  return await upsertPaymentsByBundle(paymentsFilteredByDate);
 }
 
 async function updateDebtsCollection() {
