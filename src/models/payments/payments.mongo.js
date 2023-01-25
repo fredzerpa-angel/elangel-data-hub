@@ -63,13 +63,11 @@ const paymentSchema = new mongoose.Schema({
     documentId: documentsIdSchema,
   },
   student: {
-    documentId: documentsIdSchema,
-    fullname: {
-      type: String,
-      required: true
-    }
+    type: mongoose.Schema.Types.ObjectId,
+    required: false,
   },
-  cashier: {
+  cashier: { 
+    // TODO: cambiar a usar type: ObjectId cuando se pueda obtener todos los empleados de ARCADAT
     documentId: documentsIdSchema,
     fullname: {
       type: String,
