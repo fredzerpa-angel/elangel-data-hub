@@ -35,11 +35,11 @@ async function getEmployeeBySearch(search) {
 }
 
 async function getEmployeeByDocumentId(documentId) {
-  return await employees.findOne({ documentId: { number: documentId } });
+  return await employees.findOne({ 'documentId.number': documentId });
 }
 
 async function updateEmployeeByDocumentId(documentId, updateData) {
-  return await employees.findOneAndUpdate({ documentId: { number: documentId } }, updateData);
+  return await employees.findOneAndUpdate({ 'documentId.number': documentId }, updateData);
 }
 
 async function upsertEmployeesByBundle(bundle) {

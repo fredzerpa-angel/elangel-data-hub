@@ -35,35 +35,35 @@ async function getStudentBySearch(search) {
 }
 
 async function getStudentByDocumentId(documentId) {
-  return await students.findOne({ documentId: { number: documentId } });
+  return await students.findOne({ 'documentId.number': documentId });
 }
 
 async function addPaymentToStudentByDocumentId(documentId, payment) {
   // Tomamos la data que queremos pasar del pago
   const data = payment.id;
-  return await students.updateOne({ documentId: { number: documentId } }, { $addToSet: { payments: data } })
+  return await students.updateOne({ 'documentId.number': documentId }, { $addToSet: { payments: data } })
 }
 
 async function deletePaymentFromStudentByDocumentId(documentId, payment) {
   // Tomamos el valor que removera del array Payments
   const filter = payment.id;
-  return await students.updateOne({ documentId: { number: documentId } }, { $pull: { payments: filter } })
+  return await students.updateOne({ 'documentId.number': documentId }, { $pull: { payments: filter } })
 }
 
 async function addDebtToStudentByDocumentId(documentId, debt) {
   // Tomamos la data que queremos pasar de la deuda
   const data = debt.id;
-  return await students.updateOne({ documentId: { number: documentId } }, { $addToSet: { debts: data } })
+  return await students.updateOne({ 'documentId.number': documentId }, { $addToSet: { debts: data } })
 }
 
 async function deleteDebtFromStudentByDocumentId(documentId, debt) {
   // Tomamos el valor que removera del array Debts
   const filter = debt.id;
-  return await students.updateOne({ documentId: { number: documentId } }, { $pull: { debts: filter } })
+  return await students.updateOne({ 'documentId.number': documentId }, { $pull: { debts: filter } })
 }
 
 async function updateStudentByDocumentId(documentId, updateData) {
-  return await students.findOneAndUpdate({ documentId: { number: documentId } }, updateData);
+  return await students.findOneAndUpdate({ 'documentId.number': documentId }, updateData);
 }
 
 async function upsertStudentsByBundle(bundle) {

@@ -35,7 +35,7 @@ async function getParentBySearch(search) {
 }
 
 async function getParentByDocumentId(documentId) {
-  return await parents.findOne({ documentId: { number: documentId } });
+  return await parents.findOne({ 'documentId.number': documentId });
 }
 
 async function addChildToParentByDocumentId(parentDocumentId, child) {
