@@ -2,7 +2,7 @@ const ArcadatApi = require('../api/Arcadat/Arcadat.api');
 const { getAllDebts, upsertDebtsByBundle } = require('../models/debts/debts.model');
 const { upsertParentsByBundle } = require('../models/parents/parents.model');
 const { upsertPaymentsByBundle } = require('../models/payments/payments.model');
-const { upsertStudentsByBundle, getAllStudents } = require('../models/students/students.model');
+const { upsertStudentsByBundle, getAllStudents, getStudentByDocumentId } = require('../models/students/students.model');
 const { upsertEmployeesByBundle } = require('../models/employees/employees.model');
 const { DateTime } = require('luxon');
 
@@ -36,6 +36,7 @@ async function updateStudentsCollection() {
     studentFound ?
       studentsUpdatedData.splice(studentFoundIndex, 1, { ...studentFound, ...studentCurrentData })
       :
+      // Agregamos un _id para permitirnos enlazar los estudiantes (hermanos) sin agregarlos primero a la BD
       studentsUpdatedData.push(studentCurrentData)
 
     return studentsUpdatedData;
@@ -47,7 +48,18 @@ async function updateStudentsCollection() {
 async function updateParentsCollection() {
   const currentParents = await ArcadatApi.getParents();
 
-  return await upsertParentsByBundle(currentParents);
+  // Enlazamos los hijos y padres
+  const parentsToUpdate = await Promise.all(currentParents.map(async parent => {
+    const childrenData = await Promise.all(parent.children.map(async student => {
+      
+      return await getStudentByDocumentId(student.documentId.number)
+    }))
+    parent.children = childrenData;
+    
+    return parent;
+  }));
+
+  return await upsertParentsByBundle(parentsToUpdate);
 }
 
 async function updatePaymentsCollection() {
@@ -94,7 +106,7 @@ async function updateEmployeesCollection() {
   return await upsertEmployeesByBundle(currentEmployees);
 }
 
-const refreshedCollectionMessage = (collectionName='', refreshResponse={}) => {
+const refreshedCollectionMessage = (collectionName = '', refreshResponse = {}) => {
   console.log(`
   Collection: ${collectionName}
     ${refreshResponse?.nUpserted} added. 
@@ -111,16 +123,16 @@ async function refreshCollections() {
     refreshedCollectionMessage('Students', studentsRefresh);
 
     const parentsRefresh = await updateParentsCollection();
-    refreshedCollectionMessage('parents', parentsRefresh);
+    refreshedCollectionMessage('Parents', parentsRefresh);
 
     const paymentsRefresh = await updatePaymentsCollection();
-    refreshedCollectionMessage('payments', paymentsRefresh);
+    refreshedCollectionMessage('Payments', paymentsRefresh);
 
     const debtsRefresh = await updateDebtsCollection();
-    refreshedCollectionMessage('debts', debtsRefresh);
+    refreshedCollectionMessage('Debts', debtsRefresh);
 
     const employeesRefresh = await updateEmployeesCollection();
-    refreshedCollectionMessage('employees', employeesRefresh);
+    refreshedCollectionMessage('Employees', employeesRefresh);
 
     console.log('Done refreshing Collections.');
   } catch (err) {
