@@ -38,7 +38,7 @@ const paymentSchema = new mongoose.Schema({
 
   time: {
     date: {
-      type: Date,
+      type: String,
       required: false,
     },
     hour: {
@@ -46,7 +46,7 @@ const paymentSchema = new mongoose.Schema({
       required: false,
     },
     datetime: {
-      type: Date,
+      type: String,
       required: false,
     },
     timezone: {
