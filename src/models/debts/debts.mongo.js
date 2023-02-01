@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const amountSchema = require('../schemas/amounts.schema');
+const studentsMongo = require('../students/students.mongo');
 
 const debtSchema = new mongoose.Schema({
   schoolTerm: {
@@ -7,7 +8,7 @@ const debtSchema = new mongoose.Schema({
     required: false,
   },
   student: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: studentsMongo,
     required: false,
   },
   concept: {
