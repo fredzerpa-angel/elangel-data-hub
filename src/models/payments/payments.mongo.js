@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const amountSchema = require('../schemas/amounts.schema');
 const documentsIdSchema = require('../schemas/documentsId.schema');
-const studentSchema = require('../schemas/students,schema');
+const studentSchema = require('../schemas/students.schema');
 
 const paymentSchema = new mongoose.Schema({
   schoolTerm: {
@@ -41,7 +41,7 @@ const paymentSchema = new mongoose.Schema({
     date: {
       type: String,
       required: false,
-    },
+    },  
     hour: {
       type: String,
       required: false,
