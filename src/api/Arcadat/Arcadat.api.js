@@ -563,7 +563,7 @@ async function getAdministrativeParents() {
             type: getDocumentIdType.paymentHolder(data.documentId.number)
           }, 
           children: [], 
-          isParentAcademic: true 
+          isParentAdmin: true 
         });
       } else {
         delete data.phones;
