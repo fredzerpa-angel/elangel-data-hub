@@ -8,7 +8,8 @@ const debtSchema = new mongoose.Schema({
     required: false,
   },
   student: {
-    type: studentSchema,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Student',
     required: false,
   },
   concept: {

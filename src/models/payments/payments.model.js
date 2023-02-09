@@ -74,7 +74,7 @@ async function getPaymentBySearch({ searchBy, value }) {
 
 async function upsertPaymentsByBundle(bundle) {
   return await payments.upsertMany(bundle, {
-    matchFields: ['concept', 'billId', 'student.fullname'], // Compara los docs mediante este campo
+    matchFields: ['concept', 'billId', 'student'], // Compara los docs mediante este campo
     ensureModel: true, // Valida la data por el Schema
   });
 }

@@ -79,7 +79,7 @@ async function getDebtBySearch({ searchBy, value }) {
 
 async function upsertDebtsByBundle(bundle) {
   return await debts.upsertMany(bundle, {
-    matchFields: ['schoolTerm', 'student.fullname', 'concept'], // Compara los docs mediante este campo
+    matchFields: ['schoolTerm', 'student', 'concept'], // Compara los docs mediante este campo
     ensureModel: true, // Valida la data por el Schema
   });
 }

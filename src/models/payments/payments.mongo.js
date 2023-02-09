@@ -64,7 +64,8 @@ const paymentSchema = new mongoose.Schema({
     documentId: documentsIdSchema,
   },
   student: {
-    type: studentSchema,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Student',
     required: false,
   },
   cashier: { 
