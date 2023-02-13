@@ -259,30 +259,9 @@ async function getPendingDebts() {
     data: { data: debts },
   } = await ArcadatClient(config);
 
-  // Son los nuevos conceptos usados actualmente en ARCADAT
-  const ALLOWED_DEBTS_CONCEPTS = [
-    "00-ANTICIPO MATRICULA",
-    "00-ANTICIPO SEPTIEMBRE",
-    "00-MATRICULA",
-    "00-PLATAFORMA EDUC. CONTROL DE ESTUDIO, EVALUACION Y ADM.",
-    "00-SEGURO ESCOLAR",
-    "01-SEPTIEMBRE",
-    "02-OCTUBRE",
-    "03-NOVIEMBRE",
-    "04-DICIEMBRE",
-    "05-ENERO",
-    "06-FEBRERO",
-    "07-MARZO",
-    "08-ABRIL",
-    "09-MAYO",
-    "10-JUNIO",
-    "11-JULIO",
-    "12-AGOSTO",
-    "PROYECTO DE INVERSIÓN"
-  ]
-
-  // Tomamos solo las deudas con conceptos actualizados
-  const allowedDebts = debts.filter(debt => ALLOWED_DEBTS_CONCEPTS.includes(debt.concept));
+  // Tomamos solo las deudas del ultimo año
+  // ! Cualquier deuda mayor a 2 años sera excluida
+  const allowedDebts = debts.filter(debt => debt.period.includes(DateTime.now().year));
 
   // Creamos un diccionario con las propiedades del Fetch y de Debts Schema
   const SCHEMA_MAP = {
@@ -433,14 +412,14 @@ async function getAcademicParents() {
       delete data.type; // Esta propiedad es innecesaria
       if (isParent) {
         // Agregamos al padre
-        parentsCollection.push({ 
-          ...data, 
+        parentsCollection.push({
+          ...data,
           documentId: {
-            ...data.documentId, 
+            ...data.documentId,
             type: getDocumentIdType.paymentHolder(data.documentId.number)
-          }, 
-          children: [], 
-          isParentAcademic: true 
+          },
+          children: [],
+          isParentAcademic: true
         });
       } else {
         delete data.phones;
@@ -556,14 +535,14 @@ async function getAdministrativeParents() {
       delete data.type; // Esta propiedad es innecesaria
       if (isParent) {
         // Agregamos al padre
-        parentsCollection.push({ 
-          ...data, 
+        parentsCollection.push({
+          ...data,
           documentId: {
-            ...data.documentId, 
+            ...data.documentId,
             type: getDocumentIdType.paymentHolder(data.documentId.number)
-          }, 
-          children: [], 
-          isParentAdmin: true 
+          },
+          children: [],
+          isParentAdmin: true
         });
       } else {
         delete data.phones;
