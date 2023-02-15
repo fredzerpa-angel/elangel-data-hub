@@ -79,7 +79,7 @@ async function getDebtBySearch({ searchBy, value }) {
 
 async function upsertDebtsByBundle(bundle) {
   return await debts.upsertMany(bundle, {
-    matchFields: ['schoolTerm', 'student', 'concept'], // Compara los docs mediante este campo
+    matchFields: ['schoolTerm', 'concept', 'student'], // Compara los docs mediante este campo
     ensureModel: true, // Valida la data por el Schema
   });
 }
@@ -87,7 +87,7 @@ async function upsertDebtsByBundle(bundle) {
 // @childrenIds : Array[ObjectId]
 // Recibe los Ids de los estudiantes de la familia, para calcular la deuda familiar 
 async function getFamilyDebt(childrenIds) {
-  const debts = await debts.find({student: { $in: childrenIds }})
+  const debts = await debts.find({ student: { $in: childrenIds } })
 
   const familyDebt = debts.reduce((totalDebt, debt) => totalDebt + debt.amount.usd, 0);
 
