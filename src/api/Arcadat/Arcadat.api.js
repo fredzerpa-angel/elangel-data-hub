@@ -105,7 +105,7 @@ async function getStudents() {
       const header = SCHEMA_MAP[headers[idx]];
 
       // Transformamos la fecha a una reconocida por el constructor Date de JS
-      if (header === 'birthdate') data = DateTime.fromFormat(data, 'dd/MM/yyyy').toJSDate();
+      if (header === 'birthdate') data = DateTime.fromFormat(data, 'dd/MM/yyyy').setLocale('es').toLocaleString(DateTime.DATE_SHORT);
 
       // Si despues de validar la data, esta es un campo vacio entonces no la agregamos
       return data
@@ -187,10 +187,10 @@ async function getPayments() {
     );
 
     // Limpiamos los valores
-    const paymentDateTime = DateTime.fromFormat(paymentWithSchema['time.date'] + ' ' + paymentWithSchema['time.hour'], 'yyyy/MM/dd TT');
-    paymentWithSchema['time.date'] = paymentDateTime.toFormat('D');
-    paymentWithSchema['time.hour'] = paymentDateTime.toFormat('tt');
-    paymentWithSchema['time.datetime'] = paymentDateTime.toFormat('F');
+    const paymentDateTime = DateTime.fromFormat(paymentWithSchema['time.date'] + ' ' + paymentWithSchema['time.hour'], 'yyyy/MM/dd TT').setLocale('es');
+    paymentWithSchema['time.date'] = paymentDateTime.toLocaleString(DateTime.DATE_SHORT);
+    paymentWithSchema['time.hour'] = paymentDateTime.toLocaleString(DateTime.TIME_WITH_SECONDS);
+    paymentWithSchema['time.datetime'] = paymentDateTime.toLocaleString(DateTime.DATETIME_SHORT);
     paymentWithSchema['isCredit'] = Boolean(paymentWithSchema['isCredit']);
     paymentWithSchema['canceled'] = Boolean(paymentWithSchema['canceled']);
     // Añadimos propiedades faltantes a nuestro pago
@@ -281,7 +281,7 @@ async function getPendingDebts() {
       Object.entries(debt).map(([key, value]) => {
         const header = SCHEMA_MAP[key]
         // Tomamos solamente la fecha del expiration_date
-        if (key === 'expiration_date') return [header, DateTime.fromSQL(value.date).toJSDate()];
+        if (key === 'expiration_date') return [header, DateTime.fromSQL(value.date).setLocale('es').toLocaleString(DateTime.DATE_SHORT)];
 
         return [header, value];
       })
@@ -648,7 +648,7 @@ async function getEmployees() {
       const header = SCHEMA_MAP[headers[idx]];
 
       // Transformamos la fecha a una reconocida por el constructor Date de JS
-      if (header === 'birthdate') data = DateTime.fromFormat(data, 'dd/MM/yyyy').toJSDate();
+      if (header === 'birthdate') data = DateTime.fromFormat(data, 'dd/MM/yyyy').toLocaleString(DateTime.DATE_SHORT);
 
       // Si despues de validar la data, esta es un campo vacio entonces no la agregamos
       return data
