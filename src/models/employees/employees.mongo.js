@@ -44,7 +44,7 @@ const employeeSchema = new mongoose.Schema({
     required: false,
   },
   birthdate: {
-    type: Date,
+    type: String,
     required: false,
   },
   // Se separa de las direcciones tradicionales, ya que es unica

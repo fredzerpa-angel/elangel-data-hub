@@ -31,12 +31,12 @@ const debtSchema = new mongoose.Schema({
     },
     // Creacion de la deuda
     issuedAt: {
-      type: Date,
+      type: String,
       required: false,
     },
     // Ultima actualizacion de la deuda, usualmente cambiado por un pago, este valor se actualiza por un trigger en MongoDB
     lastUpdate: {
-      type: Date,
+      type: String,
       required: false,
     },
   },

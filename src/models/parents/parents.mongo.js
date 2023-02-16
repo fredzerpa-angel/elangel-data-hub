@@ -37,7 +37,7 @@ const parentSchema = new mongoose.Schema({
     required: false,
   },
   birthdate: {
-    type: Date,
+    type: String,
     required: false,
   },
   // Se puede tener 1 o mas direcciones

@@ -19,7 +19,7 @@ const amountSchema = new mongoose.Schema({
     },
     // Dependiendo del dia el valor de la moneda fluctua (inflacion)
     date: {
-      type: Date,
+      type: String,
       required: false,
     },
   },
