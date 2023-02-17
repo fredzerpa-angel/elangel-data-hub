@@ -155,6 +155,10 @@ async function getPayments() {
     data: { data: payments },
   } = await ArcadatClient(config);
 
+  // Filtramos la cantidad de pagos 
+  // Tomamos aquellos que el periodo escolar tenga el año actual (Toma hasta 2 periodos)
+  const allowedPayments = payments.filter(payment => payment.period.includes(DateTime.now().year)) 
+
   // Creamos un diccionario con las propiedades del Fetch y de Payments Schema
   const SCHEMA_MAP = {
     period: 'schoolTerm',
@@ -177,7 +181,7 @@ async function getPayments() {
 
   // Refactorizamos el Schema de los pagos registrados en Arcadat
   // A nuestro Schema de pagos
-  const refactoredPaymentsSchema = payments.map(payment => {
+  const refactoredPaymentsSchema = allowedPayments.map(payment => {
     // Transforma las Keys de los Objects a seguir el SCHEMA_MAP
     const paymentWithSchema = Object.fromEntries(
       Object.entries(payment).map(([key, value]) => {
@@ -207,14 +211,14 @@ async function getPayments() {
     return convertObjectStringToSchema(paymentWithSchema);
   });
 
-  // Agregamos deudas unicas en el record
-  const uniquePaymentsMap = refactoredPaymentsSchema.reduce((uniquePayments, payment) => {
+  // Tomamos solamente los pagos unicos (los pagos repetidos no son duplicas)
+  const uniquePayments = [...refactoredPaymentsSchema.reduce((uniquePayments, payment) => {
     // Creamos una llave unica para identificar cada pago
-    const key = payment.concept + payment.billId + payment.student.documentId.number;
+    const key = payment.concept + payment.billId + payment.student.fullname;
 
-    // Buscamos cualquier pago repetida
+    // Buscamos cualquier pago repetido
     if (uniquePayments.has(key)) {
-      // Si se repite la pago es porque es necesario sumar el monto
+      // Si se repite el pago es porque es necesario sumar el monto
       const amount = {
         bs: uniquePayments.get(key).amount.bs + payment.amount.bs,
         usd: uniquePayments.get(key).amount.usd + payment.amount.usd,
@@ -225,10 +229,8 @@ async function getPayments() {
       uniquePayments.set(key, payment);
     }
     return uniquePayments;
-  }, new Map())
+  }, new Map()).values()];
 
-  // Tomamos solo las pagos y no el key del Map
-  const uniquePayments = [...uniquePaymentsMap.values()];
   return uniquePayments;
 }
 
