@@ -194,7 +194,7 @@ async function getPayments() {
     const paymentDateTime = DateTime.fromFormat(paymentWithSchema['time.date'] + ' ' + paymentWithSchema['time.hour'], 'yyyy/MM/dd TT').setLocale('es');
     paymentWithSchema['time.date'] = paymentDateTime.toLocaleString(DateTime.DATE_SHORT);
     paymentWithSchema['time.hour'] = paymentDateTime.toLocaleString(DateTime.TIME_WITH_SECONDS);
-    paymentWithSchema['time.datetime'] = paymentDateTime.toLocaleString(DateTime.DATETIME_SHORT);
+    paymentWithSchema['time.datetime'] = paymentDateTime.toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS);
     paymentWithSchema['isCredit'] = Boolean(paymentWithSchema['isCredit']);
     paymentWithSchema['canceled'] = Boolean(paymentWithSchema['canceled']);
     // Añadimos propiedades faltantes a nuestro pago
@@ -271,7 +271,7 @@ async function getPendingDebts() {
     id_student: 'student.documentId.number',
     name_student: 'student.fullname',
     concept: 'concept',
-    amount: 'amount.usd',
+    amount: 'amount.pending.usd',
     expiration_date: 'status.issuedAt',
   };
 

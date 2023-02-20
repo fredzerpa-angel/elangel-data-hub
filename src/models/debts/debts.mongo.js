@@ -15,7 +15,10 @@ const debtSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
-  amount: amountSchema,
+  amount: {
+    initial: amountSchema, // Es el monto que posee la deuda sin deducciones
+    pending: amountSchema, // El monto que viene de ARCADAT, es monto inicial descontando los pagos
+  },
   // Se registraran los pagos adelantados, atrasados y a tiempo respectivos al concepto
   payments: {
     type: [mongoose.Schema.Types.ObjectId],
