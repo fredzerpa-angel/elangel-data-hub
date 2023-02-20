@@ -72,6 +72,8 @@ async function getPaymentBySearch({ searchBy, value }) {
     .populate(populateConfig).lean();
 }
 
+// @bundle: Array[Object{Payment}]
+// Recibe un array de objetos donde crea un key con los matchfields para encontrarlo en la coleccion
 async function upsertPaymentsByBundle(bundle) {
   return await payments.upsertMany(bundle, {
     matchFields: ['billId', 'schoolTerm', 'concept', 'student'], // Compara los docs mediante este campo

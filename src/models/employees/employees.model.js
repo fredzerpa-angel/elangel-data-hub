@@ -42,6 +42,8 @@ async function updateEmployeeByDocumentId(documentId, updateData) {
   return await employees.findOneAndUpdate({ 'documentId.number': documentId }, updateData);
 }
 
+// @bundle: Array[Object{Employee}]
+// Recibe un array de objetos donde crea un key con los matchfields para encontrarlo en la coleccion
 async function upsertEmployeesByBundle(bundle) {
   return await employees.upsertMany(bundle, {
     matchFields: ['documentId.number'], // Compara los docs mediante este campo

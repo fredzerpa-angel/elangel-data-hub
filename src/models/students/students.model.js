@@ -66,6 +66,8 @@ async function updateStudentByDocumentId(documentId, updateData) {
   return await students.findOneAndUpdate({ 'documentId.number': documentId }, updateData);
 }
 
+// @bundle: Array[Object{Student}]
+// Recibe un array de objetos donde crea un key con los matchfields para encontrarlo en la coleccion
 async function upsertStudentsByBundle(bundle) {
   return await students.upsertMany(bundle, {
     matchFields: ['_id'], // Compara los docs mediante este campo

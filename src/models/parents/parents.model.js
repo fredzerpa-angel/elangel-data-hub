@@ -44,6 +44,8 @@ async function addChildToParentByDocumentId(parentDocumentId, child) {
   return await parents.findOneAndUpdate({ documentId: { number: parentDocumentId } }, { $addToSet: { children: data } }, { new: true })
 }
 
+// @bundle: Array[Object{Parent}]
+// Recibe un array de objetos donde crea un key con los matchfields para encontrarlo en la coleccion
 async function upsertParentsByBundle(bundle) {
   return await parents.upsertMany(bundle, {
     matchFields: ['documentId.number'], // Compara los docs mediante este campo

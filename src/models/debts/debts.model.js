@@ -77,6 +77,8 @@ async function getDebtBySearch({ searchBy, value }) {
     .lean();
 }
 
+// @bundle: Array[Object{debt}]
+// Recibe un array de objetos donde crea un key con los matchfields para encontrarlo en la coleccion
 async function upsertDebtsByBundle(bundle) {
   return await debts.upsertMany(bundle, {
     matchFields: ['schoolTerm', 'concept', 'student'], // Compara los docs mediante este campo
