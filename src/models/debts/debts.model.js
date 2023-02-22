@@ -1,6 +1,7 @@
 const debts = require('./debts.mongo');
 const { getStudentBySearch } = require('../students/students.model');
 const { getParentBySearch } = require('../parents/parents.model');
+const { DateTime } = require('luxon');
 
 async function getAllDebts() {
   return await debts.find().lean();
@@ -96,6 +97,18 @@ async function getFamilyDebt(childrenIds) {
   return totalFamilyDebt;
 }
 
+async function getDebtsByConcept(concept) {
+  return await debts.find({ concept })
+}
+
+async function getDebtsBySchoolTerm(schoolTerm = `${DateTime.now().minus({ years: 1 }).year}-${DateTime.now().year}`) {
+  return await debts.find({ schoolTerm })
+}
+
+async function getDebtsByYearIssued(year = DateTime.now().year) {
+  return await debts.find({ 'status.issuedAt': new RegExp(`${year}$`) }) // $ es un anchor de RegExp que busca al final del String
+}
+
 module.exports = {
   getAllDebts,
   createDebt,
@@ -105,4 +118,7 @@ module.exports = {
   getDebtBySearch,
   upsertDebtsByBundle,
   getFamilyDebt,
+  getDebtsByConcept,
+  getDebtsBySchoolTerm,
+  getDebtsByYearIssued,
 };
