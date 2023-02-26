@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const addressSchema = require('../schemas/addresses.schema');
 const documentsIdSchema = require('../schemas/documentsId.schema');
+const yearGradeSchema = require('../schemas/yearGrades.schema');
 const phonesSchema = require('../schemas/phones.schema');
 
 const studentSchema = new mongoose.Schema({
@@ -117,6 +118,16 @@ const studentSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     required: false
+  },
+
+  grades: { // Calificaciones
+    highschool: {
+      firstYear: [yearGradeSchema],
+      secondYear: [yearGradeSchema],
+      thirdYear: [yearGradeSchema],
+      fourthYear: [yearGradeSchema],
+      fifthYear: [yearGradeSchema],
+    }
   }
 });
 
