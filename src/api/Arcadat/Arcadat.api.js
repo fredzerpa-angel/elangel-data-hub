@@ -1,7 +1,9 @@
 const axios = require('axios');
 const { DateTime } = require('luxon');
-const xlsx = require('node-xlsx').default;
-const { convertObjectStringToSchema } = require('../../utils/functions.utils');
+const {
+  convertObjectStringToSchema,
+  fetchAndParseExcelLatinFileToJSON,
+} = require('../../utils/functions.utils');
 
 const ArcadatClient = axios.create({
   baseURL: 'https://www.arcadat.com/apps/',
@@ -9,43 +11,27 @@ const ArcadatClient = axios.create({
 
 // Arcadat no provee el tipo de documento de identidad, por lo que lo calculamos
 const getDocumentIdType = {
-  student: (documentIdNumber) => {
+  student: documentIdNumber => {
     if (isNaN(Number(documentIdNumber))) return 'Pasaporte';
 
     return documentIdNumber.length > 8 ? 'Cedula Escolar' : 'Cedula';
   },
 
-  paymentHolder: (documentIdNumber) => {
+  paymentHolder: documentIdNumber => {
     if (Number(documentIdNumber)) return 'Cedula';
 
     // Usando RegEx podemos verificar si es un RIF ("J-" o "J" seguido de numeros)
     return documentIdNumber.match(/^J-?[1-9]+/i) ? 'RIF' : 'Pasaporte';
   },
-}
+};
 
 async function getStudents() {
-  // Fetch un archivo Excel - Ya que no existe un JSON Endpoint para la obtencion de estudiantes
-  const options = {
-    url: 'rptxls/eGxzZGdzYQ',
-    params: {
+  const parsedExcelData = await fetchAndParseExcelLatinFileToJSON(
+    'https://www.arcadat.com/apps/rptxls/eGxzZGdzYQ',
+    {
       p: 'Njk1NA', // Propiedad de busqueda durante el periodo escolar 2022-2023
-    },
-    responseType: 'arraybuffer',
-    transformResponse: [
-      data => {
-        // Transforma la data para poder leer caracteres especiales en el lexico español
-        const dataWithAccents = data.toString('latin1');
-        // Tranforma la data a buffer array otra vez
-        const arrayBuffer = new TextEncoder().encode(dataWithAccents).buffer;
-        return arrayBuffer;
-      },
-    ],
-  };
-
-  const { data } = await ArcadatClient(options);
-
-  // Convierte la data del archivo Excel a una estructura JSON
-  const parsedExcelData = xlsx.parse(data);
+    }
+  );
 
   // Creamos un diccionario con las propiedades del Fetch y de Student Schema
   const SCHEMA_MAP = {
@@ -74,7 +60,8 @@ async function getStudents() {
     'Teléfonos madre': 'familyMembers.parents.mother.phones.secondary',
     'Teléfono celular madre': 'familyMembers.parents.mother.phones.main',
     'Correo electrónico madre': 'familyMembers.parents.mother.email',
-    'Identificador representante': 'familyMembers.parents.admin.documentId.number',
+    'Identificador representante':
+      'familyMembers.parents.admin.documentId.number',
     'Apellidos y nombres Representante': 'familyMembers.parents.admin.fullname',
     'Teléfonos representante': 'familyMembers.parents.admin.phones.secondary',
     'Teléfono celular representante': 'familyMembers.parents.admin.phones.main',
@@ -86,45 +73,62 @@ async function getStudents() {
   };
 
   // Refactorizamos la respuesta de Axios y XLSX a que solo retorne la data de los estudiantes, y estos ya ligados a sus respectivos Headers
-  const schemedStudents = parsedExcelData.reduce((schemedStudents, data, i, arr) => {
-    // Evitamos los headers, ya que solo nos interesa la data de los estudiantes
-    const headersIndex = 1;
-    const headers = arr[headersIndex].data[0];
-    if (i <= headersIndex) return schemedStudents;
+  const schemedStudents = parsedExcelData.reduce(
+    (schemedStudents, data, i, arr) => {
+      // Evitamos los headers, ya que solo nos interesa la data de los estudiantes
+      const headersIndex = 1;
+      const headers = arr[headersIndex].data[0];
+      if (i <= headersIndex) return schemedStudents;
 
-    const studentData = data.data[0];
-    // Unimos la data de los estudiantes con sus respectivos Headers
-    const stringSchemedStudent = studentData.reduce((schemedData, data, idx) => {
-      // Eliminamos caracteres especiales innecesarios en nuestra data
-      const specialCharacters = "'-";
-      const findSpecialCharacters = new RegExp(`[${specialCharacters}]`, 'gi');
-      // En este caso solo eliminamos estos characteres si la data esta sucia
-      data = data.length > 1 ? data : data.replace(findSpecialCharacters, '');
-      data = data.replace(/no posee/gi, '');
+      const studentData = data.data[0];
+      // Unimos la data de los estudiantes con sus respectivos Headers
+      const stringSchemedStudent = studentData.reduce(
+        (schemedData, data, idx) => {
+          // Eliminamos caracteres especiales innecesarios en nuestra data
+          const specialCharacters = "'-";
+          const findSpecialCharacters = new RegExp(
+            `[${specialCharacters}]`,
+            'gi'
+          );
+          // En este caso solo eliminamos estos characteres si la data esta sucia
+          data =
+            data.length > 1 ? data : data.replace(findSpecialCharacters, '');
+          data = data.replace(/no posee/gi, '');
 
-      const header = SCHEMA_MAP[headers[idx]];
+          const header = SCHEMA_MAP[headers[idx]];
 
-      // Transformamos la fecha a una reconocida por el constructor Date de JS
-      if (header === 'birthdate') data = DateTime.fromFormat(data, 'dd/MM/yyyy').setLocale('es').toLocaleString(DateTime.DATE_SHORT);
+          // Transformamos la fecha a una reconocida por el constructor Date de JS
+          if (header === 'birthdate')
+            data = DateTime.fromFormat(data, 'dd/MM/yyyy')
+              .setLocale('es')
+              .toLocaleString(DateTime.DATE_SHORT);
 
-      // Si despues de validar la data, esta es un campo vacio entonces no la agregamos
-      return data
-        ? {
-          ...schemedData,
-          [header]: data,
-        }
-        : schemedData;
-    }, {});
+          // Si despues de validar la data, esta es un campo vacio entonces no la agregamos
+          return data
+            ? {
+              ...schemedData,
+              [header]: data,
+            }
+            : schemedData;
+        },
+        {}
+      );
 
-    // Agregamos el tipo de documento de identidad, es Cedula, Cedula Escolar o Pasaporte
-    stringSchemedStudent['documentId.type'] = getDocumentIdType.student(stringSchemedStudent['documentId.number']);
+      // Agregamos el tipo de documento de identidad, es Cedula, Cedula Escolar o Pasaporte
+      stringSchemedStudent['documentId.type'] = getDocumentIdType.student(
+        stringSchemedStudent['documentId.number']
+      );
 
-    // Refactorizamos la data conviertiendo los Headers a una estructura Esquematica
-    // Agregamos que esta activo ya que ARCADAT solo retorna los estudiantes cursantes
-    schemedStudents.push(convertObjectStringToSchema({ ...stringSchemedStudent, isActive: true }));
+      // Refactorizamos la data conviertiendo los Headers a una estructura Esquematica
+      // Agregamos que esta activo ya que ARCADAT solo retorna los estudiantes cursantes
+      schemedStudents.push(
+        convertObjectStringToSchema({ ...stringSchemedStudent, isActive: true })
+      );
 
-    return schemedStudents;
-  }, []);
+      return schemedStudents;
+    },
+    []
+  );
 
   // Retornamos la data de los estudiantes ya refactorizada
   return schemedStudents;
@@ -155,9 +159,11 @@ async function getPayments() {
     data: { data: payments },
   } = await ArcadatClient(config);
 
-  // Filtramos la cantidad de pagos 
+  // Filtramos la cantidad de pagos
   // Tomamos aquellos que el periodo escolar tenga el año actual (Toma hasta 2 periodos)
-  const allowedPayments = payments.filter(payment => payment.period.includes(DateTime.now().year)) 
+  const allowedPayments = payments.filter(payment =>
+    payment.period.includes(DateTime.now().year)
+  );
 
   // Creamos un diccionario con las propiedades del Fetch y de Payments Schema
   const SCHEMA_MAP = {
@@ -191,20 +197,40 @@ async function getPayments() {
     );
 
     // Limpiamos los valores
-    const paymentDateTime = DateTime.fromFormat(paymentWithSchema['time.date'] + ' ' + paymentWithSchema['time.hour'], 'yyyy/MM/dd TT').setLocale('es');
-    paymentWithSchema['time.date'] = paymentDateTime.toLocaleString(DateTime.DATE_SHORT);
-    paymentWithSchema['time.hour'] = paymentDateTime.toLocaleString(DateTime.TIME_WITH_SECONDS);
-    paymentWithSchema['time.datetime'] = paymentDateTime.toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS);
+    const paymentDateTime = DateTime.fromFormat(
+      paymentWithSchema['time.date'] + ' ' + paymentWithSchema['time.hour'],
+      'yyyy/MM/dd TT'
+    ).setLocale('es');
+    paymentWithSchema['time.date'] = paymentDateTime.toLocaleString(
+      DateTime.DATE_SHORT
+    );
+    paymentWithSchema['time.hour'] = paymentDateTime.toLocaleString(
+      DateTime.TIME_WITH_SECONDS
+    );
+    paymentWithSchema['time.datetime'] = paymentDateTime.toLocaleString(
+      DateTime.DATETIME_SHORT_WITH_SECONDS
+    );
     paymentWithSchema['isCredit'] = Boolean(paymentWithSchema['isCredit']);
     paymentWithSchema['canceled'] = Boolean(paymentWithSchema['canceled']);
     // Añadimos propiedades faltantes a nuestro pago
-    paymentWithSchema['student.documentId.type'] = getDocumentIdType.student(paymentWithSchema['student.documentId.number']);
-    paymentWithSchema['paymentHolder.documentId.type'] = getDocumentIdType.paymentHolder(paymentWithSchema['paymentHolder.documentId.number']);
-    paymentWithSchema['amount.convertionRate.date'] = paymentWithSchema['time.date'];
-    paymentWithSchema['discount.convertionRate.date'] = paymentWithSchema['time.date'];
-    paymentWithSchema['discount.convertionRate.rate'] = paymentWithSchema['amount.convertionRate.rate'];
+    paymentWithSchema['student.documentId.type'] = getDocumentIdType.student(
+      paymentWithSchema['student.documentId.number']
+    );
+    paymentWithSchema['paymentHolder.documentId.type'] =
+      getDocumentIdType.paymentHolder(
+        paymentWithSchema['paymentHolder.documentId.number']
+      );
+    paymentWithSchema['amount.convertionRate.date'] =
+      paymentWithSchema['time.date'];
+    paymentWithSchema['discount.convertionRate.date'] =
+      paymentWithSchema['time.date'];
+    paymentWithSchema['discount.convertionRate.rate'] =
+      paymentWithSchema['amount.convertionRate.rate'];
     paymentWithSchema['discount.usd'] = Number(
-      (paymentWithSchema['discount.bs'] / paymentWithSchema['amount.convertionRate.rate']).toFixed(2)
+      (
+        paymentWithSchema['discount.bs'] /
+        paymentWithSchema['amount.convertionRate.rate']
+      ).toFixed(2)
     );
 
     // Refactorizamos el Object para que asimile al Payments Schema
@@ -212,24 +238,28 @@ async function getPayments() {
   });
 
   // Tomamos solamente los pagos unicos (los pagos repetidos no son duplicas)
-  const uniquePayments = [...refactoredPaymentsSchema.reduce((uniquePayments, payment) => {
-    // Creamos una llave unica para identificar cada pago
-    const key = payment.concept + payment.billId + payment.student.fullname;
+  const uniquePayments = [
+    ...refactoredPaymentsSchema
+      .reduce((uniquePayments, payment) => {
+        // Creamos una llave unica para identificar cada pago
+        const key = payment.concept + payment.billId + payment.student.fullname;
 
-    // Buscamos cualquier pago repetido
-    if (uniquePayments.has(key)) {
-      // Si se repite el pago es porque es necesario sumar el monto
-      const amount = {
-        bs: uniquePayments.get(key).amount.bs + payment.amount.bs,
-        usd: uniquePayments.get(key).amount.usd + payment.amount.usd,
-        convertionRate: { ...payment.amount.convertionRate }
-      };
-      uniquePayments.set(key, { ...payment, amount })
-    } else {
-      uniquePayments.set(key, payment);
-    }
-    return uniquePayments;
-  }, new Map()).values()];
+        // Buscamos cualquier pago repetido
+        if (uniquePayments.has(key)) {
+          // Si se repite el pago es porque es necesario sumar el monto
+          const amount = {
+            bs: uniquePayments.get(key).amount.bs + payment.amount.bs,
+            usd: uniquePayments.get(key).amount.usd + payment.amount.usd,
+            convertionRate: { ...payment.amount.convertionRate },
+          };
+          uniquePayments.set(key, { ...payment, amount });
+        } else {
+          uniquePayments.set(key, payment);
+        }
+        return uniquePayments;
+      }, new Map())
+      .values(),
+  ];
 
   return uniquePayments;
 }
@@ -238,7 +268,6 @@ async function getPendingDebts() {
   // * El endpoint de las deudas toma como paremetros 'year_init' y 'year_end' ...
   // * ... Estos parametos son irrelevantes ya que siempre retorna las deudas activas
   // * Pero es necesario agregar estos parametros para poder realizar la peticion
-
 
   // Creamos la data de un Formulario para hacer un Fetch Post
   var form = new URLSearchParams();
@@ -263,7 +292,9 @@ async function getPendingDebts() {
 
   // Tomamos solo las deudas del ultimo año
   // ! Cualquier deuda mayor a 2 años sera excluida
-  const allowedDebts = debts.filter(debt => debt.period.includes(DateTime.now().year));
+  const allowedDebts = debts.filter(debt =>
+    debt.period.includes(DateTime.now().year)
+  );
 
   // Creamos un diccionario con las propiedades del Fetch y de Debts Schema
   const SCHEMA_MAP = {
@@ -281,9 +312,15 @@ async function getPendingDebts() {
     // Transformamos las Objects Keys a las usadas en SCHEMA_MAP
     const debtWithSchema = Object.fromEntries(
       Object.entries(debt).map(([key, value]) => {
-        const header = SCHEMA_MAP[key]
+        const header = SCHEMA_MAP[key];
         // Tomamos solamente la fecha del expiration_date
-        if (key === 'expiration_date') return [header, DateTime.fromSQL(value.date).setLocale('es').toLocaleString(DateTime.DATE_SHORT)];
+        if (key === 'expiration_date')
+          return [
+            header,
+            DateTime.fromSQL(value.date)
+              .setLocale('es')
+              .toLocaleString(DateTime.DATE_SHORT),
+          ];
 
         return [header, value];
       })
@@ -295,21 +332,27 @@ async function getPendingDebts() {
     return convertObjectStringToSchema(debtWithSchema);
   });
 
-
   // Agregamos deudas unicas en el record
   const uniqueDebtsMap = refactoredDebtsSchema.reduce((uniqueDebts, debt) => {
     // Creamos una llave unica para identificar cada deuda
-    const key = debt.schoolTerm + debt.student.fullname + debt.concept + debt.status.issuedAt;
+    const key =
+      debt.schoolTerm +
+      debt.student.fullname +
+      debt.concept +
+      debt.status.issuedAt;
 
     // Buscamos cualquier deuda repetida
     if (uniqueDebts.has(key)) {
       // Si se repite la deuda es porque es necesario sumar el monto
-      uniqueDebts.set(key, { ...debt, amount: { usd: uniqueDebts.get(key).amount.usd + debt.amount.usd } })
+      uniqueDebts.set(key, {
+        ...debt,
+        amount: { usd: uniqueDebts.get(key).amount.usd + debt.amount.usd },
+      });
     } else {
       uniqueDebts.set(key, debt);
     }
     return uniqueDebts;
-  }, new Map())
+  }, new Map());
 
   // Tomamos solo las deudas y no el key del Map
   const uniqueDebts = [...uniqueDebtsMap.values()];
@@ -317,28 +360,12 @@ async function getPendingDebts() {
 }
 
 async function getAcademicParents() {
-  // Fetch un archivo Excel - Ya que no existe un JSON Endpoint para la obtencion de padres academicos
-  const options = {
-    url: 'rptxls/eGxzZGdw',
-    params: {
+  const parsedExcelData = await fetchAndParseExcelLatinFileToJSON(
+    'https://www.arcadat.com/apps/rptxls/eGxzZGdw',
+    {
       p: 'Njk1NA', // Propiedad de busqueda durante el periodo escolar 2022-2023
-    },
-    responseType: 'arraybuffer',
-    transformResponse: [
-      data => {
-        // Convert data to be able to read accents and special characters from spanish lexic
-        const dataWithAccents = data.toString('latin1');
-        // Return it as a buffer, because XLSX package use buffers
-        const arrayBuffer = new TextEncoder().encode(dataWithAccents).buffer;
-        return arrayBuffer;
-      },
-    ],
-  };
-
-  const { data } = await ArcadatClient(options);
-
-  // Convierte la data del archivo Excel a una estructura JSON
-  const parsedExcelData = xlsx.parse(data);
+    }
+  );
 
   // Creamos un diccionario con las propiedades del Fetch y de Parents Schema
   const SCHEMA_MAP = {
@@ -349,118 +376,95 @@ async function getAcademicParents() {
     'Correo electrónico': 'email',
   };
 
-  // Refactorizamos la respuesta de Axios y XLSX a que solo retorne la data de los padres... 
+  // Refactorizamos la respuesta de Axios y XLSX a que solo retorne la data de los padres...
   // ... y estos ya ligados a sus respectivos Headers
-  const schemedParents = parsedExcelData.reduce(
-    (result, data, i, arr) => {
-      // Evitamos los headers, ya que solo nos interesa la data de los padres
-      const headersIndex = 1;
-      const headers = arr[headersIndex].data[0];
-      if (i <= headersIndex) return result;
+  const schemedParents = parsedExcelData.reduce((result, data, i, arr) => {
+    // Evitamos los headers, ya que solo nos interesa la data de los padres
+    const headersIndex = 1;
+    const headers = arr[headersIndex].data[0];
+    if (i <= headersIndex) return result;
 
-      const parsedData = data.data[0];
+    const parsedData = data.data[0];
 
-      // La propiedad 'Tipo' de los hijos esta vacia, por lo que es necesario agregar 'HIJO' ... 
-      // ... como el primer valor del array o tendra errores durante el enlace entre padre-hijo
-      if (!parsedData.includes('REPRESENTANTE')) parsedData.unshift('HIJO');
+    // La propiedad 'Tipo' de los hijos esta vacia, por lo que es necesario agregar 'HIJO' ...
+    // ... como el primer valor del array o tendra errores durante el enlace entre padre-hijo
+    if (!parsedData.includes('REPRESENTANTE')) parsedData.unshift('HIJO');
 
-      // Unimos la data de los padres con sus respectivos Headers
-      const stringSchemedParent = parsedData.reduce((schemedData, data, idx) => {
-        // Eliminamos data innecesaria
-        data = data.replace(/TELÉFONOS: /gi, '');
-        data = data.replace(/no posee/gi, '');
+    // Unimos la data de los padres con sus respectivos Headers
+    const stringSchemedParent = parsedData.reduce((schemedData, data, idx) => {
+      // Eliminamos data innecesaria
+      data = data.replace(/TELÉFONOS: /gi, '');
+      data = data.replace(/no posee/gi, '');
 
-        const header = SCHEMA_MAP[headers[idx]];
+      const header = SCHEMA_MAP[headers[idx]];
 
-        if (header === 'phones') {
-          // Limpiamos y separamos los telefonos
-          data = data
-            .split('.')
-            .map(num => num.trim())
-            .filter(num => num);
+      if (header === 'phones') {
+        // Limpiamos y separamos los telefonos
+        data = data
+          .split('.')
+          .map(num => num.trim())
+          .filter(num => num);
 
-          // Existen 2 tipos de telefonos, donde si existe un segundo, es el tlf celular
-          return {
-            ...schemedData,
-            // Telefono celular
-            'phones.main': data.at(-1),
-            // Telefono fijo
-            'phones.secondary': data.at(-2),
-          }
-        }
-
-        // Si despues de validar la data, esta es un campo vacio entonces no la agregamos
-        return data
-          ?
-          {
-            ...schemedData,
-            [header]: data,
-          }
-          : schemedData
-      }, {});
-
-      // Refactorizamos la data conviertiendo los Headers a una estructura Esquematica
-      result.push(convertObjectStringToSchema(stringSchemedParent));
-
-      return result;
-    },
-    []
-  );
-
-  // Asociamos los hijos dentro de los padres en su propiedad 'children:Array[]' 
-  const parents = schemedParents.reduce(
-    (parentsCollection, data, idx, arr) => {
-      const isParent = !data.type.toLowerCase().includes('hijo');
-      delete data.type; // Esta propiedad es innecesaria
-      if (isParent) {
-        // Agregamos al padre
-        parentsCollection.push({
-          ...data,
-          documentId: {
-            ...data.documentId,
-            type: getDocumentIdType.paymentHolder(data.documentId.number)
-          },
-          children: [],
-          isParentAcademic: true
-        });
-      } else {
-        delete data.phones;
-        // Agregamos el hijo/a al ultimo padre agregado
-        parentsCollection.at(-1).children.push(data);
+        // Existen 2 tipos de telefonos, donde si existe un segundo, es el tlf celular
+        return {
+          ...schemedData,
+          // Telefono celular
+          'phones.main': data.at(-1),
+          // Telefono fijo
+          'phones.secondary': data.at(-2),
+        };
       }
 
-      return parentsCollection;
-    },
-    []
-  );
+      // Si despues de validar la data, esta es un campo vacio entonces no la agregamos
+      return data
+        ? {
+          ...schemedData,
+          [header]: data,
+        }
+        : schemedData;
+    }, {});
+
+    // Refactorizamos la data conviertiendo los Headers a una estructura Esquematica
+    result.push(convertObjectStringToSchema(stringSchemedParent));
+
+    return result;
+  }, []);
+
+  // Asociamos los hijos dentro de los padres en su propiedad 'children:Array[]'
+  const parents = schemedParents.reduce((parentsCollection, data, idx, arr) => {
+    const isParent = !data.type.toLowerCase().includes('hijo');
+    delete data.type; // Esta propiedad es innecesaria
+    if (isParent) {
+      // Agregamos al padre
+      parentsCollection.push({
+        ...data,
+        documentId: {
+          ...data.documentId,
+          type: getDocumentIdType.paymentHolder(data.documentId.number),
+        },
+        children: [],
+        isParentAcademic: true,
+      });
+    } else {
+      delete data.phones;
+      // Agregamos el hijo/a al ultimo padre agregado
+      parentsCollection.at(-1).children.push(data);
+    }
+
+    return parentsCollection;
+  }, []);
 
   return parents;
 }
 
 async function getAdministrativeParents() {
-  // Fetch un archivo Excel - Ya que no existe un JSON Endpoint para la obtencion de padres academicos
-  const options = {
-    url: 'rptxls/eGxzZGdw',
-    params: {
+  const parsedExcelData = await fetchAndParseExcelLatinFileToJSON(
+    'https://www.arcadat.com/apps/rptxls/eGxzZGdw',
+    {
       p: 'Njk1NA', // Propiedad de busqueda durante el periodo escolar 2022-2023
       t: 'PWn',
-    },
-    responseType: 'arraybuffer',
-    transformResponse: [
-      data => {
-        // Convert data to be able to read accents and special characters from spanish lexic
-        const dataWithAccents = data.toString('latin1');
-        // Return it as a buffer, because XLSX package use buffers
-        const arrayBuffer = new TextEncoder().encode(dataWithAccents).buffer;
-        return arrayBuffer;
-      },
-    ],
-  };
-
-  const { data } = await ArcadatClient(options);
-
-  // Convierte la data del archivo Excel a una estructura JSON
-  const parsedExcelData = xlsx.parse(data);
+    }
+  );
 
   // Creamos un diccionario con las propiedades del Fetch y de Parents Schema
   const SCHEMA_MAP = {
@@ -471,91 +475,83 @@ async function getAdministrativeParents() {
     'Correo electrónico': 'email',
   };
 
-  // Refactorizamos la respuesta de Axios y XLSX a que solo retorne la data de los padres... 
+  // Refactorizamos la respuesta de Axios y XLSX a que solo retorne la data de los padres...
   // ... y estos ya ligados a sus respectivos Headers
-  const schemedParents = parsedExcelData.reduce(
-    (result, data, i, arr) => {
-      // Evitamos los headers, ya que solo nos interesa la data de los padres
-      const headersIndex = 1;
-      const headers = arr[headersIndex].data[0];
-      if (i <= headersIndex) return result;
+  const schemedParents = parsedExcelData.reduce((result, data, i, arr) => {
+    // Evitamos los headers, ya que solo nos interesa la data de los padres
+    const headersIndex = 1;
+    const headers = arr[headersIndex].data[0];
+    if (i <= headersIndex) return result;
 
-      const parsedData = data.data[0];
+    const parsedData = data.data[0];
 
-      // La propiedad 'Tipo' de los hijos esta vacia, por lo que es necesario agregar 'HIJO' ... 
-      // ... como el primer valor del array o tendra errores durante el enlace entre padre-hijo
-      if (!parsedData.includes('REPRESENTANTE')) parsedData.unshift('HIJO');
+    // La propiedad 'Tipo' de los hijos esta vacia, por lo que es necesario agregar 'HIJO' ...
+    // ... como el primer valor del array o tendra errores durante el enlace entre padre-hijo
+    if (!parsedData.includes('REPRESENTANTE')) parsedData.unshift('HIJO');
 
-      // Unimos la data de los padres con sus respectivos Headers
-      const stringSchemedParent = parsedData.reduce((schemedData, data, idx) => {
-        // Eliminamos data innecesaria
-        data = data.replace(/TELÉFONOS: /gi, '');
-        data = data.replace(/no posee/gi, '');
+    // Unimos la data de los padres con sus respectivos Headers
+    const stringSchemedParent = parsedData.reduce((schemedData, data, idx) => {
+      // Eliminamos data innecesaria
+      data = data.replace(/TELÉFONOS: /gi, '');
+      data = data.replace(/no posee/gi, '');
 
-        const header = SCHEMA_MAP[headers[idx]];
+      const header = SCHEMA_MAP[headers[idx]];
 
+      if (header === 'phones') {
+        // Limpiamos y separamos los telefonos
+        data = data
+          .split('.')
+          .map(num => num.trim())
+          .filter(num => num);
 
-        if (header === 'phones') {
-          // Limpiamos y separamos los telefonos
-          data = data
-            .split('.')
-            .map(num => num.trim())
-            .filter(num => num);
-
-          // Existen 2 tipos de telefonos, donde si existe un segundo, es el tlf celular
-          return {
-            ...schemedData,
-            // Telefono celular
-            'phones.main': data.at(-1),
-            // Telefono fijo
-            'phones.secondary': data.at(-2),
-          }
-        }
-
-        // Si despues de validar la data, esta es un campo vacio entonces no la agregamos
-        return data
-          ?
-          {
-            ...schemedData,
-            [header]: data,
-          }
-          : schemedData
-      }, {});
-
-      // Refactorizamos la data conviertiendo los Headers a una estructura Esquematica
-      result.push(convertObjectStringToSchema(stringSchemedParent));
-
-      return result;
-    },
-    []
-  );
-
-  // Asociamos los hijos dentro de los padres en su propiedad 'children:Array[]' 
-  const parents = schemedParents.reduce(
-    (parentsCollection, data, idx, arr) => {
-      const isParent = !data.type.toLowerCase().includes('hijo');
-      delete data.type; // Esta propiedad es innecesaria
-      if (isParent) {
-        // Agregamos al padre
-        parentsCollection.push({
-          ...data,
-          documentId: {
-            ...data.documentId,
-            type: getDocumentIdType.paymentHolder(data.documentId.number)
-          },
-          children: [],
-          isParentAdmin: true
-        });
-      } else {
-        delete data.phones;
-        // Agregamos el hijo/a al ultimo padre agregado
-        parentsCollection.at(-1).children.push(data);
+        // Existen 2 tipos de telefonos, donde si existe un segundo, es el tlf celular
+        return {
+          ...schemedData,
+          // Telefono celular
+          'phones.main': data.at(-1),
+          // Telefono fijo
+          'phones.secondary': data.at(-2),
+        };
       }
 
-      return parentsCollection;
-    },
-    []
-  );
+      // Si despues de validar la data, esta es un campo vacio entonces no la agregamos
+      return data
+        ? {
+          ...schemedData,
+          [header]: data,
+        }
+        : schemedData;
+    }, {});
+
+    // Refactorizamos la data conviertiendo los Headers a una estructura Esquematica
+    result.push(convertObjectStringToSchema(stringSchemedParent));
+
+    return result;
+  }, []);
+
+  // Asociamos los hijos dentro de los padres en su propiedad 'children:Array[]'
+  const parents = schemedParents.reduce((parentsCollection, data, idx, arr) => {
+    const isParent = !data.type.toLowerCase().includes('hijo');
+    delete data.type; // Esta propiedad es innecesaria
+    if (isParent) {
+      // Agregamos al padre
+      parentsCollection.push({
+        ...data,
+        documentId: {
+          ...data.documentId,
+          type: getDocumentIdType.paymentHolder(data.documentId.number),
+        },
+        children: [],
+        isParentAdmin: true,
+      });
+    } else {
+      delete data.phones;
+      // Agregamos el hijo/a al ultimo padre agregado
+      parentsCollection.at(-1).children.push(data);
+    }
+
+    return parentsCollection;
+  }, []);
 
   return parents;
 }
@@ -576,58 +572,40 @@ async function getParents() {
     if (parentsMap.has(parentKey)) {
       // Si ya existe, agregamos cualquier propiedad faltante (Si y solo si las propiedades repetidas tienen el mismo valor)
       const prevParentData = parentsMap.get(parentKey);
-      parentsMap.set(parentKey, { ...prevParentData, ...parent })
+      parentsMap.set(parentKey, { ...prevParentData, ...parent });
     } else {
       // Si aun no existe, lo agregamos al diccionario
       parentsMap.set(parentKey, parent);
     }
 
     return parentsMap;
-  }, new Map())
+  }, new Map());
 
   // Retornamos un Array con los Parents, en vez del Map
   return [...uniqueParents.values()];
 }
 
 async function getEmployees() {
-  // Fetch un archivo Excel - Ya que no existe un JSON Endpoint para la obtencion de los empleados
-  const options = {
-    url: 'rptxls/eGxzZGd0',
-    params: {
-      i: 'OTI',
-    },
-    responseType: 'arraybuffer',
-    transformResponse: [
-      data => {
-        // Transforma la data para poder leer caracteres especiales en el lexico español
-        const dataWithAccents = data.toString('latin1');
-        // Tranforma la data a buffer array otra vez
-        const arrayBuffer = new TextEncoder().encode(dataWithAccents).buffer;
-        return arrayBuffer;
-      },
-    ],
-  };
-
-  const { data } = await ArcadatClient(options);
-
-  // Convierte la data del archivo Excel a una estructura JSON
-  const parsedExcelData = xlsx.parse(data);
+  const parsedExcelData = await fetchAndParseExcelLatinFileToJSON(
+    'https://www.arcadat.com/apps/rptxls/eGxzZGd0',
+    { i: 'OTI' }
+  );
 
   // Creamos un diccionario con las propiedades del Fetch y de Employee Schema
   const SCHEMA_MAP = {
     'Tipo de profesor': 'type',
     'N° de identificación': 'documentId.number',
-    'Apellidos': 'lastnames',
-    'Nombres': 'names',
-    'Sexo': 'gender',
+    Apellidos: 'lastnames',
+    Nombres: 'names',
+    Sexo: 'gender',
     'Fecha de nacimiento': 'birthdate',
-    'Edad': 'age',
+    Edad: 'age',
     'Lugar de nacimiento': 'addressOfBirth.full',
-    'Dirección': 'addresses.full',
-    'Teléfonos': 'phones.secondary',
+    Dirección: 'addresses.full',
+    Teléfonos: 'phones.secondary',
     'Teléfono celular': 'phones.main',
     'Correo electrónico': 'email',
-    'Estatus': 'status',
+    Estatus: 'status',
   };
 
   // Refactorizamos la respuesta de Axios y XLSX a que solo retorne la data de los empleados, y estos ya ligados a sus respectivos Headers
@@ -650,7 +628,10 @@ async function getEmployees() {
       const header = SCHEMA_MAP[headers[idx]];
 
       // Transformamos la fecha a una reconocida por el constructor Date de JS
-      if (header === 'birthdate') data = DateTime.fromFormat(data, 'dd/MM/yyyy').toLocaleString(DateTime.DATE_SHORT);
+      if (header === 'birthdate')
+        data = DateTime.fromFormat(data, 'dd/MM/yyyy').toLocaleString(
+          DateTime.DATE_SHORT
+        );
 
       // Si despues de validar la data, esta es un campo vacio entonces no la agregamos
       return data
@@ -663,7 +644,7 @@ async function getEmployees() {
 
     // Agregamos Fullname ya que no viene por defecto en Arcadat
     const { lastnames, names } = stringSchemedEmployee;
-    stringSchemedEmployee.fullname = `${lastnames} ${names}`
+    stringSchemedEmployee.fullname = `${lastnames} ${names}`;
 
     const schemedEmployee = convertObjectStringToSchema(stringSchemedEmployee);
     // Verificamos que posea cedula, ya que es indispensable para indentificar al empleado
@@ -676,7 +657,171 @@ async function getEmployees() {
 
   // Retornamos la data de los estudiantes ya refactorizada
   return schemedEmployees;
+}
 
+async function getGrades() {
+  const BASE_URL = `https://arcadat.com/apps/rptxls/eGxzX2V4cG9ydF9yZQ/`;
+  // Un Map de los URLS de los archivos Excel de las notas de cada salon
+  const gradesExcelFilesParamsMap = {
+    // TODO: Agregar pre-escolar y primaria
+    highschool: new Map([
+      ['first', {
+        n: 'MTY2OQ', // n = salon
+        p: 'Njk1NA', // p = periodo escolar
+        pe: 'ODMw',
+        i: 'OTI',
+      }],
+      ['second', {
+        n: 'MTY3MA', // n = salon
+        p: 'Njk1NA', // p = periodo escolar
+        pe: 'ODMw',
+        i: 'OTI',
+      }],
+      ['third', {
+        n: 'MTY3MQ', // n = salon
+        p: 'Njk1NA', // p = periodo escolar
+        pe: 'ODMw',
+        i: 'OTI',
+      }],
+      ['fourth', {
+        n: 'MTY3Mg', // n = salon
+        p: 'Njk1NA', // p = periodo escolar
+        pe: 'ODMw',
+        i: 'OTI',
+      }],
+      ['fifth', {
+        n: 'MTY3Mw', // n = salon
+        p: 'Njk1NA', // p = periodo escolar
+        pe: 'ODMw',
+        i: 'OTI',
+      }],
+    ]),
+  };
+
+  // Obtenemos los URLs de los archivos excel
+  const gradesExcelFilesUrl = Object.values(gradesExcelFilesParamsMap).flatMap(year => ([...year.values()]))
+
+  const fetchedGradesByStages = {
+    first: await Promise.all(gradesExcelFilesUrl.map(
+      async params => await fetchAndParseExcelLatinFileToJSON(BASE_URL, {
+        ...params,
+        l: 'MQ', // l = 1er lapso
+      })
+    )),
+    second: await Promise.all(gradesExcelFilesUrl.map(
+      async params => await fetchAndParseExcelLatinFileToJSON(BASE_URL, {
+        ...params,
+        l: 'Mg', // l = 2do lapso
+      })
+    )),
+    third: await Promise.all(gradesExcelFilesUrl.map(
+      async params => await fetchAndParseExcelLatinFileToJSON(BASE_URL, {
+        ...params,
+        l: 'Mw', // l = 3er lapso
+      })
+    )),
+  };
+
+  const subjectsCodeMap = {
+    CA: 'CASTELLANO',
+    ILE: 'INGLES Y OTRAS LENGUAS EXTRANJERAS',
+    MA: 'MATEMÁTICA',
+    EF: 'EDUCACION FISICA',
+    AP: 'ARTE Y PATRIMONIO',
+    CN: 'CIENCIAS NATURALES',
+    GHC: 'GEOGRAFIA, HISTORIA Y CIUDADANIA',
+    OC: 'ORIENTACION Y CONVIVENCIA',
+    PG: 'PART. EN GRUPOS DE CREACIÓN, RECREACIÓN Y PRODUCCIÓN',
+    FI: 'FISICA',
+    QU: 'QUIMICA',
+    BI: 'BIOLOGIA',
+    CT: 'CIENCIAS DE LA TIERRA',
+    FS: 'FORMACION PARA LA SOBERANIA NACIONAL',
+  };
+
+  const schemedGradesByYear = Object.entries(fetchedGradesByStages).reduce((schemedGradesByYear, [stage, yearsGrades]) => {
+    // Los periodos escolares empiezan el 01/09 y terminan el 30/07 de cada año
+    const startSchoolTermDateTime = DateTime.fromFormat(`01/09/${DateTime.now().year}`, 'dd/MM/yyyy');
+    const newSchoolTermStarted = startSchoolTermDateTime.diff(DateTime.now()).as('milliseconds') < 0;
+    // Buscamos en que periodo escolar estamos, si ya empezo el nuevo año escolar o no
+    const currentSchoolTerm = newSchoolTermStarted ?
+      `${DateTime.now().year}-${DateTime.now().plus({ years: 1 }).year}`
+      :
+      `${DateTime.now().minus({ years: 1 }).year}-${DateTime.now().year}`;
+
+    schemedGradesByYear.schoolTerm = currentSchoolTerm;
+
+    const schemedYearsGraded = yearsGrades.map(year => year.reduce((studentsGrades, { data: [data] }, idx, dataArray) => {
+      const headersLastIndex = 1; // Usamos este valor para saltar datos innecesarios del array
+      const headersIndex = 1;
+      const headers = dataArray[headersIndex].data.flat()
+
+      // Saltamos cualquier data que no sea del estudiante
+      const isNotStudentData = isNaN(Number(data[0])) || data.length !== headers.length;
+      if ((idx <= headersLastIndex) || isNotStudentData) return studentsGrades;
+
+      const dataWithHeaders = headers.reduce((dataWithHeaders, header, idx) => ({ ...dataWithHeaders, [header]: data.at(idx) }), {})
+
+      const subjectsCodeWithGrades = Object.fromEntries(Object.entries(dataWithHeaders).filter(([key, value]) => Object.keys(subjectsCodeMap).includes(key)));
+
+      // Formateamos la data de las materias calificadas al esquema de 'yearGrades.schema.js' 
+      const schemedSubjectsWithGrades = Object.entries(subjectsCodeWithGrades).map(([code, grade]) => ({
+        subject: { code, name: subjectsCodeMap[code] },
+        grade,
+      }))
+      
+      // Sacamos la informacion relevante del estudiante
+      const studentData = {
+        documentId: { number: dataWithHeaders['N° de Identificación'] },
+        fullname: dataWithHeaders['Estudiante'],
+      }
+      const section = dataWithHeaders['Sección'];
+
+      // Los estudiantes son unicos, por lo que no habra duplicados que sobreescriban la data
+      studentsGrades.push({ ...studentData, stages: { [stage]: { section, subjects: schemedSubjectsWithGrades } } });
+
+      return studentsGrades;
+    }, []))
+
+    schemedYearsGraded.forEach((yearGraded, idx) => {
+      const yearSelectionMap = {
+        0: 'firstYear',
+        1: 'secondYear',
+        2: 'thirdYear',
+        3: 'fourthYear',
+        4: 'fifthYear',
+      }
+      const yearSelected = yearSelectionMap[idx];
+
+      yearGraded.forEach(studentGraded => {
+        if (schemedGradesByYear[yearSelected].has(studentGraded.fullname)) {
+          schemedGradesByYear[yearSelected].set(studentGraded.fullname, { ...studentGraded, stages: { ...schemedGradesByYear[yearSelected].get(studentGraded.fullname).stages, ...studentGraded.stages } })
+        } else {
+          schemedGradesByYear[yearSelected].set(studentGraded.fullname, studentGraded)
+        }
+      })
+    })
+
+    return schemedGradesByYear;
+
+  }, {
+    schoolTerm: undefined,
+    firstYear: new Map(),
+    secondYear: new Map(),
+    thirdYear: new Map(),
+    fourthYear: new Map(),
+    fifthYear: new Map(),
+  })
+
+  // Eliminamos el Map para retornarlo como un Array para un mejor manejo
+  return {
+    ...schemedGradesByYear,
+    firstYear: [...schemedGradesByYear.firstYear.values()],
+    secondYear: [...schemedGradesByYear.secondYear.values()],
+    thirdYear: [...schemedGradesByYear.thirdYear.values()],
+    fourthYear: [...schemedGradesByYear.fourthYear.values()],
+    fifthYear: [...schemedGradesByYear.fifthYear.values()],
+  }
 }
 
 module.exports = {
@@ -687,4 +832,5 @@ module.exports = {
   getAdministrativeParents,
   getParents,
   getEmployees,
+  getGrades,
 };
