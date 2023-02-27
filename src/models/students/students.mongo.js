@@ -121,6 +121,19 @@ const studentSchema = new mongoose.Schema({
   },
 
   grades: { // Calificaciones
+    elementary: {
+      firstLevel: [yearGradeSchema],
+      secondLevel: [yearGradeSchema],
+      thirdLevel: [yearGradeSchema],
+    },
+    middleschool: {
+      firstGrade: [yearGradeSchema],
+      secondGrade: [yearGradeSchema],
+      thirdGrade: [yearGradeSchema],
+      fourthGrade: [yearGradeSchema],
+      fifthGrade: [yearGradeSchema],
+      sixthGrade: [yearGradeSchema],
+    },
     highschool: {
       firstYear: [yearGradeSchema],
       secondYear: [yearGradeSchema],
