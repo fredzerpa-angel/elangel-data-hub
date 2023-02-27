@@ -7,14 +7,14 @@ mongoose.connection.once('open', () => {
   console.log('MongoDB connection ready!');
 });
 
-mongoose.connection.on('error', console.error);
+mongoose.connection.on('error', err => console.log('Error on Mongo Atlas DB. Code: ', err.code));
 mongoose.connection.once('close', () => {
   console.log('MongoDB connection has been closed!')
 });
 
 async function mongoConnect() {
   try {
-    mongoose.connect(MONGODB_URI);
+    await mongoose.connect(MONGODB_URI);
   } catch (error) {
     throw new Error('Failed to connect to Mongo Atlas DB', error);
   }
