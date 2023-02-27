@@ -142,7 +142,7 @@ async function getPayments() {
   // Creamos la data de un Formulario para hacer un Fetch Post
   var form = new URLSearchParams();
   form.append('o', '1');
-  form.append('year_init', '2020'); // 2020 es el año mas antiguo seleccionable
+  form.append('year_init', DateTime.now().minus({ years: 1 }).year); // 2020 es el año mas antiguo seleccionable
   form.append('year_end', DateTime.now().year); // Hasta el año actual
 
   // Usamos el Endpoint de Alberto para obtener los pagos registrados en Arcadat
@@ -823,7 +823,7 @@ async function getGrades() {
           }
 
         }, schemedGradesByEducationLevel)
-      
+
       return schemedEducationLevelsGradesByStages
     }, {
       schoolTerm: getCurrentSchoolTerm(),
