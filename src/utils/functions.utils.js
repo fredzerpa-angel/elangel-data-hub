@@ -66,7 +66,7 @@ function convertObjectStringToSchema(stringObj = {}, divider = '.') {
   }, {});
 }
 
-async function fetchAndParseExcelLatinFileToJSON(url = '', params = {}, method='GET') {
+async function fetchAndParseExcelLatinFileToJSON(url = '', params = {}, method = 'GET') {
   // Fetch un archivo Excel - Ya que no existe un JSON Endpoint para la obtencion de padres academicos
   const options = {
     url,
