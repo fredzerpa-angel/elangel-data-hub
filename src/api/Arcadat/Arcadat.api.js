@@ -3,6 +3,7 @@ const { DateTime } = require('luxon');
 const {
   convertObjectStringToSchema,
   fetchAndParseExcelLatinFileToJSON,
+  getCurrentSchoolTerm,
 } = require('../../utils/functions.utils');
 
 const ArcadatClient = axios.create({
@@ -664,164 +665,174 @@ async function getGrades() {
   // Un Map de los URLS de los archivos Excel de las notas de cada salon
   const gradesExcelFilesParamsMap = {
     // TODO: Agregar pre-escolar y primaria
-    highschool: new Map([
-      ['first', {
+    elementary: {},
+    middleschool: {},
+    highschool: {
+      firstYear: {
         n: 'MTY2OQ', // n = salon
         p: 'Njk1NA', // p = periodo escolar
         pe: 'ODMw',
         i: 'OTI',
-      }],
-      ['second', {
+      },
+      secondYear: {
         n: 'MTY3MA', // n = salon
         p: 'Njk1NA', // p = periodo escolar
         pe: 'ODMw',
         i: 'OTI',
-      }],
-      ['third', {
+      },
+      thirdYear: {
         n: 'MTY3MQ', // n = salon
         p: 'Njk1NA', // p = periodo escolar
         pe: 'ODMw',
         i: 'OTI',
-      }],
-      ['fourth', {
+      },
+      fourthYear: {
         n: 'MTY3Mg', // n = salon
         p: 'Njk1NA', // p = periodo escolar
         pe: 'ODMw',
         i: 'OTI',
-      }],
-      ['fifth', {
+      },
+      fifthYear: {
         n: 'MTY3Mw', // n = salon
         p: 'Njk1NA', // p = periodo escolar
         pe: 'ODMw',
         i: 'OTI',
-      }],
-    ]),
+      },
+    },
   };
 
-  // Obtenemos los URLs de los archivos excel
-  const gradesExcelFilesUrl = Object.values(gradesExcelFilesParamsMap).flatMap(year => ([...year.values()]))
+  const fetchedGradesByStages = await Object.entries(gradesExcelFilesParamsMap).reduce(async (stages, [eduLevel, classroomGradesParams]) => {
 
-  const fetchedGradesByStages = {
-    first: await Promise.all(gradesExcelFilesUrl.map(
-      async params => await fetchAndParseExcelLatinFileToJSON(BASE_URL, {
-        ...params,
-        l: 'MQ', // l = 1er lapso
-      })
-    )),
-    second: await Promise.all(gradesExcelFilesUrl.map(
-      async params => await fetchAndParseExcelLatinFileToJSON(BASE_URL, {
-        ...params,
-        l: 'Mg', // l = 2do lapso
-      })
-    )),
-    third: await Promise.all(gradesExcelFilesUrl.map(
-      async params => await fetchAndParseExcelLatinFileToJSON(BASE_URL, {
-        ...params,
-        l: 'Mw', // l = 3er lapso
-      })
-    )),
-  };
+    const fetchGradesByEducationLevel = async (level, { fetchParams }) => {
+      return await Object.entries(level).reduce(async (levels, [classroomGrade, gradeParams]) => ({
+        ...await levels,
+        [classroomGrade]: await fetchAndParseExcelLatinFileToJSON(BASE_URL, { ...gradeParams, ...fetchParams }),
+      }), {})
+    }
 
-  const subjectsCodeMap = {
-    CA: 'CASTELLANO',
-    ILE: 'INGLES Y OTRAS LENGUAS EXTRANJERAS',
-    MA: 'MATEMÁTICA',
-    EF: 'EDUCACION FISICA',
-    AP: 'ARTE Y PATRIMONIO',
-    CN: 'CIENCIAS NATURALES',
-    GHC: 'GEOGRAFIA, HISTORIA Y CIUDADANIA',
-    OC: 'ORIENTACION Y CONVIVENCIA',
-    PG: 'PART. EN GRUPOS DE CREACIÓN, RECREACIÓN Y PRODUCCIÓN',
-    FI: 'FISICA',
-    QU: 'QUIMICA',
-    BI: 'BIOLOGIA',
-    CT: 'CIENCIAS DE LA TIERRA',
-    FS: 'FORMACION PARA LA SOBERANIA NACIONAL',
-  };
+    const stagesParamsMap = {
+      first: { l: 'MQ', }, // l = lapso, 1er lapso
+      second: { l: 'Mg', }, // l = lapso, 2do lapso
+      third: { l: 'Mw', }, // l = lapso, 3er lapso
+    }
 
-  const schemedGradesByYear = Object.entries(fetchedGradesByStages).reduce((schemedGradesByYear, [stage, yearsGrades]) => {
-    // Los periodos escolares empiezan el 01/09 y terminan el 30/07 de cada año
-    const startSchoolTermDateTime = DateTime.fromFormat(`01/09/${DateTime.now().year}`, 'dd/MM/yyyy');
-    const newSchoolTermStarted = startSchoolTermDateTime.diff(DateTime.now()).as('milliseconds') < 0;
-    // Buscamos en que periodo escolar estamos, si ya empezo el nuevo año escolar o no
-    const currentSchoolTerm = newSchoolTermStarted ?
-      `${DateTime.now().year}-${DateTime.now().plus({ years: 1 }).year}`
-      :
-      `${DateTime.now().minus({ years: 1 }).year}-${DateTime.now().year}`;
+    return {
+      first: {
+        ...(await stages).first,
+        [eduLevel]: await fetchGradesByEducationLevel(classroomGradesParams, { fetchParams: stagesParamsMap.first }),
+      },
+      second: {
+        ...(await stages).second,
+        [eduLevel]: await fetchGradesByEducationLevel(classroomGradesParams, { fetchParams: stagesParamsMap.second }),
+      },
+      third: {
+        ...(await stages).third,
+        [eduLevel]: await fetchGradesByEducationLevel(classroomGradesParams, { fetchParams: stagesParamsMap.third }),
+      },
+    }
 
-    schemedGradesByYear.schoolTerm = currentSchoolTerm;
+  }, { first: {}, second: {}, third: {} })
 
-    const schemedYearsGraded = yearsGrades.map(year => year.reduce((studentsGrades, { data: [data] }, idx, dataArray) => {
-      const headersLastIndex = 1; // Usamos este valor para saltar datos innecesarios del array
-      const headersIndex = 1;
-      const headers = dataArray[headersIndex].data.flat()
+  const schemedGradesByEducationLevel = Object.entries(fetchedGradesByStages)
+    .reduce((schemedGradesByEducationLevel, [stage, educationLevelsGrades]) => {
+      // Esta funcion nos devolvera la data de las calificaciones del salon en el esquema de 'yearsGrades.schema.js`
+      const schemeClassroomGrades = year => year.reduce((studentsGrades, { data: [data] }, idx, dataArray) => {
+        const headersLastIndex = 1; // Usamos este valor para saltar datos innecesarios del array
+        const headersIndex = 1;
+        const headers = dataArray[headersIndex].data.flat()
 
-      // Saltamos cualquier data que no sea del estudiante
-      const isNotStudentData = isNaN(Number(data[0])) || data.length !== headers.length;
-      if ((idx <= headersLastIndex) || isNotStudentData) return studentsGrades;
+        // Saltamos cualquier data que no sea del estudiante
+        const isNotStudentData = isNaN(Number(data[0])) || data.length !== headers.length;
+        if ((idx <= headersLastIndex) || isNotStudentData) return studentsGrades;
 
-      const dataWithHeaders = headers.reduce((dataWithHeaders, header, idx) => ({ ...dataWithHeaders, [header]: data.at(idx) }), {})
+        const dataWithHeaders = headers.reduce((dataWithHeaders, header, idx) => ({ ...dataWithHeaders, [header]: data.at(idx) }), {})
 
-      const subjectsCodeWithGrades = Object.fromEntries(Object.entries(dataWithHeaders).filter(([key, value]) => Object.keys(subjectsCodeMap).includes(key)));
+        // Diccionario de datos de las materias dadas
+        const subjectsCodeMap = {
+          // TODO: agregar las materias de preescolar y primaria
+          CA: 'CASTELLANO',
+          ILE: 'INGLES Y OTRAS LENGUAS EXTRANJERAS',
+          MA: 'MATEMÁTICA',
+          EF: 'EDUCACION FISICA',
+          AP: 'ARTE Y PATRIMONIO',
+          CN: 'CIENCIAS NATURALES',
+          GHC: 'GEOGRAFIA, HISTORIA Y CIUDADANIA',
+          OC: 'ORIENTACION Y CONVIVENCIA',
+          PG: 'PART. EN GRUPOS DE CREACIÓN, RECREACIÓN Y PRODUCCIÓN',
+          FI: 'FISICA',
+          QU: 'QUIMICA',
+          BI: 'BIOLOGIA',
+          CT: 'CIENCIAS DE LA TIERRA',
+          FS: 'FORMACION PARA LA SOBERANIA NACIONAL',
+        };
 
-      // Formateamos la data de las materias calificadas al esquema de 'yearGrades.schema.js' 
-      const schemedSubjectsWithGrades = Object.entries(subjectsCodeWithGrades).map(([code, grade]) => ({
-        subject: { code, name: subjectsCodeMap[code] },
-        grade,
-      }))
-      
-      // Sacamos la informacion relevante del estudiante
-      const studentData = {
-        documentId: { number: dataWithHeaders['N° de Identificación'] },
-        fullname: dataWithHeaders['Estudiante'],
-      }
-      const section = dataWithHeaders['Sección'];
+        const subjectsCodeWithGrades = Object.fromEntries(Object.entries(dataWithHeaders).filter(([key, value]) => Object.keys(subjectsCodeMap).includes(key)));
 
-      // Los estudiantes son unicos, por lo que no habra duplicados que sobreescriban la data
-      studentsGrades.push({ ...studentData, stages: { [stage]: { section, subjects: schemedSubjectsWithGrades } } });
+        // Formateamos la data de las materias calificadas al esquema de 'yearGrades.schema.js' 
+        const schemedSubjectsWithGrades = Object.entries(subjectsCodeWithGrades).map(([code, grade]) => ({
+          subject: { code, name: subjectsCodeMap[code] },
+          grade,
+        }))
 
-      return studentsGrades;
-    }, []))
-
-    schemedYearsGraded.forEach((yearGraded, idx) => {
-      const yearSelectionMap = {
-        0: 'firstYear',
-        1: 'secondYear',
-        2: 'thirdYear',
-        3: 'fourthYear',
-        4: 'fifthYear',
-      }
-      const yearSelected = yearSelectionMap[idx];
-
-      yearGraded.forEach(studentGraded => {
-        if (schemedGradesByYear[yearSelected].has(studentGraded.fullname)) {
-          schemedGradesByYear[yearSelected].set(studentGraded.fullname, { ...studentGraded, stages: { ...schemedGradesByYear[yearSelected].get(studentGraded.fullname).stages, ...studentGraded.stages } })
-        } else {
-          schemedGradesByYear[yearSelected].set(studentGraded.fullname, studentGraded)
+        // Sacamos la informacion relevante del estudiante
+        const student = {
+          documentId: { number: dataWithHeaders['N° de Identificación'] },
+          fullname: dataWithHeaders['Estudiante'],
         }
-      })
+        const section = dataWithHeaders['Sección'];
+
+        // Los estudiantes son unicos, por lo que no habra duplicados que sobreescriban la data
+        studentsGrades.push({ student, stages: { [stage]: { section, subjects: schemedSubjectsWithGrades } } });
+
+        return studentsGrades;
+      }, []);
+
+      // Creamos un esquema de los niveles academicos con sus calificaciones
+      // Ex: { elementary: {...}, middleschool: {...}, highschool: { firstYear: [Grades] } }
+      // ! Le falta incluir las notas por lapsos
+      const schemedEducationLevelsGrades = Object.entries(educationLevelsGrades).reduce((schemedGrades, [level, classroomGrade]) => {
+        const schemedClassroomsGrades = Object.fromEntries(Object.entries(classroomGrade).map(([classGrade, grades]) => [classGrade, schemeClassroomGrades(grades)]))
+
+        return {
+          ...schemedGrades,
+          [level]: schemedClassroomsGrades
+        };
+      }, {})
+
+      // Agregamos las notas por lapsos al esquema de notas por nivel academico
+      const schemedEducationLevelsGradesByStages = Object.entries(schemedEducationLevelsGrades)
+        .reduce((schema, [educationLevel, classroomGrades]) => {
+          const classroomGradesByStages = Object.fromEntries(Object.entries(classroomGrades).map(([classroom, grades]) => {
+            const gradesByStages = grades.map(grade => {
+              const prevStagesGrades = schema[educationLevel][classroom]?.find(schemaGrade =>
+                schemaGrade?.student?.fullname === grade.student.fullname
+              )?.stages
+
+              return {
+                ...grade,
+                stages: { ...prevStagesGrades, ...grade.stages }
+              }
+            })
+
+            return [classroom, gradesByStages]
+          }))
+
+          return {
+            ...schema,
+            [educationLevel]: classroomGradesByStages,
+          }
+
+        }, schemedGradesByEducationLevel)
+      
+      return schemedEducationLevelsGradesByStages
+    }, {
+      schoolTerm: getCurrentSchoolTerm(),
+      elementary: {},
+      middleschool: {},
+      highschool: {},
     })
 
-    return schemedGradesByYear;
-
-  }, {
-    schoolTerm: undefined,
-    firstYear: new Map(),
-    secondYear: new Map(),
-    thirdYear: new Map(),
-    fourthYear: new Map(),
-    fifthYear: new Map(),
-  })
-
-  // Eliminamos el Map para retornarlo como un Array para un mejor manejo
-  return {
-    ...schemedGradesByYear,
-    firstYear: [...schemedGradesByYear.firstYear.values()],
-    secondYear: [...schemedGradesByYear.secondYear.values()],
-    thirdYear: [...schemedGradesByYear.thirdYear.values()],
-    fourthYear: [...schemedGradesByYear.fourthYear.values()],
-    fifthYear: [...schemedGradesByYear.fifthYear.values()],
-  }
+  return schemedGradesByEducationLevel;
 }
 
 module.exports = {
