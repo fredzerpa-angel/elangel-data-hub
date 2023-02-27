@@ -1,4 +1,5 @@
 const axios = require("axios");
+const { DateTime } = require("luxon");
 const xlsx = require('node-xlsx').default;
 
 /* 
@@ -92,7 +93,21 @@ async function fetchAndParseExcelLatinFileToJSON(url = '', params = {}, method =
   return parsedExcelData;
 }
 
+function getCurrentSchoolTerm() {
+  // Los periodos escolares empiezan el 01/09 y terminan el 30/07 de cada año
+  const startSchoolTermDateTime = DateTime.fromFormat(`01/09/${DateTime.now().year}`, 'dd/MM/yyyy');
+  const newSchoolTermStarted = startSchoolTermDateTime.diff(DateTime.now()).as('milliseconds') < 0;
+  // Buscamos en que periodo escolar estamos, si ya empezo el nuevo año escolar o no
+  const currentSchoolTerm = newSchoolTermStarted ?
+    `${DateTime.now().year}-${DateTime.now().plus({ years: 1 }).year}`
+    :
+    `${DateTime.now().minus({ years: 1 }).year}-${DateTime.now().year}`;
+
+  return currentSchoolTerm;
+}
+
 module.exports = {
   convertObjectStringToSchema,
   fetchAndParseExcelLatinFileToJSON,
+  getCurrentSchoolTerm,
 };
