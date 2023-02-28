@@ -13,7 +13,14 @@
 
 # misc
 .DS_Store
+<<<<<<< HEAD
 .env*
+=======
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+>>>>>>> afc88b635844115ddf7fa5153348d3289cdd1353
 .eslintcache
 
 npm-debug.log*
