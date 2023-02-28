@@ -1,7 +1,7 @@
 {
-  "name": "elangel-data-hub",
+  "name": "elangel-data-hub-api",
   "version": "1.0.0",
-  "description": "Testing mongo & mongoose features",
+  "description": "",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
@@ -9,9 +9,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "mongo",
-    "mongoose",
-    "preview"
+    "elangel",
+    "elangel-api",
+    "elangel-datahub",
+    "elangel-data-hub"
   ],
   "author": "Fred Zerpa",
   "license": "MIT",
