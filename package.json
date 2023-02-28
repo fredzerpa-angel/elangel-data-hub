@@ -1,5 +1,5 @@
 {
-  "name": "mongo-preview",
+  "name": "elangel-data-hub",
   "version": "1.0.0",
   "description": "Testing mongo & mongoose features",
   "main": "src/server.js",
