@@ -17,6 +17,7 @@
   "author": "Fred Zerpa",
   "license": "MIT",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.282.0",
     "@meanie/mongoose-upsert-many": "^2.2.0",
     "axios": "^0.27.2",
     "dotenv": "^16.0.0",
