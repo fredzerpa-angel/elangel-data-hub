@@ -6,6 +6,7 @@ const DUMP_INITIAL_OPTIONS = {
   filePrefix: '', // Si solo se usa el prefix se agregara un sufijo de la fecha actual en formato ISO
   fileFullname: null, // Reemplaza el nombre completo del archivo a crear
   pathToDumpFolder: null, // Si es nulo se creara el backup en el mismo directorio
+  database: '',
   config: path.join(__dirname, 'config.yaml'), // ref: https://www.mongodb.com/docs/database-tools/mongorestore/#std-option-mongorestore.--archive
 }
 
@@ -15,9 +16,9 @@ const DUMP_INITIAL_OPTIONS = {
 function dumpDatabase(dumpOptions = DUMP_INITIAL_OPTIONS) {
   const options = { ...DUMP_INITIAL_OPTIONS, ...dumpOptions };
 
-  const DUMP_NAME = options.fileFullname ?? `${options.filePrefix}-${DateTime.now().toISODate()}`;
+  const DUMP_NAME = options.fileFullname ?? `${options.filePrefix}-${DateTime.now().toISODate()}.archive.gz`;
   const DUMP_PATH = path.join(options.pathToDumpFolder ?? '', DUMP_NAME);
-  const cmd = `mongodump --config="${options.config}" --archive="${DUMP_PATH}.archive.gz" --gzip --quiet`;
+  const cmd = `mongodump --config="${options.config}" --db ${options.database} --archive="${DUMP_PATH}" --gzip --quiet`;
 
   try {
     execSync(cmd);
