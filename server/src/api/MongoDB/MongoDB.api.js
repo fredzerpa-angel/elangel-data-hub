@@ -23,6 +23,10 @@ function dumpDatabase(dumpOptions = DUMP_INITIAL_OPTIONS) {
     execSync(cmd);
     return {
       ok: true,
+      data: {
+        fileName: DUMP_NAME,
+        filePath: DUMP_PATH,
+      }
     }
   } catch (err) {
     return {
