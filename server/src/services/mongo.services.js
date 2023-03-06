@@ -32,7 +32,7 @@ async function mongoDisconnect() {
   }
 }
 
-async function mongoDumpDB() {
+async function mongoBackupDatabase() {
   try {
 
     const dumpResponse = dumpDatabase({
@@ -56,5 +56,5 @@ async function mongoDumpDB() {
 module.exports = {
   mongoConnect,
   mongoDisconnect,
-  mongoDumpDB,
+  mongoBackupDatabase,
 };
