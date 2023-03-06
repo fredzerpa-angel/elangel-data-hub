@@ -3,9 +3,9 @@ const { DateTime } = require('luxon');
 const execSync = require('child_process').execSync;
 
 const DUMP_INITIAL_OPTIONS = {
-  filePrefix: null, // Si solo se usa el prefix se agregara un sufijo de la fecha actual en formato ISO
+  filePrefix: '', // Si solo se usa el prefix se agregara un sufijo de la fecha actual en formato ISO
   fileFullname: null, // Reemplaza el nombre completo del archivo a crear
-  folderPathToDump: null, // Si es nulo se creara el backup en el mismo directorio
+  pathToDumpFolder: null, // Si es nulo se creara el backup en el mismo directorio
   config: path.join(__dirname, 'config.yaml'), // ref: https://www.mongodb.com/docs/database-tools/mongorestore/#std-option-mongorestore.--archive
 }
 
@@ -16,7 +16,7 @@ function dumpDatabase(dumpOptions = DUMP_INITIAL_OPTIONS) {
   const options = { ...DUMP_INITIAL_OPTIONS, ...dumpOptions };
 
   const DUMP_NAME = options.fileFullname ?? `${options.filePrefix}-${DateTime.now().toISODate()}`;
-  const DUMP_PATH = path.join(options.folderPathToDump ?? '', DUMP_NAME);
+  const DUMP_PATH = path.join(options.pathToDumpFolder ?? '', DUMP_NAME);
   const cmd = `mongodump --config="${options.config}" --archive="${DUMP_PATH}.archive.gz" --gzip --quiet`;
 
   try {
@@ -34,8 +34,7 @@ function dumpDatabase(dumpOptions = DUMP_INITIAL_OPTIONS) {
 }
 
 const RESTORE_INITIAL_OPTIONS = {
-  fileName: null, // Nombre completo (excluyendo la extension) del archivo. Ex: 'el-angel-2023-01-01'
-  filePath: null, // Si es nulo buscara en la ruta del directorio actual
+  filePath: '', // Nombre completo (incluyendo la ruta) del archivo. Ex: 'el-angel-2023-01-01'
   // ! Confirmar las autorizaciones del usuario para insertar documentos en la BD
   config: path.join(__dirname, 'config.yaml'), // ref: https://www.mongodb.com/docs/database-tools/mongorestore/#std-option-mongorestore.--archive
 }
@@ -43,8 +42,7 @@ const RESTORE_INITIAL_OPTIONS = {
 async function restoreDatabase(restoreOptions = RESTORE_INITIAL_OPTIONS) {
   const options = { ...RESTORE_INITIAL_OPTIONS, ...restoreOptions };
 
-  const RESTORE_FILE_NAME = `${options.fileName}.archive.gz`;
-  const RESTORE_FILE_PATH = path.join(options.filePath ?? '', RESTORE_FILE_NAME);
+  const RESTORE_FILE_PATH = options.filePath.includes('.archive.gz') ? options.filePath : `${options.filePath}.archive.gz`;
   const cmd = `mongorestore --config="${options.config}" --archive="${RESTORE_FILE_PATH}" --gzip`;
 
   try {
