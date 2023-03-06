@@ -1,6 +1,8 @@
 const axios = require("axios");
 const { DateTime } = require("luxon");
 const xlsx = require('node-xlsx').default;
+const fs = require('fs');
+
 
 /* 
   Convierte una propiedad String de un objeto en un esquema
@@ -106,8 +108,28 @@ function getCurrentSchoolTerm() {
   return currentSchoolTerm;
 }
 
+function removeFile(filePath) {
+  try {
+
+    fs.unlinkSync(filePath);
+
+    return {
+      ok: true,
+      file: filePath,
+    }
+  } catch (err) {
+    return {
+      ok: false,
+      file: filePath,
+      error: err,
+    }
+  }
+
+}
+
 module.exports = {
   convertObjectStringToSchema,
   fetchAndParseExcelLatinFileToJSON,
   getCurrentSchoolTerm,
+  removeFile
 };
