@@ -47,7 +47,7 @@ async function mongoBackupDatabase() {
 
     if (uploadBackupResponse.ok) removeFile(dumpResponse.data.filePath);
 
-    console.log(`Dumped Backup File ${uploadBackupResponse.file} on AWS.`);
+    console.log(`Created Backup File ${uploadBackupResponse.file} on AWS.`);
   } catch (err) {
     console.log('Error on Database Backup Service: ', err.message);
   }
