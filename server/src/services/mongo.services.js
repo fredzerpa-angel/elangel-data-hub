@@ -1,5 +1,7 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
+const path = require('path');
+const { dumpDatabase } = require('../api/MongoDB/MongoDB.api');
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -28,7 +30,17 @@ async function mongoDisconnect() {
   }
 }
 
+function mongoDumpDB() {
+  const dumpResponse = dumpDatabase({
+    filePrefix: 'db-elangel',
+    folderPathToDump: path.join(__dirname, '..', 'temp-backups', 'MongoDB'),
+  })
+
+  if (dumpResponse.ok) console.log(`Database el-angel Backup dumped on ${path.join(__dirname, 'temp-backups', 'MongoDB')}`)
+}
+
 module.exports = {
   mongoConnect,
   mongoDisconnect,
+  mongoDumpDB,
 };
