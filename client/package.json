@@ -1,0 +1,74 @@
+{
+  "name": "soft-ui-dashboard-react",
+  "version": "4.0.0",
+  "author": "Creative Tim",
+  "license": "SEE LICENSE IN <https://www.creative-tim.com/license>",
+  "description": "ReactJS version of Soft UI Dashboard by Creative Tim",
+  "bugs": {
+    "url": "https://github.com/app-generator/react-soft-ui-dashboard/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/app-generator/react-soft-ui-dashboard.git"
+  },
+  "engines": {
+    "node": ">= 14",
+    "npm": ">=6"
+  },
+  "build": {
+    "npm": "v14.0.0"
+  },
+  "dependencies": {
+    "@emotion/react": "11.9.3",
+    "@emotion/styled": "11.9.3",
+    "@mui/icons-material": "5.8.4",
+    "@mui/material": "5.8.6",
+    "@mui/styled-engine": "5.8.0",
+    "@testing-library/jest-dom": "5.16.4",
+    "@testing-library/react": "13.3.0",
+    "@testing-library/user-event": "14.2.1",
+    "axios": "^1.2.0",
+    "chart.js": "4.2.0",
+    "chroma-js": "2.4.2",
+    "prop-types": "15.8.1",
+    "react": "18.2.0",
+    "react-chartjs-2": "5.2.0",
+    "react-countup": "6.3.0",
+    "react-dom": "18.2.0",
+    "react-flatpickr": "3.10.13",
+    "react-loader-spinner": "^5.3.4",
+    "react-router-dom": "6.3.0",
+    "react-scripts": "5.0.1",
+    "uuid": "8.3.2",
+    "web-vitals": "2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
+    "install:peer-deps": "npm install --legacy-peer-deps"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "prettier": "2.7.1"
+  }
+}
