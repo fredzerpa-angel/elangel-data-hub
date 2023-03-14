@@ -1,24 +1,23 @@
 import axios from "./index";
-import { API_SERVER } from "config/constant";
 
-class AuthApi {
-  static Login = (data) => {
-    return axios.post(`${API_SERVER}users/login`, data);
-  };
+const API_SERVER = process.env.REACT_APP_BACKEND_SERVER;
 
-  static Register = (data) => {
-    return axios.post(`${API_SERVER}users/register`, data);
-  };
-
-  static Authorize = (code) => {
-    return axios.get(`${API_SERVER}sessions/oauth/github?code=${code}`);
-  };
-
-  static Logout = (data) => {
-    return axios.post(`${API_SERVER}users/logout`, data, {
+const AuthApi = {
+  loginWithEmailAndPassword: async (data) => {
+    return await axios.post(`${API_SERVER}/auth/login`, data);
+  },
+  loginWithGoogle: async (token) => {
+    const user = await axios.post(`${API_SERVER}/auth/google`, token);
+    return user;
+  },
+  registerWithEmailAndPassword: async (data) => {
+    return await axios.post(`${API_SERVER}/auth/register`, data);
+  },
+  logout: async (data) => {
+    return await axios.post(`${API_SERVER}/auth/logout`, data, {
       headers: { Authorization: `${data.token}` },
-    });
-  };
+    })
+  }
 }
 
 export default AuthApi;

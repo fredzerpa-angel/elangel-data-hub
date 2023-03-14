@@ -20,7 +20,7 @@ import Divider from "@mui/material/Divider";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 
-function Separator() {
+function Separator({text=""}) {
   return (
     <SoftBox position="relative" py={0.25}>
       <Divider />
@@ -34,7 +34,7 @@ function Separator() {
         sx={{ transform: "translate(-50%, -60%)" }}
       >
         <SoftTypography variant="button" fontWeight="medium" color="secondary">
-          or
+          {text}
         </SoftTypography>
       </SoftBox>
     </SoftBox>

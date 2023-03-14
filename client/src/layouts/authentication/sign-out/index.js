@@ -24,7 +24,7 @@ function SignOut() {
   let { user } = useAuth();
 
   const handleLogout = useCallback(async () => {
-    await AuthApi.Logout(user);
+    await AuthApi.logout(user);
     await setUser(null);
     localStorage.removeItem("user");
     return navigate("/authentication/sign-in");

@@ -107,7 +107,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const handleCloseMenu = () => setOpenMenu(false);
 
   const handleLogout = () => {
-    AuthApi.Logout(user);
+    AuthApi.logout(user);
     setUser(null);
     localStorage.removeItem("user");
     return navigate("/authentication/sign-in");

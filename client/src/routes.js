@@ -39,6 +39,7 @@ Coded by www.creative-tim.com
 import Dashboard from "layouts/dashboard";
 import Tables from "layouts/tables";
 import Billing from "layouts/billing";
+import Events from "layouts/events";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
@@ -82,6 +83,16 @@ const routes = [
     noCollapse: true,
     protected: true,
   },
+  {
+    type: "collapse",
+    name: "Events",
+    key: "events",
+    route: "/events",
+    icon: <CreditCard size="12px" />,
+    component: <Events />,
+    noCollapse: true,
+    protected: true,
+  },
   { type: "title", title: "Account Pages", key: "account-pages" },
   {
     type: "collapse",
@@ -111,6 +122,7 @@ const routes = [
     component: <SignUp />,
     noCollapse: true,
   },
+
 ];
 
 export default routes;

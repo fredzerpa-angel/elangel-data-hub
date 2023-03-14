@@ -24,28 +24,19 @@ import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 
 // Soft UI Dashboard React examples
-import DefaultNavbar from "examples/Navbars/DefaultNavbar";
 import PageLayout from "examples/LayoutContainers/PageLayout";
 
 // Authentication layout components
 import Footer from "layouts/authentication/components/Footer";
 
-function CoverLayout({ color, header, title, description, image, top, children }) {
+function CoverLayout({ color, header, logo, title, description, image, top, children }) {
   return (
     <PageLayout background="white">
-      <DefaultNavbar
-        action={{
-          type: "external",
-          route: "https://appseed.us/product/node-js-react-soft-dashboard",
-          label: "free download",
-          color: "dark",
-        }}
-      />
       <Grid
         container
         justifyContent="center"
         sx={{
-          minHeight: "75vh",
+          minHeight: "100vh",
           margin: 0,
         }}
       >
@@ -54,14 +45,23 @@ function CoverLayout({ color, header, title, description, image, top, children }
             <SoftBox pt={3} px={3}>
               {!header ? (
                 <>
-                  <SoftBox mb={1}>
+                  <SoftBox
+                    height="16rem"
+                    sx={{
+                      backgroundImage: `url(${logo})`,
+                      backgroundSize: 'contain',
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'center',
+                    }}
+                  />
+                  {/* <SoftBox mb={1}>
                     <SoftTypography variant="h3" fontWeight="bold" color={color} textGradient>
                       {title}
                     </SoftTypography>
                   </SoftBox>
                   <SoftTypography variant="body2" fontWeight="regular" color="text">
                     {description}
-                  </SoftTypography>
+                  </SoftTypography> */}
                 </>
               ) : (
                 header
@@ -88,6 +88,7 @@ function CoverLayout({ color, header, title, description, image, top, children }
               height="100%"
               sx={{
                 backgroundImage: `url(${image})`,
+                backgroundRepeat: 'no-repeat',
                 backgroundSize: "cover",
                 transform: "skewX(10deg)",
               }}
@@ -124,6 +125,7 @@ CoverLayout.propTypes = {
   header: PropTypes.node,
   title: PropTypes.string,
   description: PropTypes.string,
+  logo: PropTypes.string,
   image: PropTypes.string.isRequired,
   top: PropTypes.number,
   children: PropTypes.node.isRequired,

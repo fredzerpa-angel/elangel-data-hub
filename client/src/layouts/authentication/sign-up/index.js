@@ -60,7 +60,7 @@ function SignUp() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    AuthApi.Register(formData)
+    AuthApi.registerWithEmailAndPassword(formData)
       .then((response) => {
         if (response.data.success) {
           return navigate("/authentication/sign-in");
