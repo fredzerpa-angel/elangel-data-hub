@@ -18,6 +18,6 @@ const server = http.createServer(app);
 // Cargamos los servicios
 (async function startServer() {
   await mongoConnect();
-  await refreshCollections();
+  // await refreshCollections();
   server.listen(PORT, console.log(`Listening on PORT ${PORT}`));
 })()
