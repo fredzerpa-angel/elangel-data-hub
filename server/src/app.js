@@ -1,4 +1,6 @@
 // Libraries
+const path = require('path');
+const cors = require('cors');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 
@@ -13,6 +15,11 @@ const authRouter = require('./routes/auth/auth.router');
 
 const app = express();
 
+// Aceptamos requests de otros origenes
+app.use(cors({
+  origin: 'http://localhost:3000',
+}))
+
 // Transforma requests entrantes con datos tipo JSON
 app.use(express.json({ limit: '50mb' })); // Cambiamos el limite para poder obtener decenas de miles de datos JSON, como los pagos
 // Transforma requests entrantes con datos tipo Form
@@ -23,6 +30,8 @@ app.use(
 );
 // Creamos una sesion para el usuario logueado y guardamos los datos en una Cookie en el cliente
 app.use(cookieParser(process.env.COOKIE_SESSION_SECRET))
+
+
 
 app.use('/students', studentsRouter);
 app.use('/parents', parentsRouter);
