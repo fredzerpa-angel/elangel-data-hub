@@ -16,8 +16,7 @@ async function httpGetAllParents(req, res) {
     const response = search ? await getParentBySearch(search) : await getAllParents();
     return res.status(200).json(response);
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de Datos tiro un error
+    return res.status(502).json({ // Base de Datos tiro un error
       error: 'Failed to fetch parents',
       message: error.message,
     });
@@ -30,8 +29,7 @@ async function httpGetParent(req, res) {
   try {
     return res.status(200).json(await getParentById(id));
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de Datos tiro un error
+    return res.status(502).json({ // Base de Datos tiro un error
       error: 'Failed to fetch parents',
       message: error.message,
     });
@@ -46,8 +44,7 @@ async function httpCreateParent(req, res) {
   try {
     return res.status(201).json(await createParent(parentData));
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de Datos tiro un error
+    return res.status(502).json({ // Base de Datos tiro un error
       error: 'Failed to create new parent',
       message: error.message,
     });
@@ -63,8 +60,7 @@ async function httpUpdateParent(req, res) {
   try {
     return res.status(200).json(await updateParent(parentId, updateData));
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de datos tiro un error
+    return res.status(502).json({ // Base de datos tiro un error
       error: 'Failed to update parent',
       message: error.message,
     });
@@ -79,8 +75,7 @@ async function httpDeleteParent(req, res) {
   try {
     return res.status(200).json(await deleteParent(parentId));
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de datos tiro un error
+    return res.status(502).json({ // Base de datos tiro un error
       error: 'Failed to delete parent',
       message: error.message,
     });

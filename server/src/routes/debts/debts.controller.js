@@ -33,8 +33,7 @@ async function httpGetAllDebts(req, res) {
 
     return res.status(200).json(response);
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de Datos tiro un error
+    return res.status(502).json({ // Base de Datos tiro un error
       error: 'Failed to fetch debts',
       message: error.message,
     });
@@ -47,8 +46,7 @@ async function httpGetDebt(req, res) {
   try {
     return res.status(200).json(await getDebtById(id));
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de Datos tiro un error
+    return res.status(502).json({ // Base de Datos tiro un error
       error: 'Failed to fetch debts',
       message: error.message,
     });
@@ -63,8 +61,7 @@ async function httpCreateDebt(req, res) {
   try {
     return res.status(201).json(await createDebt(debtData));
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de Datos tiro un error
+    return res.status(502).json({ // Base de Datos tiro un error
       error: 'Failed to create new debt',
       message: error.message,
     });
@@ -80,8 +77,7 @@ async function httpUpdateDebt(req, res) {
   try {
     return res.status(200).json(await updateDebt(debtId, updateData));
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de datos tiro un error
+    return res.status(502).json({ // Base de datos tiro un error
       error: 'Failed to update debt',
       message: error.message,
     });
@@ -96,8 +92,7 @@ async function httpDeleteDebt(req, res) {
   try {
     return res.status(200).json(await deleteDebt(debtId));
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de datos tiro un error
+    return res.status(502).json({ // Base de datos tiro un error
       error: 'Failed to delete debt',
       message: error.message,
     });

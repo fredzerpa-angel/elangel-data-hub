@@ -33,8 +33,7 @@ async function httpGetAllPayments(req, res) {
 
     return res.status(200).json(response);
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de Datos tiro un error
+    return res.status(502).json({ // Base de Datos tiro un error
       error: 'Failed to fetch payments',
       message: error.message,
     });
@@ -47,8 +46,7 @@ async function httpGetPayment(req, res) {
   try {
     return res.status(200).json(await getPaymentById(id));
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de Datos tiro un error
+    return res.status(502).json({ // Base de Datos tiro un error
       error: 'Failed to fetch payments',
       message: error.message,
     });
@@ -63,8 +61,7 @@ async function httpCreatePayment(req, res) {
   try {
     return res.status(201).json(await createPayment(paymentData));
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de Datos tiro un error
+    return res.status(502).json({ // Base de Datos tiro un error
       error: 'Failed to create new payment',
       message: error.message,
     });
@@ -80,8 +77,7 @@ async function httpUpdatePayment(req, res) {
   try {
     return res.status(200).json(await updatePayment(paymentId, updateData));
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de datos tiro un error
+    return res.status(502).json({ // Base de datos tiro un error
       error: 'Failed to update payment',
       message: error.message,
     });
@@ -96,8 +92,7 @@ async function httpDeletePayment(req, res) {
   try {
     return res.status(200).json(await deletePayment(paymentId));
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de datos tiro un error
+    return res.status(502).json({ // Base de datos tiro un error
       error: 'Failed to delete payment',
       message: error.message,
     });

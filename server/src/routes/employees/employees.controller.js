@@ -17,8 +17,7 @@ async function httpGetAllEmployees(req, res) {
     const response = response ? await getEmployeeBySearch(search) : await getAllEmployees();
     return res.status(200).json(response);
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de Datos tiro un error
+    return res.status(502).json({ // Base de Datos tiro un error
       error: 'Failed to fetch employees',
       message: error.message,
     });
@@ -31,8 +30,7 @@ async function httpGetEmployee(req, res) {
   try {
     return res.status(200).json(await getEmployeeById(id));
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de Datos tiro un error
+    return res.status(502).json({ // Base de Datos tiro un error
       error: 'Failed to fetch employees',
       message: error.message,
     });
@@ -47,8 +45,7 @@ async function httpCreateEmployee(req, res) {
   try {
     return res.status(201).json(await createEmployee(employeeData));
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de Datos tiro un error
+    return res.status(502).json({ // Base de Datos tiro un error
       error: 'Failed to create new employee',
       message: error.message,
     });
@@ -64,8 +61,7 @@ async function httpUpdateEmployee(req, res) {
   try {
     return res.status(200).json(await updateEmployee(employeeId, updateData));
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de datos tiro un error
+    return res.status(502).json({ // Base de datos tiro un error
       error: 'Failed to update employee',
       message: error.message,
     });
@@ -80,8 +76,7 @@ async function httpDeleteEmployee(req, res) {
   try {
     return res.status(200).json(await deleteEmployee(employeeId));
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de datos tiro un error
+    return res.status(502).json({ // Base de datos tiro un error
       error: 'Failed to delete employee',
       message: error.message,
     });
@@ -103,8 +98,7 @@ async function httpCreateEmployeesByBundle(req, res) {
   try {
     return res.status(201).json(await upsertEmployeesByBundle(bundle));
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de datos tiro un error
+    return res.status(502).json({ // Base de datos tiro un error
       error: 'Failed to create bundle of employee',
       message: error.message,
     });

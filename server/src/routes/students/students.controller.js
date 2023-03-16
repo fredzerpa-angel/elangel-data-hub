@@ -17,8 +17,7 @@ async function httpGetAllStudents(req, res) {
     return res.status(200).json(response);
 
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de Datos tiro un error
+    return res.status(502).json({ // Base de Datos tiro un error
       error: 'Failed to fetch students',
       message: error.message,
     });
@@ -31,8 +30,7 @@ async function httpGetStudent(req, res) {
   try {
     return res.status(200).json(await getStudentById(id));
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de Datos tiro un error
+    return res.status(502).json({ // Base de Datos tiro un error
       error: 'Failed to fetch students',
       message: error.message,
     });
@@ -47,8 +45,7 @@ async function httpCreateStudent(req, res) {
   try {
     return res.status(201).json(await createStudent(studentData));
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de Datos tiro un error
+    return res.status(502).json({ // Base de Datos tiro un error
       error: 'Failed to create new student',
       message: error.message,
     });
@@ -64,8 +61,7 @@ async function httpUpdateStudent(req, res) {
   try {
     return res.status(200).json(await updateStudent(studentId, updateData));
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de datos tiro un error
+    return res.status(502).json({ // Base de datos tiro un error
       error: 'Failed to update student',
       message: error.message,
     });
@@ -80,8 +76,7 @@ async function httpDeleteStudent(req, res) {
   try {
     return res.status(200).json(await deleteStudent(studentId));
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de datos tiro un error
+    return res.status(502).json({ // Base de datos tiro un error
       error: 'Failed to delete student',
       message: error.message,
     });
@@ -103,8 +98,7 @@ async function httpCreateStudentsByBundle(req, res) {
   try {
     return res.status(201).json(await upsertStudentsByBundle(bundle));
   } catch (error) {
-    return res.status(502).json({
-      code: 502, // Base de datos tiro un error
+    return res.status(502).json({ // Base de datos tiro un error
       error: 'Failed to create bundle of student',
       message: error.message,
     });
