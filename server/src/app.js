@@ -31,7 +31,7 @@ app.use(
 // Creamos una sesion para el usuario logueado y guardamos los datos en una Cookie en el cliente
 app.use(cookieParser(process.env.COOKIE_SESSION_SECRET))
 
-
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.use('/students', studentsRouter);
 app.use('/parents', parentsRouter);
@@ -40,5 +40,10 @@ app.use('/debts', debtsRouter);
 app.use('/events', eventsRouter);
 app.use('/employees', employeesRouter);
 app.use('/auth', authRouter);
+
+// Enviamos el Front End a cada endpoint
+app.get('/*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+});
 
 module.exports = app;
