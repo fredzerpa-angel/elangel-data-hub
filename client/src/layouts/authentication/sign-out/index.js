@@ -16,7 +16,7 @@ import { useCallback, useEffect } from "react";
 
 import AuthApi from "../../../api/auth";
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from "../../../auth-context/auth.context";
+import { useAuth } from "../../../context/auth.context";
 
 function SignOut() {
   const navigate = useNavigate();

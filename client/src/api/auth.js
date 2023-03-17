@@ -1,22 +1,19 @@
-import axios from "./index";
+import axios from 'axios';
 
-const API_SERVER = process.env.REACT_APP_BACKEND_SERVER;
+const API_SERVER = 'api/auth';
 
 const AuthApi = {
   loginWithEmailAndPassword: async (data) => {
-    return await axios.post(`${API_SERVER}/auth/login`, data);
+    return await axios.post(`${API_SERVER}/login`, data);
   },
   loginWithGoogle: async (token) => {
-    const user = await axios.post(`${API_SERVER}/auth/google`, token);
-    return user;
+    return await axios.post(`${API_SERVER}/google`, { token });
   },
   registerWithEmailAndPassword: async (data) => {
-    return await axios.post(`${API_SERVER}/auth/register`, data);
+    return await axios.post(`${API_SERVER}/register`, data);
   },
-  logout: async (data) => {
-    return await axios.post(`${API_SERVER}/auth/logout`, data, {
-      headers: { Authorization: `${data.token}` },
-    })
+  logout: async () => {
+    return await axios.post(`${API_SERVER}/logout`);
   }
 }
 

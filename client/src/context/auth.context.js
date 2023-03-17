@@ -5,11 +5,11 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ userData, children }) => {
-  let [user, setUser] = useState(userData);
-  user = typeof user === "string" ? JSON.parse(user) : user;
-  
+  const [user, setUser] = useState(userData?.profile);
+  const [token, setToken] = useState(userData?.token);
+
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
+    <AuthContext.Provider value={{ user, setUser, token, setToken }}>
       <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
         {children}
       </GoogleOAuthProvider>
