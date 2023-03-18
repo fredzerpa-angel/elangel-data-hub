@@ -1,7 +1,3 @@
-
-
-import { useEffect } from "react";
-
 // react-router-dom components
 import { useLocation, NavLink } from "react-router-dom";
 
