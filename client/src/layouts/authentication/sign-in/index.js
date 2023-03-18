@@ -52,8 +52,6 @@ function SignIn() {
     e.preventDefault();
     setIsLoading(true);
 
-    console.log({ formData });
-
     AuthApi.loginWithEmailAndPassword({ ...formData, session: rememberMe })
       .then((response) => {
         if (response.data.status >= 400) {
