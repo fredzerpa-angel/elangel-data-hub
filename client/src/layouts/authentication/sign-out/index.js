@@ -23,9 +23,9 @@ function SignOut() {
   const { setUser } = useAuth();
 
   const handleLogout = useCallback(async () => {
-    await AuthApi.logout();
-    await setUser(null);
-    return navigate("/authentication/sign-in");
+    AuthApi.logout();
+    setUser(null);
+    return navigate("/auth/sign-in");
   }, [navigate, setUser]);
   
   useEffect(() => {

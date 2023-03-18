@@ -3,10 +3,9 @@ import { Logout, Person } from '@mui/icons-material';
 import { Avatar, Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
 import { useAuth } from 'context/auth.context';
 import { useNavigate } from 'react-router-dom';
-import AuthApi from 'api/auth';
 
 const AccountMenu = ({ buttonProps, menuProps }) => {
-  const { user, setUser } = useAuth();
+  const { user } = useAuth();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
@@ -14,9 +13,8 @@ const AccountMenu = ({ buttonProps, menuProps }) => {
   const handleClick = event => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null)
 
-  const handleLogout = async () => {
-    await AuthApi.logout(user);
-    setUser(null);
+  const handleLogout = () => {
+    navigate('/auth/sign-out');
   };
 
   return (

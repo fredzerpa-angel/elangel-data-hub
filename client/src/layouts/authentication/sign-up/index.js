@@ -50,7 +50,7 @@ function SignUp() {
     AuthApi.registerWithEmailAndPassword(formData)
       .then((response) => {
         if (response.data.success) {
-          return navigate("/authentication/sign-in");
+          return navigate("/auth/sign-in");
         } else {
           setError(response.data.msg);
         }
@@ -160,7 +160,7 @@ function SignUp() {
                   Already have an account?&nbsp;
                   <SoftTypography
                     component={Link}
-                    to="/authentication/sign-in"
+                    to="/auth/sign-in"
                     variant="button"
                     color="dark"
                     fontWeight="bold"
