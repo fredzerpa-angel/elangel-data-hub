@@ -21,7 +21,7 @@ import borders from "assets/theme/base/borders";
 import rgba from "assets/theme/functions/rgba";
 import pxToRem from "assets/theme/functions/pxToRem";
 
-const { white } = colors;
+const { white, } = colors;
 const { borderRadius } = borders;
 
 const sidenav = {

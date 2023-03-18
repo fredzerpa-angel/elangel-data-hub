@@ -19,8 +19,8 @@ SoftUI.displayName = "SoftUIContext";
 // Soft UI Dashboard React reducer
 function reducer(state, action) {
   switch (action.type) {
-    case "MINI_SIDENAV": {
-      return { ...state, miniSidenav: action.value };
+    case "MOBILE_SIDENAV": {
+      return { ...state, openMobileSidenav: action.value };
     }
     case "TRANSPARENT_SIDENAV": {
       return { ...state, transparentSidenav: action.value };
@@ -49,11 +49,11 @@ function reducer(state, action) {
 // Soft UI Dashboard React context provider
 function SoftUIControllerProvider({ children }) {
   const initialState = {
-    miniSidenav: false,
+    openMobileSidenav: false,
     transparentSidenav: true,
     sidenavColor: "info",
     transparentNavbar: true,
-    fixedNavbar: true,
+    fixedNavbar: false,
     openConfigurator: false,
     layout: "dashboard",
   };
@@ -82,24 +82,22 @@ SoftUIControllerProvider.propTypes = {
 };
 
 // Context module functions
-const setMiniSidenav = (dispatch, value) => dispatch({ type: "MINI_SIDENAV", value });
+const setOpenMobileSidenav = (dispatch, value) => dispatch({ type: "MOBILE_SIDENAV", value });
 const setTransparentSidenav = (dispatch, value) => dispatch({ type: "TRANSPARENT_SIDENAV", value });
 const setSidenavColor = (dispatch, value) => dispatch({ type: "SIDENAV_COLOR", value });
 const setTransparentNavbar = (dispatch, value) => dispatch({ type: "TRANSPARENT_NAVBAR", value });
 const setFixedNavbar = (dispatch, value) => dispatch({ type: "FIXED_NAVBAR", value });
 const setOpenConfigurator = (dispatch, value) => dispatch({ type: "OPEN_CONFIGURATOR", value });
-const setDirection = (dispatch, value) => dispatch({ type: "DIRECTION", value });
 const setLayout = (dispatch, value) => dispatch({ type: "LAYOUT", value });
 
 export {
   SoftUIControllerProvider,
   useSoftUIController,
-  setMiniSidenav,
+  setOpenMobileSidenav,
   setTransparentSidenav,
   setSidenavColor,
   setTransparentNavbar,
   setFixedNavbar,
   setOpenConfigurator,
-  setDirection,
   setLayout,
 };

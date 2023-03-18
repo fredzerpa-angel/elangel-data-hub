@@ -8,7 +8,6 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 // @mui material components
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import Icon from "@mui/material/Icon";
 
 // Soft UI Dashboard React components
 import SoftBox from "components/SoftBox";
@@ -25,32 +24,16 @@ import routes from "./routes";
 import { ProtectedRoute } from "./ProtectedRoute";
 
 // Soft UI Dashboard React contexts
-import { useSoftUIController, setMiniSidenav, setOpenConfigurator } from "context";
+import { useSoftUIController, setOpenConfigurator } from "context";
 
 // Images
-import brand from "assets/images/logo-ct.png";
+import brandLogo from "assets/images/el-angel/logo.png";
+import { Settings } from "@mui/icons-material";
 
 export default function App() {
   const [controller, dispatch] = useSoftUIController();
-  const { miniSidenav, layout, openConfigurator, sidenavColor } = controller;
-  const [onMouseEnter, setOnMouseEnter] = useState(false);
+  const { layout, openConfigurator, sidenavColor } = controller;
   const { pathname } = useLocation();
-
-  // Open sidenav when mouse enter on mini sidenav
-  const handleOnMouseEnter = () => {
-    if (miniSidenav && !onMouseEnter) {
-      setMiniSidenav(dispatch, false);
-      setOnMouseEnter(true);
-    }
-  };
-
-  // Close sidenav when mouse leave mini sidenav
-  const handleOnMouseLeave = () => {
-    if (onMouseEnter) {
-      setMiniSidenav(dispatch, true);
-      setOnMouseEnter(false);
-    }
-  };
 
   // Change the openConfigurator state
   const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
@@ -99,9 +82,7 @@ export default function App() {
       sx={{ cursor: "pointer" }}
       onClick={handleConfiguratorOpen}
     >
-      <Icon fontSize="default" color="inherit">
-        settings
-      </Icon>
+      <Settings />
     </SoftBox>
   );
 
@@ -112,11 +93,9 @@ export default function App() {
         <>
           <Sidenav
             color={sidenavColor}
-            brand={brand}
-            brandName="Soft UI Dashboard"
+            brandLogo={brandLogo}
+            brandName="U.E. El Angel"
             routes={routes}
-            onMouseEnter={handleOnMouseEnter}
-            onMouseLeave={handleOnMouseLeave}
           />
           <Configurator />
           {configsButton}

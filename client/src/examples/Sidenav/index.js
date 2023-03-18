@@ -26,34 +26,18 @@ import SidenavRoot from "examples/Sidenav/SidenavRoot";
 import sidenavLogoLabel from "examples/Sidenav/styles/sidenav";
 
 // Soft UI Dashboard React context
-import { useSoftUIController, setMiniSidenav } from "context";
+import { useSoftUIController, setOpenMobileSidenav } from "context";
+import Overlay from "./Overlay";
 
-function Sidenav({ color, brand, brandName, routes, ...rest }) {
+function Sidenav({ color, brandLogo, brandName, routes, ...rest }) {
   const [controller, dispatch] = useSoftUIController();
-  const { miniSidenav, transparentSidenav } = controller;
+  const { openMobileSidenav, transparentSidenav } = controller;
   const location = useLocation();
   const { pathname } = location;
   const collapseName = pathname.split("/").slice(1)[0];
 
-  const closeSidenav = () => setMiniSidenav(dispatch, true);
+  const closeSidenav = () => setOpenMobileSidenav(dispatch, false);
 
-  useEffect(() => {
-    // A function that sets the mini state of the sidenav.
-    function handleMiniSidenav() {
-      setMiniSidenav(dispatch, window.innerWidth < 1200);
-    }
-
-    /** 
-     The event listener that's calling the handleMiniSidenav function when resizing the window.
-    */
-    window.addEventListener("resize", handleMiniSidenav);
-
-    // Call the handleMiniSidenav function to set the state with the initial value.
-    handleMiniSidenav();
-
-    // Remove event listener on cleanup
-    return () => window.removeEventListener("resize", handleMiniSidenav);
-  }, [dispatch, location]);
 
   // Render all the routes from the routes.js (All the visible items on the Sidenav)
   const renderRoutes = routes.map(({ type, name, icon, title, noCollapse, key, route, href }) => {
@@ -113,36 +97,38 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
   });
 
   return (
-    <SidenavRoot {...rest} variant="permanent" ownerState={{ transparentSidenav, miniSidenav }}>
-      <SoftBox pt={3} pb={1} px={4} textAlign="center">
-        <SoftBox
-          display={{ xs: "block", xl: "none" }}
-          position="absolute"
-          top={0}
-          right={0}
-          p={1.625}
-          onClick={closeSidenav}
-          sx={{ cursor: "pointer" }}
-        >
-          <SoftTypography variant="h6" color="secondary">
-            <Icon sx={{ fontWeight: "bold" }}>close</Icon>
-          </SoftTypography>
-        </SoftBox>
-        <SoftBox component={NavLink} to="/" display="flex" alignItems="center">
-          {brand && <SoftBox component="img" src={brand} alt="Soft UI Logo" width="2rem" />}
+    <>
+      <SidenavRoot {...rest} variant="permanent" ownerState={{ transparentSidenav, openMobileSidenav }}>
+        <SoftBox pt={3} pb={1} px={4} textAlign="center">
           <SoftBox
-            width={!brandName && "100%"}
-            sx={(theme) => sidenavLogoLabel(theme, { miniSidenav })}
+            display={{ xs: "block", xl: "none" }}
+            position="absolute"
+            top={5}
+            right={5}
+            p={1.625}
+            onClick={closeSidenav}
+            sx={{ cursor: "pointer" }}
           >
-            <SoftTypography component="h6" variant="button" fontWeight="medium">
-              {brandName}
+            <SoftTypography variant="h6" color="secondary">
+              <Icon sx={{ fontWeight: "bold" }}>close</Icon>
             </SoftTypography>
           </SoftBox>
+          <SoftBox component={NavLink} to="/" display="flex" alignItems="center" justifyContent="center">
+            {brandLogo && <SoftBox component="img" src={brandLogo} alt="El Angel Logo" width="2rem" />}
+            <SoftBox
+              sx={(theme) => sidenavLogoLabel(theme, { openMobileSidenav })}
+            >
+              <SoftTypography textAlign="start" component="h6" variant="button" fontWeight="medium">
+                {brandName}
+              </SoftTypography>
+            </SoftBox>
+          </SoftBox>
         </SoftBox>
-      </SoftBox>
-      <Divider />
-      <List>{renderRoutes}</List>
-    </SidenavRoot>
+        <Divider />
+        <List>{renderRoutes}</List>
+      </SidenavRoot>
+      <Overlay onClick={closeSidenav} ownerState={{ openMobileSidenav }} />
+    </>
   );
 }
 
