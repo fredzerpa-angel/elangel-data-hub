@@ -34,7 +34,7 @@ export const AuthProvider = ({ userData, children }) => {
       <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
         {
           loadingSession ?
-            <LoadingPage message={error?.type === 'Connection unstable' ? 'Conexion a internet inestable' : ''} />
+            <LoadingPage message={error?.type === 'Connection unstable' && 'Conexion a internet inestable'} />
             :
             children
         }
