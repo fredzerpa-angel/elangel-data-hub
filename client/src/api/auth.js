@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_SERVER = 'api/auth';
+const API_SERVER = '/api/auth';
 
 const AuthApi = {
   loginWithEmailAndPassword: async (data) => {
@@ -11,6 +11,9 @@ const AuthApi = {
   },
   registerWithEmailAndPassword: async (data) => {
     return await axios.post(`${API_SERVER}/register`, data);
+  },
+  checkSession: async () => {
+    return await axios.post(`${API_SERVER}/session`);
   },
   logout: async () => {
     return await axios.post(`${API_SERVER}/logout`);

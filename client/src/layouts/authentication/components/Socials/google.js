@@ -4,16 +4,14 @@ import { useAuth } from 'context/auth.context';
 import { useNavigate } from 'react-router-dom';
 
 const GoogleSocial = () => {
-  const { setUser, setToken } = useAuth();
+  const { setUser } = useAuth();
   const navigate = useNavigate();
 
   return (
     <GoogleLogin
       onSuccess={async ({ credential: googleToken }) => {
-        const { data: { token, profile } } = await AuthApi.loginWithGoogle(googleToken);
-        console.log({ token, profile });
-        setToken(token);
-        setUser(profile);
+        const { data: user } = await AuthApi.loginWithGoogle(googleToken);
+        setUser(user);
         navigate('/dashboard');
       }}
       onError={(error) => {

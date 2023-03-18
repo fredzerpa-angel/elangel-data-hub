@@ -4,9 +4,7 @@ import { useNavigate, Outlet } from 'react-router-dom';
 
 export const ProtectedRoute = () => {
   const navigate = useNavigate();
-  let { user } = useAuth();
-
-  console.log({ user });
+  const { user } = useAuth();
 
   useEffect(() => {
     if (!user || !user.token || user.token === "") {

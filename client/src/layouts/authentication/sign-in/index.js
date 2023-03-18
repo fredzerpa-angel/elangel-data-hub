@@ -1,6 +1,6 @@
 
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RotatingLines } from "react-loader-spinner";
 // react-router-dom components
 import { useNavigate } from "react-router-dom";
@@ -37,7 +37,7 @@ function SignIn() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const { setUser } = useAuth();
+  const { user, setUser } = useAuth();
 
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
 
@@ -48,34 +48,32 @@ function SignIn() {
     });
   };
 
-  const setProfile = (response) => {
-    const { user, token } = response.data;
-    user.token = token;
-    setUser(user);
-    localStorage.setItem("user", JSON.stringify(user));
-    return navigate("/dashboard");
-  };
-
   const submitFormData = (e) => {
     e.preventDefault();
     setIsLoading(true);
 
+    console.log({ formData });
+
     AuthApi.loginWithEmailAndPassword({ ...formData, session: rememberMe })
       .then((response) => {
-        if (response.data.success) {
-          return setProfile(response);
-        } else {
-          setError(response.data.msg);
+        if (response.data.status >= 400) {
+          setError(response.data.message);
         }
+        setUser(response.data);
+        return navigate('/dashboard');
       })
       .catch((error) => {
         if (error.response) {
-          return setError(error.response.data.msg);
+          return setError(error.response.data.message);
         }
         return setError("There has been an error.");
       })
       .finally(() => setIsLoading(false));
   };
+
+  useEffect(() => {
+    if (user) navigate('/');
+  }, [navigate, user])
 
   return (
     <CoverLayout
@@ -149,7 +147,7 @@ function SignIn() {
               </h6>
             </SoftBox>
             <SoftBox mt={4} mb={1}>
-              <SoftButton variant="gradient" color="info" onClick={submitFormData} fullWidth>
+              <SoftButton type="submit" variant="gradient" color="info" onClick={submitFormData} fullWidth>
                 Iniciar sesion
               </SoftButton>
             </SoftBox>

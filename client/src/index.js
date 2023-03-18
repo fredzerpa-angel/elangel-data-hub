@@ -21,14 +21,11 @@ import { AuthProvider } from "./context/auth.context";
 // Soft UI Dashboard React Context Provider
 import { SoftUIControllerProvider } from "context";
 
-let user = localStorage.getItem("user");
-user = JSON.parse(user);
-
 createRoot(document.getElementById("root"))
   .render(
     <BrowserRouter>
       <SoftUIControllerProvider>
-        <AuthProvider userData={user}>
+        <AuthProvider>
           <App />
         </AuthProvider>
       </SoftUIControllerProvider>
