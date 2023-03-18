@@ -72,29 +72,22 @@ const navbarContainer = ({ breakpoints }) => ({
   },
 });
 
-const navbarRow = ({ breakpoints }, { isMini }) => ({
-  display: "flex",
+const navbarRow = ({ breakpoints }, { hideOnMobile }) => ({
+  display: hideOnMobile ? "none" : "flex",
   alignItems: "center",
-  justifyContent: "space-between",
+  justifyContent: "flex-end",
   width: "100%",
+  gap: 1,
 
   [breakpoints.up("md")]: {
-    justifyContent: isMini ? "space-between" : "stretch",
-    width: isMini ? "100%" : "max-content",
-  },
-
-  [breakpoints.up("xl")]: {
-    justifyContent: "stretch !important",
-    width: "max-content !important",
+    display: "flex",
+    justifyContent: "stretch",
+    width: "max-content",
   },
 });
 
 const navbarIconButton = ({ typography: { size }, breakpoints }) => ({
   px: 0.75,
-
-  "& .material-icons, .material-icons-round": {
-    fontSize: `${size.md} !important`,
-  },
 
   "& .MuiTypography-root": {
     display: "none",
