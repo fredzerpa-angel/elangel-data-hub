@@ -27,7 +27,7 @@ import { ProtectedRoute } from "./ProtectedRoute";
 import { useSoftUIController, setOpenConfigurator } from "context";
 
 // Images
-import brandLogo from "assets/images/el-angel/logo.png";
+import brandLogo from "assets/images/el-angel/logo-small.png";
 import { Settings } from "@mui/icons-material";
 
 export default function App() {
