@@ -99,7 +99,7 @@ function Sidenav({ color, brandLogo, brandName, routes, ...rest }) {
   return (
     <>
       <SidenavRoot {...rest} variant="permanent" ownerState={{ transparentSidenav, openMobileSidenav }}>
-        <SoftBox pt={3} pb={1} px={4} textAlign="center">
+        <SoftBox pt={3} px={4} textAlign="center">
           <SoftBox
             display={{ xs: "block", xl: "none" }}
             position="absolute"
@@ -114,11 +114,11 @@ function Sidenav({ color, brandLogo, brandName, routes, ...rest }) {
             </SoftTypography>
           </SoftBox>
           <SoftBox component={NavLink} to="/" display="flex" alignItems="center" justifyContent="center">
-            {brandLogo && <SoftBox component="img" src={brandLogo} alt="El Angel Logo" width="2rem" />}
+            {brandLogo && <SoftBox component="img" src={brandLogo} alt="El Angel Logo" width="2.5rem" />}
             <SoftBox
               sx={(theme) => sidenavLogoLabel(theme, { openMobileSidenav })}
             >
-              <SoftTypography textAlign="start" component="h6" variant="button" fontWeight="medium">
+              <SoftTypography textAlign="start" component="h6" variant="button" fontSize="1rem" fontWeight="medium">
                 {brandName}
               </SoftTypography>
             </SoftBox>
