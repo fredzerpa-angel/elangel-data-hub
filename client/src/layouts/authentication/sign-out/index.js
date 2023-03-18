@@ -21,14 +21,12 @@ import { useAuth } from "../../../context/auth.context";
 function SignOut() {
   const navigate = useNavigate();
   const { setUser } = useAuth();
-  let { user } = useAuth();
 
   const handleLogout = useCallback(async () => {
-    await AuthApi.logout(user);
+    await AuthApi.logout();
     await setUser(null);
-    localStorage.removeItem("user");
     return navigate("/authentication/sign-in");
-  }, [navigate, setUser, user]);
+  }, [navigate, setUser]);
   
   useEffect(() => {
     handleLogout();
