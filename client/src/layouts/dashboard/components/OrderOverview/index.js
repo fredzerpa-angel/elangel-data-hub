@@ -13,7 +13,7 @@ import TimelineItem from "examples/Timeline/TimelineItem";
 
 function OrdersOverview() {
   return (
-    <Card className="h-100">
+    <Card>
       <SoftBox pt={3} px={3}>
         <SoftTypography variant="h6" fontWeight="medium">
           Orders overview
