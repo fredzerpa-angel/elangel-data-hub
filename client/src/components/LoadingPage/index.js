@@ -7,7 +7,7 @@ const LoadingPage = ({ message = '' }) => {
     <Grid container justifyContent='center' alignItems='center' height='calc(100vh - 16px)'>
       <Grid item xs={8} sm={5} md={4} lg={3}>
         <img src={logo} alt='El Angel Logo' width='100%' />
-        <LinearProgress />
+        <LinearProgress color="info" />
         <Typography mt={2} align="center">
           {message}
         </Typography>

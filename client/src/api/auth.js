@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_SERVER = '/api/auth';
+const API_SERVER = (process.env.NODE_ENV === 'development' ? process.env.REACT_APP_BACKEND_API_URL : '') + '/api/auth';
 
 const AuthApi = {
   loginWithEmailAndPassword: async (data) => {

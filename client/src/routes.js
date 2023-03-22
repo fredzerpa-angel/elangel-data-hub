@@ -29,15 +29,11 @@ import Billing from "layouts/billing";
 import Events from "layouts/events";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
-import SignUp from "layouts/authentication/sign-up";
+import SignOut from "layouts/authentication/sign-out";
 
 // Soft UI Dashboard React icons
-import Shop from "examples/Icons/Shop";
 import Office from "examples/Icons/Office";
-import Document from "examples/Icons/Document";
-import SpaceShip from "examples/Icons/SpaceShip";
-import CustomerSupport from "examples/Icons/CustomerSupport";
-import CreditCard from "examples/Icons/CreditCard";
+import { Assessment, Payments, Person, Today } from "@mui/icons-material";
 
 const routes = [
   {
@@ -45,71 +41,68 @@ const routes = [
     name: "Dashboard",
     key: "dashboard",
     route: "/dashboard",
-    icon: <Shop size="12px" />,
+    icon: <Assessment />,
     component: <Dashboard />,
     noCollapse: true,
     protected: true,
   },
   {
-    type: "collapse",
+    type: "route",
     name: "Tables",
     key: "tables",
     route: "/tables",
-    icon: <Office size="12px" />,
+    icon: <Office />,
     component: <Tables />,
     noCollapse: true,
     protected: true,
   },
   {
     type: "collapse",
-    name: "Billing",
+    name: "Pagos & Deudas",
     key: "billing",
     route: "/billing",
-    icon: <CreditCard size="12px" />,
+    icon: <Payments />,
     component: <Billing />,
     noCollapse: true,
     protected: true,
   },
   {
     type: "collapse",
-    name: "Events",
+    name: "Eventos",
     key: "events",
     route: "/events",
-    icon: <CreditCard size="12px" />,
+    icon: <Today />,
     component: <Events />,
     noCollapse: true,
     protected: true,
   },
-  { type: "title", title: "Account Pages", key: "account-pages" },
+  { type: "title", title: "Configuracion", key: "account-pages" },
   {
     type: "collapse",
-    name: "Profile",
+    name: "Perfil",
     key: "profile",
     route: "/profile",
-    icon: <CustomerSupport size="12px" />,
+    icon: <Person />,
     component: <Profile />,
     noCollapse: true,
     protected: true,
   },
   {
-    type: "collapse",
+    type: "route",
     name: "Sign In",
     key: "sign-in",
-    route: "/authentication/sign-in",
-    icon: <Document size="12px" />,
+    route: "/auth/sign-in",
     component: <SignIn />,
     noCollapse: true,
   },
   {
-    type: "collapse",
-    name: "Sign Up",
-    key: "sign-up",
-    route: "/authentication/sign-up",
-    icon: <SpaceShip size="12px" />,
-    component: <SignUp />,
+    type: "route",
+    name: "Sign Out",
+    key: "sign-out",
+    route: "/auth/sign-out",
+    component: <SignOut />,
     noCollapse: true,
-  },
-
+  }
 ];
 
 export default routes;

@@ -30,8 +30,11 @@ import { useSoftUIController, setOpenConfigurator } from "context";
 import brandLogo from "assets/images/el-angel/logo-small.png";
 import { Settings } from "@mui/icons-material";
 
+import { useAuth } from "context/auth.context";
+
 export default function App() {
   const [controller, dispatch] = useSoftUIController();
+  const { user } = useAuth();
   const { layout, openConfigurator, sidenavColor } = controller;
   const { pathname } = useLocation();
 
@@ -89,7 +92,7 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      {layout === "dashboard" && (
+      {layout === "dashboard" && user && (
         <>
           <Sidenav
             color={sidenavColor}

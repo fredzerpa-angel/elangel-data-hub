@@ -16,10 +16,12 @@ export const AuthProvider = ({ userData, children }) => {
     (async () => {
       try {
         setTimeout(() => { setError({ type: 'Connection unstable', error: 'Bad internet connection' }) }, 10000);
-        const { data: userSession } = await AuthApi.checkSession();
-        setUser(userSession);
+        const { data } = await AuthApi.checkSession();
+        if (data?.error) throw new Error(data);
+        setUser(data);
       } catch (err) {
         console.log(err);
+
         setError({
           type: 'Fetching Session',
           error: err.response,

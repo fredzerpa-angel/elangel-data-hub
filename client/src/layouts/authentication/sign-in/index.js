@@ -1,12 +1,12 @@
 
 
 import { useEffect, useState } from "react";
-import { RotatingLines } from "react-loader-spinner";
+
 // react-router-dom components
 import { useNavigate } from "react-router-dom";
 
 // @mui material components
-import Switch from "@mui/material/Switch";
+import Card from "@mui/material/Card";
 
 // Soft UI Dashboard React components
 import SoftBox from "components/SoftBox";
@@ -15,16 +15,20 @@ import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
 
 // Authentication layout components
-import CoverLayout from "layouts/authentication/components/CoverLayout";
-import GoogleSocial from "../components/Socials/google";
+import BasicLayout from "layouts/authentication/components/BasicLayout";
 import Separator from "layouts/authentication/components/Separator";
 
 // Images
-import elAngelInstagramPhoto from "assets/images/el-angel/instagram/promo.jpg";
-import logo from "assets/images/el-angel/logo.png";
+import logo from "assets/images/el-angel/logo.png"
+import curved6 from "assets/images/curved-images/curved14.jpg";
 
 import AuthApi from "../../../api/auth";
-import { useAuth } from "../../../context/auth.context";
+
+import { useAuth } from "context/auth.context";
+import GoogleSocial from "../components/Socials/google";
+import { CardMedia, Switch } from "@mui/material";
+
+import linearGradient from "assets/theme/functions/linearGradient";
 
 function SignIn() {
   const navigate = useNavigate();
@@ -48,25 +52,21 @@ function SignIn() {
     });
   };
 
-  const submitFormData = (e) => {
+  const submitFormData = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    AuthApi.loginWithEmailAndPassword({ ...formData, session: rememberMe })
-      .then((response) => {
-        if (response.data.status >= 400) {
-          setError(response.data.message);
-        }
-        setUser(response.data);
-        return navigate('/dashboard');
-      })
-      .catch((error) => {
-        if (error.response) {
-          return setError(error.response.data.message);
-        }
-        return setError("There has been an error.");
-      })
-      .finally(() => setIsLoading(false));
+    try {
+      const { data } = await AuthApi.loginWithEmailAndPassword({ ...formData, session: rememberMe })
+      if (data.status >= 400) return setError(data.message);
+      setUser(data);
+      return navigate('/dashboard');
+    } catch (err) {
+      if (error.response) return setError(error.response.data.message);
+      return setError("There has been an error.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -74,90 +74,101 @@ function SignIn() {
   }, [navigate, user])
 
   return (
-    <CoverLayout
-      title="Bienvenido de vuelta"
-      description="Inicie sesion a traves de su cuenta de Google El Angel o con su cuenta de Email."
-      logo={logo}
-      image={elAngelInstagramPhoto}
-      top={5}
-    >
-      {isLoading ? (
-        <SoftBox display="flex" justifyContent="center">
-          <RotatingLines
-            strokeColor="black"
-            strokeWidth="5"
-            animationDuration="0.75"
-            width="96"
-            visible={true}
-          />
-        </SoftBox>
-      ) :
+    <BasicLayout
+      title={
         <>
-          <SoftBox display="flex" flexDirection="column" alignItems="center" mb={2}>
-            <GoogleSocial />
-          </SoftBox>
-          <Separator text="o" />
-          <SoftBox component="form" role="form">
-            <SoftBox mb={2}>
-              <SoftBox mb={1} ml={0.5}>
-                <SoftTypography component="label" variant="caption" fontWeight="bold">
-                  Email
-                </SoftTypography>
-              </SoftBox>
-              <SoftInput type="email" name="email" value={formData?.email} onChange={handleFormData} placeholder="Email" />
-            </SoftBox>
-            <SoftBox mb={2}>
-              <SoftBox mb={1} ml={0.5}>
-                <SoftTypography component="label" variant="caption" fontWeight="bold">
-                  Contraseña
-                </SoftTypography>
-              </SoftBox>
-              <SoftInput
-                type="password"
-                name="password"
-                onChange={handleFormData}
-                placeholder="Contraseña"
-                value={formData?.password}
-              />
-            </SoftBox>
-            <SoftBox display="flex" alignItems="center">
-              <Switch checked={rememberMe} onChange={handleSetRememberMe} />
-              <SoftTypography
-                variant="button"
-                fontWeight="regular"
-                onClick={handleSetRememberMe}
-                sx={{ cursor: "pointer", userSelect: "none" }}
-              >
-                &nbsp;&nbsp;Recuerdame
-              </SoftTypography>
-            </SoftBox>
-            <SoftBox mt={2} mb={2} textAlign="center">
-              <h6
-                style={{
-                  fontSize: ".8em",
-                  color: "red",
-                  textAlign: "center",
-                  fontWeight: 400,
-                  transition: ".2s all",
-                }}
-              >
-                {error}
-              </h6>
-            </SoftBox>
-            <SoftBox mt={4} mb={1}>
-              <SoftButton type="submit" variant="gradient" color="info" onClick={submitFormData} fullWidth>
-                Iniciar sesion
-              </SoftButton>
-            </SoftBox>
-            <SoftBox mt={3} textAlign="center">
-              <SoftTypography variant="button" color="text" fontWeight="regular">
-                Si no posees una cuenta, por favor comunicate con Administracion El Angel.
-              </SoftTypography>
-            </SoftBox>
-          </SoftBox>
+          Bienvenido a {" "}
+          <SoftTypography
+            component="span"
+            variant="inherit"
+            sx={({ palette: { gradients } }) => ({
+              background: linearGradient(gradients.info.state, 'white', 0),
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            })}
+          >
+            El Angel DataHub
+          </SoftTypography>
         </>
       }
-    </CoverLayout>
+      description="¡Visualiza los mejores reportes del Colegio El Angel!"
+      image={curved6}
+    >
+      <Card sx={{ p: 4 }}>
+        <CardMedia
+          component="img"
+          sx={{
+            height: '10rem',
+            objectFit: 'contain',
+            m: 0,
+            mb: 2,
+          }}
+          image={logo}
+        />
+        <SoftBox display="flex" flexDirection="column" alignItems="center" mb={2}>
+          <GoogleSocial />
+        </SoftBox>
+        <Separator text="o" />
+        <SoftBox component="form" role="form">
+          <SoftBox mb={2}>
+            <SoftBox mb={1} ml={0.5}>
+              <SoftTypography component="label" variant="caption" fontWeight="bold">
+                Email
+              </SoftTypography>
+            </SoftBox>
+            <SoftInput type="email" name="email" value={formData?.email} onChange={handleFormData} placeholder="Email" />
+          </SoftBox>
+          <SoftBox mb={2}>
+            <SoftBox mb={1} ml={0.5}>
+              <SoftTypography component="label" variant="caption" fontWeight="bold">
+                Contraseña
+              </SoftTypography>
+            </SoftBox>
+            <SoftInput
+              type="password"
+              name="password"
+              onChange={handleFormData}
+              placeholder="Contraseña"
+              value={formData?.password}
+            />
+          </SoftBox>
+          <SoftBox display="flex" alignItems="center">
+            <Switch checked={rememberMe} onChange={handleSetRememberMe} />
+            <SoftTypography
+              variant="button"
+              fontWeight="regular"
+              onClick={handleSetRememberMe}
+              sx={{ cursor: "pointer", userSelect: "none" }}
+            >
+              &nbsp;&nbsp;Recuerdame
+            </SoftTypography>
+          </SoftBox>
+          <SoftBox mt={2} mb={2} textAlign="center">
+            <h6
+              style={{
+                fontSize: ".8em",
+                color: "red",
+                textAlign: "center",
+                fontWeight: 400,
+                transition: ".2s all",
+              }}
+            >
+              {error}
+            </h6>
+          </SoftBox>
+          <SoftBox mt={4} mb={1}>
+            <SoftButton loading={isLoading} type="submit" variant="gradient" color="info" onClick={submitFormData} fullWidth>
+              { !isLoading && "Iniciar sesion" }
+            </SoftButton>
+          </SoftBox>
+          <SoftBox mt={3} textAlign="center">
+            <SoftTypography variant="button" color="text" fontWeight="regular">
+              Si no posees una cuenta, por favor comunicate con Administracion El Angel.
+            </SoftTypography>
+          </SoftBox>
+        </SoftBox>
+      </Card>
+    </BasicLayout>
   );
 }
 

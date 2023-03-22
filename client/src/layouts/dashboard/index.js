@@ -2,7 +2,6 @@
 
 // @mui material components
 import Grid from "@mui/material/Grid";
-import Icon from "@mui/material/Icon";
 
 // Soft UI Dashboard React components
 import SoftBox from "components/SoftBox";
@@ -31,6 +30,7 @@ import gradientLineChartData from "layouts/dashboard/data/gradientLineChartData"
 
 // react-chartjs-2 components
 import { Chart as ChartJS, registerables } from 'chart.js';
+import { ArrowUpward } from "@mui/icons-material";
 ChartJS.register(...registerables); // Fix react-chartjs-2 migration from v3 to v5
 
 function Dashboard() {
@@ -110,7 +110,7 @@ function Dashboard() {
                 description={
                   <SoftBox display="flex" alignItems="center">
                     <SoftBox fontSize={size.lg} color="success" mb={0.3} mr={0.5} lineHeight={0}>
-                      <Icon className="font-bold">arrow_upward</Icon>
+                      <ArrowUpward />
                     </SoftBox>
                     <SoftTypography variant="button" color="text" fontWeight="medium">
                       4% more{" "}
@@ -120,8 +120,9 @@ function Dashboard() {
                     </SoftTypography>
                   </SoftBox>
                 }
-                height="20.25rem"
-                chart={gradientLineChartData}
+                p={3}
+                height="100%"
+                chart={{ ...gradientLineChartData, height: "20rem" }}
               />
             </Grid>
           </Grid>

@@ -24,7 +24,7 @@ import configs from "examples/Charts/LineCharts/GradientLineChart/configs";
 // Soft UI Dashboard React base styles
 import colors from "assets/theme/base/colors";
 
-function GradientLineChart({ title, description, height, chart }) {
+function GradientLineChart({ title, description, chart, ...rest }) {
   const chartRef = useRef(null);
   const [chartData, setChartData] = useState({
     // Placeholders for initial state, helps with undefined errors
@@ -54,32 +54,40 @@ function GradientLineChart({ title, description, height, chart }) {
       }))
       : [];
 
-    setChartData(configs(chart.labels || [], chartDatasets));
+    setChartData(configs(chart.labels || [], chartDatasets, chart.options));
   }, [chart]);
 
   const renderChart = (
-    <SoftBox p={2}>
+    <SoftBox {...rest}>
       {title || description ? (
-        <SoftBox px={description ? 1 : 0} pt={description ? 1 : 0}>
-          {title && (
-            <SoftBox mb={1}>
-              <SoftTypography variant="h6">{title}</SoftTypography>
-            </SoftBox>
-          )}
+        <SoftBox>
+          <SoftBox mb={1}>
+            {
+              typeof title === 'string' ?
+                (
+                  <SoftTypography variant="h6">{title}</SoftTypography>
+                ) : title
+            }
+          </SoftBox>
           <SoftBox mb={2}>
-            <SoftTypography component="div" variant="button" fontWeight="regular" color="text">
-              {description}
-            </SoftTypography>
+            {
+              typeof description === 'string' ?
+                (
+                  <SoftTypography variant="button" fontWeight="regular" color="text">
+                    {description}
+                  </SoftTypography>
+                ) : description
+            }
           </SoftBox>
         </SoftBox>
       ) : null}
       {useMemo(
         () => (
-          <SoftBox ref={chartRef} sx={{ height }}>
-            <Line data={data} options={options} />
+          <SoftBox ref={chartRef} sx={{ height: chart.height }}>
+            <Line data={data} options={options} redraw />
           </SoftBox>
         ),
-        [data, height, options]
+        [chart.height, data, options]
       )}
     </SoftBox>
   );
@@ -96,10 +104,11 @@ GradientLineChart.defaultProps = {
 
 // Typechecking props for the GradientLineChart
 GradientLineChart.propTypes = {
-  title: PropTypes.string,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   description: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  chart: PropTypes.objectOf(PropTypes.array).isRequired,
+  background: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  chart: PropTypes.object.isRequired,
 };
 
 export default GradientLineChart;

@@ -46,13 +46,13 @@ function Footer({ company, links }) {
         fontSize={size.sm}
         px={1.5}
       >
-        &copy; {new Date().getFullYear()} 
+        &copy; {new Date().getFullYear()}
         <Link href={href} target="_blank">
           <SoftTypography variant="button" fontWeight="medium">
             &nbsp;{name}&nbsp;
           </SoftTypography>
         </Link>
-        - Coded by AppSeed.
+        - Coded by Fred ❤.
       </SoftBox>
       <SoftBox
         component="ul"
@@ -79,11 +79,14 @@ function Footer({ company, links }) {
 
 // Setting default values for the props of Footer
 Footer.defaultProps = {
-  company: { href: "https://www.creative-tim.com/?AFFILIATE=128200", name: "Creative-Tim" },
+  company: {
+    // href: "",
+    name: "El Angel"
+  },
   links: [
     { href: "https://appseed.us/product/soft-ui-dashboard/api-server-nodejs/react/", name: "Sources" },
     { href: "https://appseed.us/support/", name: "Support" },
-    { href: "https://appseed.us/", name: "AppSeed" },
+    { href: "https://www.creative-tim.com/learning-lab/react/default-item/soft-ui-dashboard/", name: "Docs" },
   ],
 };
 

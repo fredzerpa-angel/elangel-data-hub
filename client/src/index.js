@@ -25,7 +25,7 @@ createRoot(document.getElementById("root"))
   .render(
     <BrowserRouter>
       <SoftUIControllerProvider>
-        <AuthProvider>
+        <AuthProvider userData={null}>
           <App />
         </AuthProvider>
       </SoftUIControllerProvider>

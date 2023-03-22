@@ -14,6 +14,27 @@ const gradientLineChartData = {
       data: [30, 90, 40, 140, 290, 290, 340, 230, 400],
     },
   ],
+  // Clean chart
+  // options: {
+  //   scales: {
+  //     x: {
+  //       grid: {
+  //         display: false,
+  //       },
+  //       ticks: {
+  //         display: false,
+  //       }
+  //     },
+  //     y: {
+  //       grid: {
+  //         display: false,
+  //       },
+  //       ticks: {
+  //         display: false,
+  //       }
+  //     }
+  //   }
+  // }
 };
 
 export default gradientLineChartData;

@@ -1,15 +1,14 @@
-
-
 // Soft UI Dashboard React base styles
 import typography from "assets/theme/base/typography";
+import { merge } from 'lodash';
 
-function configs(labels, datasets) {
+function configs(labels, datasets, options) {
   return {
     data: {
       labels,
       datasets: [...datasets],
     },
-    options: {
+    options: merge({
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
@@ -63,7 +62,7 @@ function configs(labels, datasets) {
           },
         },
       },
-    },
+    }, options),
   };
 }
 
