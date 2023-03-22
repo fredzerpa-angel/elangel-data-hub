@@ -9,7 +9,6 @@ import SoftTypography from "components/SoftTypography";
 
 // Soft UI Dashboard React examples
 import DefaultItem from "examples/Items/DefaultItem";
-import { ArrowUpward, ReportProblemOutlined } from "@mui/icons-material";
 
 
 const EventsOverview = ({ events }) => {
@@ -21,7 +20,7 @@ const EventsOverview = ({ events }) => {
         'info': 'info_outlined',
         'error': 'error_outlined',
         'warning': 'warning_amber',
-        'success': 'check_outlined',
+        'success': 'done_outlined',
       }
       return (
         <DefaultItem
