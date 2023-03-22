@@ -84,8 +84,7 @@ Footer.defaultProps = {
     name: "El Angel"
   },
   links: [
-    { href: "https://appseed.us/product/soft-ui-dashboard/api-server-nodejs/react/", name: "Sources" },
-    { href: "https://appseed.us/support/", name: "Support" },
+    { href: encodeURI("mailto:administracion@elangel.edu.ve?subject=Soporte Data Hub"), name: "Soporte" },
     { href: "https://www.creative-tim.com/learning-lab/react/default-item/soft-ui-dashboard/", name: "Docs" },
   ],
 };
