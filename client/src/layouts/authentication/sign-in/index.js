@@ -32,8 +32,7 @@ import linearGradient from "assets/theme/functions/linearGradient";
 
 function SignIn() {
   const navigate = useNavigate();
-
-  const [rememberMe, setRememberMe] = useState(true);
+  const [rememberMe, setRememberMe] = useState(JSON.parse(window.localStorage.getItem('rememberSession')));
   const [formData, setFormData] = useState({
     'email': '',
     'password': ''
@@ -43,7 +42,10 @@ function SignIn() {
 
   const { user, setUser } = useAuth();
 
-  const handleSetRememberMe = () => setRememberMe(!rememberMe);
+  const handleSetRememberMe = () => {
+    window.localStorage.setItem('rememberSession', !rememberMe);
+    setRememberMe(!rememberMe)
+  };
 
   const handleFormData = (e) => {
     setFormData({
@@ -158,7 +160,7 @@ function SignIn() {
           </SoftBox>
           <SoftBox mt={4} mb={1}>
             <SoftButton loading={isLoading} type="submit" variant="gradient" color="info" onClick={submitFormData} fullWidth>
-              { !isLoading && "Iniciar sesion" }
+              {!isLoading && "Iniciar sesion"}
             </SoftButton>
           </SoftBox>
           <SoftBox mt={3} textAlign="center">
