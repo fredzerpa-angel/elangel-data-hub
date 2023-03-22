@@ -8,8 +8,8 @@ const { JWT_SECRET_USERS } = process.env;
 async function checkStandardPermissions(req, res, next) {
   try {
     // Obtenemos el token para verificar el usuario
-    const bearer = req.headers.authorization;
-    const token = bearer.split(' ')[1];
+    const bearer = req.headers?.authorization;
+    const token = bearer?.split(' ')[1];
 
     const userProfile = jwt.verify(token, JWT_SECRET_USERS);
 
@@ -48,7 +48,7 @@ async function checkAdminPermissions(req, res, next) {
 async function getUserByEmailAndPassword(email, password) {
   const userAccount = await Users.getUserByEmail(email);
 
-  const passwordMatched = userAccount.comparePassword(password);
+  const passwordMatched = userAccount?.comparePassword(password);
 
   if (!passwordMatched) throw new Error('Incorrect Email or Password');
 
