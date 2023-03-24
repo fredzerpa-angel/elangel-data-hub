@@ -1,106 +1,102 @@
-
-
-// react-routers components
-import { Link } from "react-router-dom";
-
 // prop-types is library for typechecking of props
 import PropTypes from "prop-types";
 
 // @mui material components
-import Card from "@mui/material/Card";
-import Divider from "@mui/material/Divider";
-import Tooltip from "@mui/material/Tooltip";
-import Icon from "@mui/material/Icon";
+import { Card, Tooltip } from "@mui/material";
 
 // Soft UI Dashboard React components
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 
-// Soft UI Dashboard React base styles
-import colors from "assets/theme/base/colors";
-import typography from "assets/theme/base/typography";
+import { startCase } from 'lodash';
+import SoftButton from "components/SoftButton";
+import { Edit } from "@mui/icons-material";
+import { useState } from "react";
+import SoftInput from "components/SoftInput";
 
-function ProfileInfoCard({ title, description, info, social, action }) {
-  const labels = [];
-  const values = [];
-  const { socialMediaColors } = colors;
-  const { size } = typography;
+const ProfileInfoCard = ({ title, info, action }) => {
+  const [editMode, setEditMode] = useState(false);
 
-  // Convert this form `objectKey` of the object key in to this `object key`
-  Object.keys(info).forEach((el) => {
-    if (el.match(/[A-Z\s]+/)) {
-      const uppercaseLetter = Array.from(el).find((i) => i.match(/[A-Z]+/));
-      const newElement = el.replace(uppercaseLetter, ` ${uppercaseLetter.toLowerCase()}`);
+  const openEditMode = () => setEditMode(true);
+  const closeEditMode = () => setEditMode(false);
 
-      labels.push(newElement);
-    } else {
-      labels.push(el);
-    }
-  });
+  const submitForm = () => {
 
-  // Push the object values into the values array
-  Object.values(info).forEach((el) => values.push(el));
+  }
 
   // Render the card info items
-  const renderItems = labels.map((label, key) => (
-    <SoftBox key={label} display="flex" py={1} pr={2}>
-      <SoftTypography variant="button" fontWeight="bold" textTransform="capitalize">
-        {label}: &nbsp;
-      </SoftTypography>
-      <SoftTypography variant="button" fontWeight="regular" color="text">
-        &nbsp;{values[key]}
-      </SoftTypography>
-    </SoftBox>
-  ));
+  const renderItems = Object.entries(info).map(([key, value], i) => {
+    const isEditable = !['nivel', 'email'].includes(key);
 
-  // Render the card social media icons
-  const renderSocial = social.map(({ link, icon, color }) => (
-    <SoftBox
-      key={color}
-      component="a"
-      href={link}
-      target="_blank"
-      rel="noreferrer"
-      fontSize={size.lg}
-      color={socialMediaColors[color].main}
-      pr={1}
-      pl={0.5}
-      lineHeight={1}
-    >
-      {icon}
-    </SoftBox>
-  ));
+    return (
+      <SoftBox key={i} display="flex" flexDirection="column" py={1} pr={2} >
+        <SoftTypography variant="button" width="100%" fontWeight="bold" textTransform="capitalize" >
+          {
+            // Convert this form `objectKey` of the object key in to this `object key`
+            `${startCase(key)}: \u00A0`
+          }
+        </SoftTypography>
+
+        <SoftInput
+          name={key}
+          size="small"
+          width="100%"
+          defaultValue={value}
+          readOnly={!(isEditable && editMode)}
+          sx={
+            !(isEditable && editMode) &&
+            {
+              '&, &:focus, &.Mui-focused': { border: 'none', boxShadow: 'none' }
+            }
+          }
+        />
+      </SoftBox>
+    )
+  });
+
 
   return (
-    <Card sx={{ height: "100%" }}>
-      <SoftBox display="flex" justifyContent="space-between" alignItems="center" pt={2} px={2}>
+    <Card sx={{ p: 2 }}>
+      <SoftBox display="flex" justifyContent="space-between">
         <SoftTypography variant="h6" fontWeight="medium" textTransform="capitalize">
           {title}
         </SoftTypography>
-        <SoftTypography component={Link} to={action.route} variant="body2" color="secondary">
-          <Tooltip title={action.tooltip} placement="top">
-            <Icon>edit</Icon>
-          </Tooltip>
-        </SoftTypography>
+
+        {
+          !editMode && (
+            <Tooltip title={action.tooltip} placement="top">
+              <SoftButton
+                iconOnly
+                variant="text"
+                color="text"
+                circular
+                onClick={openEditMode}
+              >
+                <Edit />
+              </SoftButton>
+            </Tooltip>
+          )
+        }
       </SoftBox>
-      <SoftBox p={2}>
-        <SoftBox mb={2} lineHeight={1}>
-          <SoftTypography variant="button" color="text" fontWeight="regular">
-            {description}
-          </SoftTypography>
-        </SoftBox>
-        <SoftBox opacity={0.3}>
-          <Divider />
-        </SoftBox>
+      <SoftTypography variant="button" fontWeight="regular" color="text" paragraph>
+        Para cambiar su nivel o email, por favor comuniquese con administracion
+      </SoftTypography>
+      <SoftBox px={1} py={1} component="form" role="form">
         <SoftBox>
           {renderItems}
-          <SoftBox display="flex" py={1} pr={2}>
-            <SoftTypography variant="button" fontWeight="bold" textTransform="capitalize">
-              social: &nbsp;
-            </SoftTypography>
-            {renderSocial}
-          </SoftBox>
         </SoftBox>
+        {
+          editMode && (
+            <SoftBox display="flex" alignItems="center" justifyContent="flex-end" gap={3} p={2}>
+              <SoftButton size="small" onClick={closeEditMode}>
+                Cancelar
+              </SoftButton>
+              <SoftButton size="small" color="dark" onClick={submitForm}>
+                Guardar
+              </SoftButton>
+            </SoftBox>
+          )
+        }
       </SoftBox>
     </Card>
   );
@@ -109,9 +105,7 @@ function ProfileInfoCard({ title, description, info, social, action }) {
 // Typechecking props for the ProfileInfoCard
 ProfileInfoCard.propTypes = {
   title: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
   info: PropTypes.objectOf(PropTypes.string).isRequired,
-  social: PropTypes.arrayOf(PropTypes.object).isRequired,
   action: PropTypes.shape({
     route: PropTypes.string.isRequired,
     tooltip: PropTypes.string.isRequired,

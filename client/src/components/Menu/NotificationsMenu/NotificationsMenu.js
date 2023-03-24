@@ -7,7 +7,7 @@ import { Notifications, Payment } from '@mui/icons-material';
 import team2 from "assets/images/team-2.jpg";
 import logoSpotify from "assets/images/small-logos/logo-spotify.svg";
 
-const NotificationsMenu = ({ buttonProps, menuProps }) => {
+const NotificationsMenu = ({ button, menu }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
@@ -23,7 +23,7 @@ const NotificationsMenu = ({ buttonProps, menuProps }) => {
         aria-haspopup="true"
         variant="contained"
         onClick={handleClick}
-        {...buttonProps}
+        {...button}
       >
         <Notifications />
       </IconButton>
@@ -36,7 +36,7 @@ const NotificationsMenu = ({ buttonProps, menuProps }) => {
         open={open}
         onClose={handleClose}
         sx={{ mt: 1 }}
-        {...menuProps}
+        {...menu}
       >
         <NotificationItem
           image={<img src={team2} alt="person" />}

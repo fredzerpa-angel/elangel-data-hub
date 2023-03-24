@@ -4,7 +4,7 @@ import { Avatar, Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem
 import { useAuth } from 'context/auth.context';
 import { useNavigate } from 'react-router-dom';
 
-const AccountMenu = ({ buttonProps, menuProps }) => {
+const AccountMenu = ({ button, menu }) => {
   const { user } = useAuth();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -25,7 +25,7 @@ const AccountMenu = ({ buttonProps, menuProps }) => {
         aria-controls={open ? 'account-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
-        {...buttonProps}
+        {...button}
       >
         <Avatar alt={user?.fullname} src={user?.imageUrl} />
       </IconButton>
@@ -38,7 +38,7 @@ const AccountMenu = ({ buttonProps, menuProps }) => {
         onClick={handleClose}
         transformOrigin={{ horizontal: 'center', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
-        {...menuProps}
+        {...menu}
       >
         <MenuItem onClick={() => navigate('/profile')}>
           <ListItemIcon>

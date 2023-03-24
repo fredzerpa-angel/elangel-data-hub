@@ -33,8 +33,8 @@ import {
   setOpenMobileSidenav,
 } from "context";
 
-import AccountMenu from "components/Menu/AccountMenu";
-import NotificationsMenu from "components/Menu/NotificationMenu";
+import AccountMenu from "components/Menu/AccountMenu/AccountMenu";
+import NotificationsMenu from "components/Menu/NotificationsMenu/NotificationsMenu";
 import { Menu, MenuOpen } from "@mui/icons-material";
 
 function DashboardNavbar({ absolute, light, isMini }) {
@@ -94,8 +94,8 @@ function DashboardNavbar({ absolute, light, isMini }) {
             </IconButton>
           </SoftBox>
           <SoftBox color={light ? "white" : "inherit"} sx={(theme) => navbarRow(theme, { hideOnMobile: false })}>
-            <NotificationsMenu buttonProps={{ size: 'large', sx: { navbarIconButton } }} />
-            <AccountMenu buttonProps={{ sx: navbarIconButton }} />
+            <NotificationsMenu button={{ size: 'large', sx: { navbarIconButton } }} />
+            <AccountMenu button={{ sx: navbarIconButton }} />
           </SoftBox>
         </SoftBox>
       </Toolbar>

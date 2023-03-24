@@ -24,7 +24,6 @@
 
 // Soft UI Dashboard React layouts
 import Dashboard from "layouts/dashboard";
-import Tables from "layouts/tables";
 import Billing from "layouts/billing";
 import Events from "layouts/events";
 import Profile from "layouts/profile";
@@ -32,7 +31,6 @@ import SignIn from "layouts/authentication/sign-in";
 import SignOut from "layouts/authentication/sign-out";
 
 // Soft UI Dashboard React icons
-import Office from "examples/Icons/Office";
 import { Assessment, Payments, Person, Today } from "@mui/icons-material";
 
 const routes = [
@@ -43,16 +41,6 @@ const routes = [
     route: "/dashboard",
     icon: <Assessment />,
     component: <Dashboard />,
-    noCollapse: true,
-    protected: true,
-  },
-  {
-    type: "route",
-    name: "Tables",
-    key: "tables",
-    route: "/tables",
-    icon: <Office />,
-    component: <Tables />,
     noCollapse: true,
     protected: true,
   },
