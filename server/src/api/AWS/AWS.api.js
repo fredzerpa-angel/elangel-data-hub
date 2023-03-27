@@ -13,7 +13,7 @@ const AWS_S3_CLIENT = new S3Client({
 const UPLOAD_CONFIG = {
   filePath: '', // Nombre completo (incluyendo la ruta) del archivo. Ex: 'el-angel-2023-01-01'
   keyName: '', // Reenombra el archivo al guardarse en el bucket (incluye las extensiones '.gz, .gzip, .txt, .json')
-  bucketName: 'elangel-mongodb-dumps',
+  bucketName: '', // Nombre del S3 Bucket
 }
 
 async function uploadFileToBucket(config = UPLOAD_CONFIG) {

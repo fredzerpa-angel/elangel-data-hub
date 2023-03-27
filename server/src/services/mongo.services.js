@@ -43,6 +43,7 @@ async function mongoBackupDatabase() {
 
     const uploadBackupResponse = await uploadFileToBucket({
       filePath: dumpResponse.data.filePath,
+      bucketName: 'elangel-mongodb-dumps',
     })
 
     if (uploadBackupResponse.ok) removeFile(dumpResponse.data.filePath);
