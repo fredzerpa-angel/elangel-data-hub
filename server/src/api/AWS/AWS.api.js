@@ -1,6 +1,5 @@
 require('dotenv').config();
-const { PutObjectCommand, S3Client } = require("@aws-sdk/client-s3");
-const path = require('path');
+const { S3Client, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 
 const AWS_S3_CLIENT = new S3Client({
   region: 'us-east-1',
@@ -16,22 +15,49 @@ const UPLOAD_CONFIG = {
   bucketName: '', // Nombre del S3 Bucket
 }
 
-async function uploadFileToBucket(config = UPLOAD_CONFIG) {
+async function uploadFileToBucket(config = UPLOAD_CONFIG, options = { ContentEncoding: '', ContentType: '', ACL: '' }) {
   const uploadConfig = { ...UPLOAD_CONFIG, ...config };
 
-  const fileOriginalName = path.basename(config.filePath);
-  const fileName = config.keyName ?? fileOriginalName;
   const command = new PutObjectCommand({
     Bucket: uploadConfig.bucketName, // Nombre del bucket
-    Key: fileName, // Nombre del archivo al guardarse en el bucket
-    Body: uploadConfig.filePath // Archivo o data que se guardara en el bucket
+    Key: uploadConfig.keyName, // Nombre del archivo al guardarse en el bucket
+    Body: uploadConfig.filePath, // Archivo o data que se guardara en el bucket
+    ...options
   });
 
   try {
     const response = await AWS_S3_CLIENT.send(command);
     return {
       ok: response.$metadata.httpStatusCode >= 200 && response.$metadata.httpStatusCode <= 300,
-      file: fileName,
+      file: uploadConfig.keyName,
+      response,
+    }
+  } catch (err) {
+    return {
+      ok: false,
+      error: err,
+    }
+  }
+}
+
+const DELETE_CONFIG = {
+  keyName: '', // Reenombra el archivo al guardarse en el bucket (incluye las extensiones '.gz, .gzip, .txt, .json')
+  bucketName: '', // Nombre del S3 Bucket
+}
+
+async function deleteFileFromBucket(config = DELETE_CONFIG) {
+  const deleteConfig = { ...DELETE_CONFIG, ...config };
+
+  const command = new DeleteObjectCommand({
+    Bucket: deleteConfig.bucketName, // Nombre del bucket
+    Key: deleteConfig.keyName, // Nombre del archivo al guardarse en el bucket
+  });
+
+  try {
+    const response = await AWS_S3_CLIENT.send(command);
+    return {
+      ok: response.$metadata.httpStatusCode >= 200 && response.$metadata.httpStatusCode <= 300,
+      file: deleteConfig.keyName,
       response,
     }
   } catch (err) {
@@ -44,4 +70,5 @@ async function uploadFileToBucket(config = UPLOAD_CONFIG) {
 
 module.exports = {
   uploadFileToBucket,
+  deleteFileFromBucket
 }

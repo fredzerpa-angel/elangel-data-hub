@@ -11,10 +11,11 @@ import SoftAvatar from "components/SoftAvatar";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 // Images
-import burceMars from "assets/images/bruce-mars.jpg";
 import curved0 from "assets/images/curved-images/curved0.jpg";
 
-const Header = () => {
+const Header = ({ user }) => {
+  const isAdmin = Object.values(user.privileges).flatMap(access => Object.values(access)).every(Boolean);
+
   return (
     <SoftBox position="relative">
       <DashboardNavbar absolute light />
@@ -50,8 +51,8 @@ const Header = () => {
         <Grid container spacing={3} alignItems="center">
           <Grid item>
             <SoftAvatar
-              src={burceMars}
-              alt="profile-image"
+              src={user.imageUrl}
+              alt={user.fullname}
               variant="rounded"
               size="xl"
               shadow="sm"
@@ -60,10 +61,10 @@ const Header = () => {
           <Grid item>
             <SoftBox height="100%" mt={0.5} lineHeight={1}>
               <SoftTypography variant="h5" fontWeight="medium">
-                Alex Thompson
+                {user.fullname}
               </SoftTypography>
-              <SoftTypography variant="button" color="text" fontWeight="medium">
-                CEO / Co-Founder
+              <SoftTypography variant="button" color="text" fontWeight="medium" textTransform="uppercase">
+                {isAdmin ? "Administrador" : "Usuario"}
               </SoftTypography>
             </SoftBox>
           </Grid>

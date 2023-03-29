@@ -9,14 +9,28 @@ import Switch from "@mui/material/Switch";
 // Soft UI Dashboard React components
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
+import { Controller, useForm } from "react-hook-form";
+import useUsers from "hooks/users.hooks";
+import { enqueueSnackbar } from "notistack";
 
-function PlatformSettings() {
-  const [followsMe, setFollowsMe] = useState(true);
-  const [answersPost, setAnswersPost] = useState(true);
-  const [mentionsMe, setMentionsMe] = useState(true);
+function PlatformSettings({ user }) {
+  const { updateUserByEmail } = useUsers();
+  const { control, handleSubmit } = useForm({
+    defaultValues: user.notifications
+  });
+
+  const onSubmit = async (notifications) => {
+    try {
+      const response = await updateUserByEmail(user.email, { notifications });
+      if (!response?.ok) throw new Error(response.message)
+      return enqueueSnackbar("Se han cambiado tus configuraciones exitosamente", { variant: "success" });
+    } catch (err) {
+      enqueueSnackbar(err.message, { variant: "error" });
+    }
+  }
 
   return (
-    <Card sx={{ p: 2 }}>
+    <Card sx={{ p: 2 }} component="form" role="form" onChange={handleSubmit(onSubmit)}>
       <SoftBox>
         <SoftTypography variant="h6" fontWeight="medium" textTransform="capitalize">
           Configuraciones
@@ -26,9 +40,15 @@ function PlatformSettings() {
         <SoftTypography variant="caption" fontWeight="bold" color="text" textTransform="uppercase">
           Cuenta
         </SoftTypography>
-        <SoftBox display="flex" py={1} mb={0.25}>
+        <SoftBox display="flex" alignItems="center" py={1} mb={0.25}>
           <SoftBox mt={0.25}>
-            <Switch checked={followsMe} onChange={() => setFollowsMe(!followsMe)} />
+            <Controller
+              control={control}
+              name="students.assistance"
+              render={({ field: { value, ...rest } }) => (
+                <Switch checked={value} {...rest} />
+              )}
+            />
           </SoftBox>
           <SoftBox width="80%" ml={2}>
             <SoftTypography variant="button" fontWeight="regular" color="text">
@@ -36,19 +56,31 @@ function PlatformSettings() {
             </SoftTypography>
           </SoftBox>
         </SoftBox>
-        <SoftBox display="flex" py={1} mb={0.25}>
+        <SoftBox display="flex" alignItems="center" py={1} mb={0.25}>
           <SoftBox mt={0.25}>
-            <Switch checked={answersPost} onChange={() => setAnswersPost(!answersPost)} />
+            <Controller
+              control={control}
+              name="events.onGoing"
+              render={({ field: { value, ...rest } }) => (
+                <Switch checked={value} {...rest} />
+              )}
+            />
           </SoftBox>
           <SoftBox width="80%" ml={2}>
             <SoftTypography variant="button" fontWeight="regular" color="text">
-              Notificarme los eventos 'En Curso'
+              Notificarme los eventos "En Curso"
             </SoftTypography>
           </SoftBox>
         </SoftBox>
-        <SoftBox display="flex" py={1} mb={0.25}>
+        <SoftBox display="flex" alignItems="center" py={1} mb={0.25}>
           <SoftBox mt={0.25}>
-            <Switch checked={mentionsMe} onChange={() => setMentionsMe(!mentionsMe)} />
+            <Controller
+              control={control}
+              name="debts.onWatch"
+              render={({ field: { value, ...rest } }) => (
+                <Switch checked={value} {...rest} />
+              )}
+            />
           </SoftBox>
           <SoftBox width="80%" ml={2}>
             <SoftTypography variant="button" fontWeight="regular" color="text">

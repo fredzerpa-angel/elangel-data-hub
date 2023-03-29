@@ -17,29 +17,31 @@ import PlatformSettings from "layouts/profile/components/PlatformSettings";
 import ChangePassword from "./components/ChangePassword";
 import UsersList from "./components/UsersList";
 
+import { useAuth } from "context/auth.context";
+
 // Data
-import usersListData from "layouts/profile/data/usersListData";
+import USERS_MOCK from "layouts/profile/data/usersListData";
 
 const ProfileOverview = () => {
+  const { user } = useAuth();
+
   return (
     <DashboardLayout>
-      <Header />
+      <Header user={user} />
       <SoftBox mt={5} mb={3}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={4}>
-            <PlatformSettings />
+            <PlatformSettings user={user} />
           </Grid>
           <Grid item container xs={12} md={4} spacing={3}>
             <Grid item xs={12} md={12}>
               <ProfileInfoCard
                 title="Informacion de Perfil"
                 info={{
-                  nivel: 'ADMINISTRADOR',
-                  email: "alecthompson@mail.com",
-                  nombreCompleto: "Alec M. Thompson",
-                  telefono: "(44) 123 1234 123",
+                  email: user.email,
+                  fullname: user?.fullname,
+                  phone: user?.phones?.main || "N/A",
                 }}
-                action={{ route: "", tooltip: "Editar" }}
               />
             </Grid>
             <Grid item xs={12} md={12}>
@@ -47,7 +49,7 @@ const ProfileOverview = () => {
             </Grid>
           </Grid>
           <Grid item xs={12} md={4}>
-            <UsersList title="Usuarios" users={usersListData} />
+            <UsersList title="Usuarios" users={USERS_MOCK.filter(({ email }) => email !== user.email)} />
           </Grid>
         </Grid>
       </SoftBox>

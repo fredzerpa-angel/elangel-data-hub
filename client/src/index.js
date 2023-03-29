@@ -16,18 +16,25 @@ Coded by www.creative-tim.com
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from "react-router-dom";
 import App from "App";
-import { AuthProvider } from "./context/auth.context";
 
 // Soft UI Dashboard React Context Provider
+import { AuthProvider } from "./context/auth.context";
 import { SoftUIControllerProvider } from "context";
+import { SnackbarProvider } from 'notistack'
 
 createRoot(document.getElementById("root"))
   .render(
     <BrowserRouter>
       <SoftUIControllerProvider>
-        <AuthProvider userData={null}>
-          <App />
-        </AuthProvider>
+        <SnackbarProvider
+          maxSnack={3}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          disableWindowBlurListener={true}
+        >
+          <AuthProvider userData={null}>
+            <App />
+          </AuthProvider>
+        </SnackbarProvider>
       </SoftUIControllerProvider>
-    </BrowserRouter>
+    </BrowserRouter >
   );

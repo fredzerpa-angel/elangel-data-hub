@@ -5,7 +5,7 @@ require('dotenv').config();
 
 const { JWT_SECRET_USERS } = process.env;
 
-async function checkStandardPermissions(req, res, next) {
+async function checkUserAuth(req, res, next) {
   try {
     // Obtenemos el token para verificar el usuario
     const bearer = req.headers?.authorization;
@@ -28,13 +28,14 @@ async function checkStandardPermissions(req, res, next) {
   }
 }
 
-async function checkAdminPermissions(req, res, next) {
+const checkUserPrivilegesAccess = (privilege = "users", access = "read") => async (req, res, next) => {
   try {
-    // Obtenemos el perfil del usuario del Standard Permissions middleware
+    // Obtenemos el perfil del usuario del checkUserAuth middleware
     const { userProfile } = res.locals;
-
-    const isAdmin = (await Users.getUserByEmail(userProfile.email)).role;
-    if (isAdmin) throw new Error('Insufficient privileges')
+    
+    // Leemos los privilegios del usuario 
+    const isAllowed = (await Users.getUserByEmail(userProfile.email)).privileges[privilege][access];
+    if (!isAllowed) throw new Error('Insufficient privileges')
 
     return next(); // Si no hay error, el usuario esta autorizado
   } catch (error) {
@@ -48,7 +49,7 @@ async function checkAdminPermissions(req, res, next) {
 async function getUserByEmailAndPassword(email, password) {
   const userAccount = await Users.getUserByEmail(email);
 
-  const passwordMatched = userAccount?.comparePassword(password);
+  const passwordMatched = await userAccount?.comparePassword(password);
 
   if (!passwordMatched) throw new Error('Incorrect Email or Password');
 
@@ -87,8 +88,8 @@ async function getGoogleOAuthProfile(token) {
 }
 
 module.exports = {
-  checkStandardPermissions,
-  checkAdminPermissions,
+  checkUserAuth,
+  checkUserPrivilegesAccess,
   getGoogleOAuthProfile,
   isAnAllowedUser,
   createUserIfNotExists,

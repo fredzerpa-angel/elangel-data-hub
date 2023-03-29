@@ -43,6 +43,7 @@ async function mongoBackupDatabase() {
 
     const uploadBackupResponse = await uploadFileToBucket({
       filePath: dumpResponse.data.filePath,
+      keyName: path.basename(dumpResponse.data.filePath), // Nombre original del archivo
       bucketName: 'elangel-mongodb-dumps',
     })
 

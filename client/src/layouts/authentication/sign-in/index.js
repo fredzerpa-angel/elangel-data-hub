@@ -22,7 +22,7 @@ import Separator from "layouts/authentication/components/Separator";
 import logo from "assets/images/el-angel/logo.png"
 import curved6 from "assets/images/curved-images/curved14.jpg";
 
-import AuthApi from "../../../api/auth";
+import AuthApi from "../../../api/auth.api";
 
 import { useAuth } from "context/auth.context";
 import GoogleSocial from "../components/Socials/google";

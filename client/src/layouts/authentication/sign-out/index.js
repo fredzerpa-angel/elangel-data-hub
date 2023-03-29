@@ -14,7 +14,7 @@ Coded by www.creative-tim.com
 */
 import { useCallback, useEffect } from "react";
 
-import AuthApi from "../../../api/auth";
+import AuthApi from "../../../api/auth.api";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from "../../../context/auth.context";
 

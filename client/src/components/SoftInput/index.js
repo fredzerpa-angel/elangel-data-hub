@@ -37,7 +37,7 @@ const SoftInput = forwardRef(({ size, icon, error, success, disabled, ...rest },
           ownerState={{ size, error, success, iconDirection, disabled }}
         />
         <SoftInputIconBoxRoot ownerState={{ size }}>
-          <SoftInputIconRoot fontSize="small" ownerState={{ size }}>
+          <SoftInputIconRoot fontSize="small" onClick={icon.onClick} ownerState={{ size, isButton: !!(icon.onClick) }}>
             {icon.component}
           </SoftInputIconRoot>
         </SoftInputIconBoxRoot>
@@ -58,6 +58,7 @@ SoftInput.defaultProps = {
   icon: {
     component: false,
     direction: "none",
+    onClick: null,
   },
   error: false,
   success: false,
@@ -69,6 +70,7 @@ SoftInput.propTypes = {
   size: PropTypes.oneOf(["small", "medium", "large"]),
   icon: PropTypes.shape({
     component: PropTypes.oneOfType([PropTypes.node, PropTypes.bool]),
+    onClick: PropTypes.func,
     direction: PropTypes.oneOf(["none", "left", "right"]),
   }),
   error: PropTypes.bool,

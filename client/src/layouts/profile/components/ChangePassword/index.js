@@ -8,39 +8,48 @@ import Card from "@mui/material/Card";
 // Soft UI Dashboard React components
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
-import AuthApi from "api/auth";
 import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
 
+import useUsers from "hooks/users.hooks";
+import { useForm } from "react-hook-form";
+import { enqueueSnackbar } from "notistack";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+
 function ChangePassword() {
-  const [formData, setFormData] = useState({
-    password: '',
-    repassword: ''
-  });
-  const [error, setError] = useState("");
+  const { changePassword } = useUsers();
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    defaultValues: {
+      oldPassword: "",
+      newPassword: ""
+    }
+  })
+  const [visibleOldPassword, setVisibleOldPassword] = useState(false);
+  const [visibleNewPassword, setVisibleNewPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleFormData = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const submitFormData = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-
+  
+  const onSubmit = async ({ oldPassword, newPassword }) => {
     try {
-      const { data } = await AuthApi.loginWithEmailAndPassword(formData)
-      if (data.status >= 400) return setError(data.message);
+      setIsLoading(true);
+      const response = await changePassword(oldPassword, newPassword);
+      if (!response?.ok) {
+        return enqueueSnackbar(response.message, { variant: "error" });
+      }
+      enqueueSnackbar("Su clave se ha cambiado exitosamente", { variant: "success" })
     } catch (err) {
-      if (error.response) return setError(error.response.data.message);
-      return setError("There has been an error.");
+      return enqueueSnackbar(err.message, { variant: "error" });
     } finally {
       setIsLoading(false);
     }
-  };
+  }
+
+  const renderPasswordVisibilityIcon = (visible) => {
+    return visible ?
+      <Visibility />
+      :
+      <VisibilityOff />
+  }
 
   return (
     <Card sx={{ p: 2 }}>
@@ -52,50 +61,61 @@ function ChangePassword() {
           Si ha olvidado su contraseña, por favor comuniquese con administracion
         </SoftTypography>
       </SoftBox>
-      <SoftBox component="form" role="form">
+      <SoftBox component="form" role="form" onSubmit={handleSubmit(onSubmit)}>
         <SoftBox mb={2}>
           <SoftBox mb={1} ml={0.5}>
-            <SoftTypography component="label" variant="caption" fontWeight="bold">
-              Contraseña
+            <SoftTypography component="label" variant="caption" fontWeight="bold" textTransform="capitalize">
+              Contraseña actual
             </SoftTypography>
           </SoftBox>
           <SoftInput
-            type="password"
-            name="password"
-            value={formData?.password}
-            onChange={handleFormData}
+            {...register("oldPassword", {
+              required: "Este campo es obligatorio",
+              minLength: { value: 8, message: "La contraseña debe contener al menos 8 caracteres" }
+            })}
             placeholder="Contraseña Actual"
+            error={!!errors?.oldPassword}
+            type={visibleOldPassword ? 'text' : 'password'}
+            icon={{
+              component: renderPasswordVisibilityIcon(visibleOldPassword),
+              direction: "right",
+              onClick: () => setVisibleOldPassword(!visibleOldPassword),
+            }}
           />
+          {!!errors?.oldPassword &&
+            <SoftTypography fontSize="small" color="error" fontWeight="light">
+              {errors?.oldPassword.message}
+            </SoftTypography>
+          }
         </SoftBox>
         <SoftBox mb={2}>
           <SoftBox mb={1} ml={0.5}>
-            <SoftTypography component="label" variant="caption" fontWeight="bold">
+            <SoftTypography component="label" variant="caption" fontWeight="bold" textTransform="capitalize">
               Nueva contraseña
             </SoftTypography>
           </SoftBox>
           <SoftInput
-            type="password"
-            name="repassword"
-            value={formData?.password}
-            onChange={handleFormData}
+            {...register("newPassword", {
+              required: "Este campo es obligatorio",
+              minLength: { value: 8, message: "La contraseña debe contener al menos 8 caracteres" }
+            })}
             placeholder="Nueva Contraseña"
-          />
-        </SoftBox>
-        <SoftBox mt={2} mb={2} textAlign="center">
-          <h6
-            style={{
-              fontSize: ".8em",
-              color: "red",
-              textAlign: "center",
-              fontWeight: 400,
-              transition: ".2s all",
+            error={!!errors?.newPassword}
+            type={visibleNewPassword ? 'text' : 'password'}
+            icon={{
+              component: renderPasswordVisibilityIcon(visibleNewPassword),
+              direction: "right",
+              onClick: () => setVisibleNewPassword(!visibleNewPassword),
             }}
-          >
-            {error}
-          </h6>
+          />
+          {!!errors?.newPassword &&
+            <SoftTypography fontSize="small" color="error" fontWeight="light">
+              {errors?.newPassword.message}
+            </SoftTypography>
+          }
         </SoftBox>
         <SoftBox mt={4} mb={1}>
-          <SoftButton loading={isLoading} type="submit" variant="gradient" color="info" onClick={submitFormData} fullWidth>
+          <SoftButton loading={isLoading} type="submit" variant="gradient" color="info" fullWidth>
             {!isLoading && "Cambiar contraseña"}
           </SoftButton>
         </SoftBox>

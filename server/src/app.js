@@ -3,10 +3,13 @@ const path = require('path');
 const cors = require('cors');
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const fileUpload = require('express-fileupload');
 require('dotenv').config();
 
 // Routes
 const apiRouter = require('./routes/api/api.router');
+const authRouter = require('./routes/auth/auth.router');
+const { checkUserAuth } = require('./routes/auth/auth.utils');
 
 const app = express();
 
@@ -26,13 +29,16 @@ app.use(
     extended: false,
   })
 );
+app.use(fileUpload());
+
 // Creamos una sesion para el usuario logueado y guardamos los datos en una Cookie en el cliente
 app.use(cookieParser(process.env.COOKIE_SESSION_SECRET))
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // Se centraran todas las rutas del servidor (Estudiantes, Pagos, ...) en el ruta '/api'
-app.use('/api', apiRouter);
+app.use('/api', checkUserAuth, apiRouter);
+app.use('/auth', authRouter); // LogIn, LogOut y Registro de usuario
 
 // Enviamos el Front End a cada endpoint
 app.get('/*', (req, res) => {

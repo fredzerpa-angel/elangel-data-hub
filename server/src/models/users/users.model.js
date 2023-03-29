@@ -1,14 +1,14 @@
 const users = require('./users.mongo');
 
 async function getAllUsers() {
-  return await users.find().lean();
+  return await users.find({}, { password: 0 }).lean();
 }
 
 async function createUser(userData) {
   return await users.create(userData);
 }
 
-async function updateUser(userId, updateData) {
+async function updateUserById(userId, updateData) {
   const options = {
     new: true, // Retorna el Estudiante con los datos actualizados
     runValidators: true, // Aplica las validaciones del User Schema otra vez
@@ -17,8 +17,21 @@ async function updateUser(userId, updateData) {
   return await users.findByIdAndUpdate(userId, updateData, options);
 }
 
-async function deleteUser(userId) {
-  return await users.findByIdAndDelete(userId);
+async function updateUserByEmail(email, updateData) {
+  const options = {
+    new: true, // Retorna el Estudiante con los datos actualizados
+    runValidators: true, // Aplica las validaciones del User Schema otra vez
+  };
+
+  return await users.findOneAndUpdate({ email: email }, updateData, options);
+}
+
+async function deleteUserByEmail(email) {
+  return await users.findOneAndDelete({ email });
+}
+
+async function getUserById(id) {
+  return await users.findById(id);
 }
 
 async function getUserByEmail(email) {
@@ -31,7 +44,7 @@ async function userExists({ email }) {
 
 async function getUserBySearch(search) {
   return await users
-    .find()
+    .find({}, { password: 0 })
     .or([
       { email: new RegExp(search, 'gi') },
     ]).lean();
@@ -40,9 +53,11 @@ async function getUserBySearch(search) {
 module.exports = {
   getAllUsers,
   createUser,
-  updateUser,
-  deleteUser,
+  updateUserById,
+  updateUserByEmail,
+  deleteUserByEmail,
   userExists,
+  getUserById,
   getUserByEmail,
   getUserBySearch,
 };

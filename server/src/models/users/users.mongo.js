@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const phonesSchema = require('../schemas/phones.schema');
 
 const userSchema = new mongoose.Schema({
   imageUrl: {
@@ -27,32 +28,83 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
-  role: {
-    type: String,
-    enum: ['user', 'admin'],
-    required: true,
-    default: 'user',
+  phones: phonesSchema,
+  privileges: {
+    reports: {
+      read: {
+        type: Boolean,
+        default: true,
+      },
+    },
+    users: {
+      read: {
+        type: Boolean,
+        default: true,
+      },
+      upsert: {
+        type: Boolean,
+        default: false,
+      },
+      delete: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    events: {
+      read: {
+        type: Boolean,
+        default: true,
+      },
+      upsert: {
+        type: Boolean,
+        default: false,
+      },
+      delete: {
+        type: Boolean,
+        default: false,
+      },
+    },
+  },
+  notifications: {
+    students: {
+      // Estudiantes que necesitan asistencia academica
+      assistance: {
+        type: Boolean,
+        default: true,
+      },
+    },
+    events: {
+      // Eventos que estan en curso
+      onGoing: {
+        type: Boolean,
+        default: true,
+      },
+    },
+    debts: {
+      // Deudas de los estudiantes que necesitan ser vigiladas por su acumulacion
+      onWatch: {
+        type: Boolean,
+        default: true,
+      },
+    }
   }
 });
 
-userSchema.pre('save', function (next) {
+userSchema.pre('save', async function (next) {
+  // Solo encriptamos la calve si ha sido modificada o es nueva
   if (!this.isModified('password')) return next();
 
-  bcrypt.hashSync(this.password, 10, (err, passwordHashed) => {
-    if (err) return next(err);
-
-    this.password = passwordHashed;
-    next();
-  })
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    return next();
+  } catch (err) {
+    return next(err);
+  }
 });
 
-userSchema.methods.comparePassword = function (password) {
-  return bcrypt.compareSync(password, this.password)
-}
-
-userSchema.methods.setPassword = async function (password, cb) {
-  const passwordHashed = await bcrypt.hash(password, 10);
-  return await this.updateOne({ password: passwordHashed }, cb);
+userSchema.methods.comparePassword = async function (password) {
+  return await bcrypt.compare(password, this.password)
 }
 
 // Conecta userSchema con "Users" colleccion

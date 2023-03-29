@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import AuthApi from "api/auth";
+import AuthApi from "api/auth.api";
 import LoadingPage from "components/LoadingPage";
 
 const AuthContext = createContext(null);

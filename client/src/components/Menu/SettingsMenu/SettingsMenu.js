@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { MoreVert } from '@mui/icons-material';
-import { Box, Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
+import { Box, Divider, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
 import PropTypes from 'prop-types';
+import SoftButton from 'components/SoftButton';
 
 const SettingsMenu = ({ button, menu, items }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -13,7 +14,7 @@ const SettingsMenu = ({ button, menu, items }) => {
   const renderItems = items.map((item, idx, arr) => {
     const isLastItem = ++idx === arr.length;
     return (
-      <Box>
+      <Box key={idx}>
         <MenuItem onClick={item?.action ?? null}>
           <ListItemIcon>
             {item?.icon}
@@ -32,19 +33,20 @@ const SettingsMenu = ({ button, menu, items }) => {
 
   return (
     <>
-      <IconButton
+      <SoftButton
         onClick={openMenu}
         aria-controls={open ? 'settings-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
         iconOnly
-        variant='text'
-        color='text'
+        size="large"
+        variant="text"
+        color="secondary"
         sx={{ pl: 0 }}
         {...button}
       >
         <MoreVert />
-      </IconButton>
+      </SoftButton>
 
       <Menu
         anchorEl={anchorEl}

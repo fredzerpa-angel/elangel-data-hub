@@ -8,17 +8,14 @@ const studentsRouter = require('../students/students.router');
 const debtsRouter = require('../debts/debts.router');
 const eventsRouter = require('../events/events.router');
 const employeesRouter = require('../employees/employees.router');
-const authRouter = require('../auth/auth.router');
+const usersRouter = require('../users/users.router');
 
-// Utils
-const { checkStandardPermissions } = require('../auth/auth.utils');
-
-apiRouter.use('/students', checkStandardPermissions, studentsRouter);
-apiRouter.use('/parents', checkStandardPermissions, parentsRouter);
-apiRouter.use('/payments', checkStandardPermissions, paymentsRouter);
-apiRouter.use('/debts', checkStandardPermissions, debtsRouter);
-apiRouter.use('/events', checkStandardPermissions, eventsRouter);
-apiRouter.use('/employees', checkStandardPermissions, employeesRouter);
-apiRouter.use('/auth', authRouter);
+apiRouter.use('/students', studentsRouter);
+apiRouter.use('/parents', parentsRouter);
+apiRouter.use('/payments', paymentsRouter);
+apiRouter.use('/debts', debtsRouter);
+apiRouter.use('/events', eventsRouter);
+apiRouter.use('/employees', employeesRouter);
+apiRouter.use('/users', usersRouter);
 
 module.exports = apiRouter;

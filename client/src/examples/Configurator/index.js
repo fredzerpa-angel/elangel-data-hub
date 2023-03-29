@@ -77,7 +77,7 @@ function Configurator() {
         px={3}
       >
         <SoftBox>
-          <SoftTypography variant="h5">Soft UI Configurator</SoftTypography>
+          <SoftTypography variant="h5">Configuraciones de Pantalla</SoftTypography>
           <SoftTypography variant="body2" color="text">
             Vea nuestas opciones del dashboard.
           </SoftTypography>
