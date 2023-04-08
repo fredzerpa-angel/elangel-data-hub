@@ -1,7 +1,3 @@
-
-
-import { useState } from "react";
-
 // @mui material components
 import Card from "@mui/material/Card";
 import Switch from "@mui/material/Switch";
@@ -10,19 +6,17 @@ import Switch from "@mui/material/Switch";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import { Controller, useForm } from "react-hook-form";
-import useUsers from "hooks/users.hooks";
 import { enqueueSnackbar } from "notistack";
 
-function PlatformSettings({ user }) {
-  const { updateUserByEmail } = useUsers();
+function PlatformSettings({ settings, onChange }) {
   const { control, handleSubmit } = useForm({
-    defaultValues: user.notifications
+    defaultValues: settings
   });
 
-  const onSubmit = async (notifications) => {
+  const onSubmit = async (settings) => {
     try {
-      const response = await updateUserByEmail(user.email, { notifications });
-      if (!response?.ok) throw new Error(response.message)
+      const response = await onChange({ notifications: settings });
+      if (response?.error || !response) throw new Error(response?.message || "Error en el cambio de configuraciones")
       return enqueueSnackbar("Se han cambiado tus configuraciones exitosamente", { variant: "success" });
     } catch (err) {
       enqueueSnackbar(err.message, { variant: "error" });

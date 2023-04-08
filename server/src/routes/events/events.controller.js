@@ -10,8 +10,6 @@ const {
 async function httpGetAllEvents(req, res) {
   const { search } = req.query;
 
-  // TODO: Implementar las validaciones
-
   try {
     const response = await getEventBySearch(search);
     return res.status(200).json(response);
@@ -25,7 +23,6 @@ async function httpGetAllEvents(req, res) {
 
 async function httpGetEvent(req, res) {
   const { id } = req.params;
-  // TODO: Implementar las validaciones
   try {
     return res.status(200).json(await getEventById(id));
   } catch (error) {
@@ -38,8 +35,6 @@ async function httpGetEvent(req, res) {
 
 async function httpCreateEvent(req, res) {
   const eventData = req.body;
-
-  // TODO: Implementar las validaciones
 
   try {
     return res.status(201).json(await createEvent(eventData));
@@ -55,8 +50,6 @@ async function httpUpdateEvent(req, res) {
   const eventId = req.params.id;
   const updateData = req.body;
 
-  // TODO: Implementar validaciones
-
   try {
     return res.status(200).json(await updateEvent(eventId, updateData));
   } catch (error) {
@@ -70,7 +63,6 @@ async function httpUpdateEvent(req, res) {
 async function httpDeleteEvent(req, res) {
   const eventId = req.params.id;
 
-  // TODO: Implementar validaciones
   try {
     return res.status(200).json(await deleteEvent(eventId));
   } catch (error) {

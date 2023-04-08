@@ -37,29 +37,32 @@ const createUserApi = (token) => {
         data: userUpdatedData,
       });
     },
+    updateSelfUser: async (userUpdatedData) => {
+      return await usersApiInstance({
+        method: 'PUT',
+        data: userUpdatedData,
+      });
+    },
     deleteUserByEmail: async (email) => {
       return await usersApiInstance({
         method: 'DELETE',
-        url: email,
+        url: { email },
       });
     },
     changePassword: async (oldPassword, newPassword) => {
       return await usersApiInstance({
-        method: 'POST',
+        method: 'PUT',
         url: `/change-password`,
-        data: {
-          oldPassword,
-          newPassword
-        }
+        data: { oldPassword, newPassword }
       })
     },
-    setUserPassword: async (userId, password) => {
+    confirmPassword: async (password) => {
       return await usersApiInstance({
         method: 'POST',
-        url: `/set-password/${userId}`,
-        data: password
+        url: `/confirm-password`,
+        data: { password }
       })
-    },
+    }
   })
 };
 

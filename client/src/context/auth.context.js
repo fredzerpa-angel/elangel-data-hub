@@ -11,6 +11,7 @@ export const AuthProvider = ({ userData, children }) => {
   const [loadingSession, setLoadingSession] = useState(true);
   const [error, setError] = useState(null);
 
+  console.log({ user })
   useEffect(() => {
     setLoadingSession(true);
     (async () => {

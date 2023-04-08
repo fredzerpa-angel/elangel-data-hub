@@ -10,7 +10,6 @@ require('dotenv').config();
 const apiRouter = require('./routes/api/api.router');
 const authRouter = require('./routes/auth/auth.router');
 const { checkUserAuth } = require('./routes/auth/auth.utils');
-
 const app = express();
 
 // Nos permite el uso concurrente de cliente y el servidor
@@ -24,12 +23,8 @@ if (process.env.NODE_ENV === 'development') {
 // Transforma requests entrantes con datos tipo JSON
 app.use(express.json({ limit: '50mb' })); // Cambiamos el limite para poder obtener decenas de miles de datos JSON, como los pagos
 // Transforma requests entrantes con datos tipo Form
-app.use(
-  express.urlencoded({
-    extended: false,
-  })
-);
-app.use(fileUpload());
+app.use(express.urlencoded({ extended: false }));
+app.use(fileUpload()); // Middleware usado para recibir los archivos enviados por formulario del cliente. Ex: Fotos
 
 // Creamos una sesion para el usuario logueado y guardamos los datos en una Cookie en el cliente
 app.use(cookieParser(process.env.COOKIE_SESSION_SECRET))

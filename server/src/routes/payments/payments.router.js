@@ -12,7 +12,7 @@ const paymentsRouter = express.Router();
 paymentsRouter.get('/', httpGetAllPayments);
 paymentsRouter.get('/:id', httpGetPayment);
 paymentsRouter.post('/', httpCreatePayment);
-paymentsRouter.patch('/:id', httpUpdatePayment);
+paymentsRouter.put('/:id', httpUpdatePayment);
 paymentsRouter.delete('/:id', httpDeletePayment);
 
 module.exports = paymentsRouter;

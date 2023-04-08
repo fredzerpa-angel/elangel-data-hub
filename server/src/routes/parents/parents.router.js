@@ -12,7 +12,7 @@ const parentsRouter = express.Router();
 parentsRouter.get('/', httpGetAllParents);
 parentsRouter.get('/:id', httpGetParent);
 parentsRouter.post('/', httpCreateParent);
-parentsRouter.patch('/:id', httpUpdateParent);
+parentsRouter.put('/:id', httpUpdateParent);
 parentsRouter.delete('/:id', httpDeleteParent);
 
 module.exports = parentsRouter;

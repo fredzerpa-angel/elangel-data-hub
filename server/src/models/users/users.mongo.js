@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: false,
+    // select: false,
   },
   names: {
     type: String,
@@ -29,6 +30,10 @@ const userSchema = new mongoose.Schema({
     required: false,
   },
   phones: phonesSchema,
+  isAdmin: {
+    type: Boolean,
+    default: false,
+  },
   privileges: {
     reports: {
       read: {
@@ -96,7 +101,7 @@ userSchema.pre('save', async function (next) {
 
   try {
     const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
+    this.password = await bcrypt.hash(String(this.password), salt); // bcrypt solo usa Strings
     return next();
   } catch (err) {
     return next(err);
@@ -104,8 +109,17 @@ userSchema.pre('save', async function (next) {
 });
 
 userSchema.methods.comparePassword = async function (password) {
-  return await bcrypt.compare(password, this.password)
+  return await bcrypt.compare(String(password), this.password) // bcrypt solo compara Strings
 }
+
+// Eliminamos datos sensibles al enviarlos por nuestro API al cliente
+userSchema.set('toJSON', {
+  transform: function (doc, ret, opt) {
+    delete ret.password;
+    delete ret._id;
+    delete ret.__v;
+  }
+});
 
 // Conecta userSchema con "Users" colleccion
 module.exports = mongoose.model('User', userSchema);

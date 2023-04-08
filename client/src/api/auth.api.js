@@ -11,7 +11,6 @@ const authApiInstance = axios.create({
 const AuthApi = {
   loginWithEmailAndPassword: async (data) => {
     return await authApiInstance({
-
       method: 'POST',
       url: '/login',
       data

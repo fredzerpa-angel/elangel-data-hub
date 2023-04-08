@@ -1,6 +1,6 @@
 
 
-import { useRef, useEffect, useState, useMemo } from "react";
+import { useRef, useEffect, useState, useMemo, memo } from "react";
 
 // porp-types is a library for typechecking of props
 import PropTypes from "prop-types";
@@ -23,11 +23,13 @@ import configs from "examples/Charts/LineCharts/GradientLineChart/configs";
 
 // Soft UI Dashboard React base styles
 import colors from "assets/theme/base/colors";
+import isEqual from "react-fast-compare";
 
 function GradientLineChart({ title, description, chart, ...rest }) {
   const chartRef = useRef(null);
   const [chartData, setChartData] = useState({
     // Placeholders for initial state, helps with undefined errors
+    labels: [],
     data: {
       datasets: [],
     },
@@ -111,4 +113,5 @@ GradientLineChart.propTypes = {
   chart: PropTypes.object.isRequired,
 };
 
-export default GradientLineChart;
+
+export default memo(GradientLineChart, isEqual);

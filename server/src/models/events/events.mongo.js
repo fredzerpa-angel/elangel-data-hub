@@ -5,7 +5,7 @@ const eventSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  name: {
+  title: {
     type: String,
     required: true,
   },
@@ -16,22 +16,22 @@ const eventSchema = new mongoose.Schema({
   overseers: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: 'Employee',
-    required: true,
+    required: false,
   },
   goal: {
     type: String,
-    required: true,
+    required: false,
   },
   participants: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: 'Student',
-    required: true,
+    required: false,
   },
-  startDate: {
+  start: {
     type: Date,
     required: true,
   },
-  endDate: {
+  end: {
     type: Date,
     required: false,
   },
@@ -39,10 +39,41 @@ const eventSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  createdBy: {
+    type: {
+      _id: false, // No cree un _id
+      // Users Schema. Existe otras cuentas 
+      imageUrl: String,
+      email: String,
+      fullname: String,
+      names: String,
+      lastnames: String,
+    },
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    required: true,
+  },
   status: {
     type: String,
     required: true,
   },
+  updates: {
+    _id: false, // No cree un _id
+    type: [{
+      issuedBy: {
+        // Users Schema. Existe otras cuentas 
+        imageUrl: String,
+        email: String,
+        fullName: String,
+        names: String,
+        lastnames: String,
+      },
+      issuedAt: Date
+    }],
+    required: false,
+  }
 });
 
 module.exports = mongoose.model('Event', eventSchema);

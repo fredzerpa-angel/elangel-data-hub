@@ -31,6 +31,7 @@ import brandLogo from "assets/images/el-angel/logo-small.png";
 import { Settings } from "@mui/icons-material";
 
 import { useAuth } from "context/auth.context";
+import { MountPoint } from "context/confirmation.context";
 
 export default function App() {
   const [controller, dispatch] = useSoftUIController();
@@ -92,6 +93,7 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <MountPoint />
       {layout === "dashboard" && user && (
         <>
           <Sidenav

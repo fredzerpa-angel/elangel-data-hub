@@ -26,54 +26,52 @@ import AuthApi from "../../../api/auth.api";
 
 import { useAuth } from "context/auth.context";
 import GoogleSocial from "../components/Socials/google";
-import { CardMedia, Switch } from "@mui/material";
+import { CardMedia, FormControlLabel, Switch } from "@mui/material";
 
 import linearGradient from "assets/theme/functions/linearGradient";
+import { enqueueSnackbar } from "notistack";
+import { Controller, useForm } from "react-hook-form";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 function SignIn() {
-  const navigate = useNavigate();
-  const [rememberMe, setRememberMe] = useState(JSON.parse(window.localStorage.getItem('rememberSession')));
-  const [formData, setFormData] = useState({
-    'email': '',
-    'password': ''
-  });
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-
   const { user, setUser } = useAuth();
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [visiblePassword, setVisiblePassword] = useState(false);
+  const { register, handleSubmit, control, formState: { errors } } = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+      rememberMe: JSON.parse(window.localStorage.getItem("rememberSession")) || false,
+    }
+  });
 
-  const handleSetRememberMe = () => {
-    window.localStorage.setItem('rememberSession', !rememberMe);
-    setRememberMe(!rememberMe)
-  };
-
-  const handleFormData = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const submitFormData = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-
+  const onSubmit = async ({ email, password, rememberMe }) => {
+    console.log({ email, password, rememberMe })
     try {
-      const { data } = await AuthApi.loginWithEmailAndPassword({ ...formData, session: rememberMe })
-      if (data.status >= 400) return setError(data.message);
+      setIsLoading(true);
+      const { data } = await AuthApi.loginWithEmailAndPassword({ email, password, session: rememberMe })
+      if (data.status >= 400) return enqueueSnackbar(data.message, { variant: "error" });
       setUser(data);
-      return navigate('/dashboard');
+      return navigate("/dashboard");
     } catch (err) {
-      if (error.response) return setError(error.response.data.message);
-      return setError("There has been an error.");
+      if (err.response) return enqueueSnackbar(err.response.data.message, { variant: "error" });
+      return enqueueSnackbar("Ha ocurrido un error", { variant: "error" });
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    if (user) navigate('/');
+    if (user) navigate("/");
   }, [navigate, user])
+
+  const renderPasswordVisibilityIcon = () => {
+    return visiblePassword ?
+      <Visibility />
+      :
+      <VisibilityOff />
+  }
 
   return (
     <BasicLayout
@@ -84,9 +82,9 @@ function SignIn() {
             component="span"
             variant="inherit"
             sx={({ palette: { gradients } }) => ({
-              background: linearGradient(gradients.info.state, 'white', 0),
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              background: linearGradient(gradients.info.state, "white", 0),
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
             })}
           >
             El Angel DataHub
@@ -100,8 +98,8 @@ function SignIn() {
         <CardMedia
           component="img"
           sx={{
-            height: '10rem',
-            objectFit: 'contain',
+            height: "10rem",
+            objectFit: "contain",
             m: 0,
             mb: 2,
           }}
@@ -111,55 +109,68 @@ function SignIn() {
           <GoogleSocial />
         </SoftBox>
         <Separator text="o" />
-        <SoftBox component="form" role="form">
+        <SoftBox component="form" role="form" onSubmit={handleSubmit(onSubmit)}>
           <SoftBox mb={2}>
-            <SoftBox mb={1} ml={0.5}>
-              <SoftTypography component="label" variant="caption" fontWeight="bold">
+            <SoftBox ml={0.5}>
+              <SoftTypography component="label" variant="caption" fontWeight="bold" textTransform="capitalize">
                 Email
               </SoftTypography>
             </SoftBox>
-            <SoftInput type="email" name="email" value={formData?.email} onChange={handleFormData} placeholder="Email" />
+            <SoftInput
+              {...register("email", { required: "Este campo es obligatorio" })}
+              type="email"
+              error={!!errors?.email}
+              placeholder="Email"
+            />
+            {!!errors?.email && <SoftTypography fontSize="small" color="error" fontWeight="light">{errors?.email.message}</SoftTypography>}
           </SoftBox>
           <SoftBox mb={2}>
-            <SoftBox mb={1} ml={0.5}>
-              <SoftTypography component="label" variant="caption" fontWeight="bold">
+            <SoftBox ml={0.5}>
+              <SoftTypography component="label" variant="caption" fontWeight="bold" textTransform="capitalize">
                 Contraseña
               </SoftTypography>
             </SoftBox>
             <SoftInput
-              type="password"
-              name="password"
-              onChange={handleFormData}
+              {...register("password", { required: "Este campo es obligatorio" })}
+              type={visiblePassword ? 'text' : 'password'}
+              error={!!errors?.password}
               placeholder="Contraseña"
-              value={formData?.password}
+              icon={{
+                component: renderPasswordVisibilityIcon(),
+                direction: "right",
+                onClick: () => setVisiblePassword(!visiblePassword),
+              }}
+            />
+            {!!errors?.password && <SoftTypography fontSize="small" color="error" fontWeight="light">{errors?.password.message}</SoftTypography>}
+          </SoftBox>
+          <SoftBox display="flex" alignItems="center" ml={1}>
+            <Controller
+              control={control}
+              name="rememberMe"
+              render={({ field: { value, onChange, ...rest } }) => (
+                <FormControlLabel
+                  label={<SoftTypography variant="body2" fontWeight="regular" ml={1}>Recuerdame</SoftTypography>}
+                  control={
+                    <Switch
+                      {...rest}
+                      value={value}
+                      checked={value}
+                      onChange={(event, nextValue) => {
+                        window.localStorage.setItem("rememberSession", nextValue);
+                        return onChange(event, nextValue);
+                      }}
+                    />
+                  }
+                  sx={{
+                    width: "fit-content"
+                  }}
+                />
+              )}
+
             />
           </SoftBox>
-          <SoftBox display="flex" alignItems="center">
-            <Switch checked={rememberMe} onChange={handleSetRememberMe} />
-            <SoftTypography
-              variant="button"
-              fontWeight="regular"
-              onClick={handleSetRememberMe}
-              sx={{ cursor: "pointer", userSelect: "none" }}
-            >
-              &nbsp;&nbsp;Recuerdame
-            </SoftTypography>
-          </SoftBox>
-          <SoftBox mt={2} mb={2} textAlign="center">
-            <h6
-              style={{
-                fontSize: ".8em",
-                color: "red",
-                textAlign: "center",
-                fontWeight: 400,
-                transition: ".2s all",
-              }}
-            >
-              {error}
-            </h6>
-          </SoftBox>
           <SoftBox mt={4} mb={1}>
-            <SoftButton loading={isLoading} type="submit" variant="gradient" color="info" onClick={submitFormData} fullWidth>
+            <SoftButton loading={isLoading} type="submit" variant="gradient" color="info" fullWidth>
               {!isLoading && "Iniciar sesion"}
             </SoftButton>
           </SoftBox>

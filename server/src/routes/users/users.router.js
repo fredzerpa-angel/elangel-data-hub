@@ -6,18 +6,22 @@ const {
   httpCreateUser,
   httpUpdateUserByEmail,
   httpDeleteUserByEmail,
+  httpUpdateSelfUser,
+  httpConfirmPassword,
   httpChangePassword,
 } = require('./users.controller');
 
 const usersRouter = express.Router();
 
+// * Tomar en cuenta el orden de las rutas, ya que la respuesta dependera de cual coincida primero
 usersRouter.get('/', checkUserPrivilegesAccess('users', 'read'), httpGetAllUsers);
 usersRouter.get('/:id', checkUserPrivilegesAccess('users', 'read'), httpGetUser);
 
-usersRouter.post('/change-password', httpChangePassword);
 usersRouter.post('/', checkUserPrivilegesAccess('users', 'upsert'), httpCreateUser);
-// usersRouter.post('/set-password/:id', checkUserPrivilegesAccess('users', 'upsert'), );
+usersRouter.post('/confirm-password', httpConfirmPassword);
 
+usersRouter.put('/', httpUpdateSelfUser);
+usersRouter.put('/change-password', httpChangePassword);
 usersRouter.put('/:email', checkUserPrivilegesAccess('users', 'upsert'), httpUpdateUserByEmail);
 
 usersRouter.delete('/:email', checkUserPrivilegesAccess('users', 'delete'), httpDeleteUserByEmail);

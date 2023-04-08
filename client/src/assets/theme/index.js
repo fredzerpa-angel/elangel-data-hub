@@ -62,6 +62,9 @@ import buttonBase from "assets/theme/components/buttonBase";
 import icon from "assets/theme/components/icon";
 import svgIcon from "assets/theme/components/svgIcon";
 import link from "assets/theme/components/link";
+import { esES } from "@mui/x-data-grid";
+import { esES as pickersEsES } from "@mui/x-date-pickers";
+import { esES as coreEsES } from "@mui/material/locale";
 
 export default createTheme({
   breakpoints: { ...breakpoints },
@@ -129,4 +132,7 @@ export default createTheme({
     MuiSvgIcon: { ...svgIcon },
     MuiLink: { ...link },
   },
+  esES, // x-data-grid translations
+  pickersEsES, // x-date-pickers translations
+  coreEsES, // core translations
 });

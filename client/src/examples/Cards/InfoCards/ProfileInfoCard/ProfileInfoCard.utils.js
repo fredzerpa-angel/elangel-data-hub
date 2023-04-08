@@ -1,7 +1,16 @@
-export const formatUserInfoToModalSchema = info => Object.fromEntries(Object.entries(info).map(([key, value]) => {
-  return [key, { value }]
+export const serializeUserInfoToSchema = info => Object.fromEntries(Object.entries(info).map(([key, value]) => {
+  if (typeof value !== 'object') return [key, { value }]
+
+  const serializedObject = Object.fromEntries(Object.entries(value).map(([childKey, childValue]) => [childKey, { value: childValue }]))
+  return [key, { value: serializedObject }]
+
 }))
 
-export const formatUserInfoToMongoSchema = info => Object.fromEntries(Object.entries(info).map(([key, { value }]) => {
-  return [key, value]
+export const deserializeUserInfo = info => Object.fromEntries(Object.entries(info).map(([key, { value }]) => {
+  if (typeof value !== 'object') return [key, value]
+
+  const deserializedObject = Object.fromEntries(Object.entries(value).map(([childKey, { value }]) => {
+    return [childKey, value]
+  }))
+  return [key, deserializedObject]
 }))

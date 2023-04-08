@@ -144,7 +144,5 @@ const studentSchema = new mongoose.Schema({
   }
 });
 
-module.exports = studentSchema;
-
 // Conecta studentSchema con "Students" colleccion
 module.exports = mongoose.model('Student', studentSchema);

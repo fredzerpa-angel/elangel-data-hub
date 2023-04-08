@@ -12,7 +12,7 @@ const debtsRouter = express.Router();
 debtsRouter.get('/', httpGetAllDebts);
 debtsRouter.get('/:id', httpGetDebt);
 debtsRouter.post('/', httpCreateDebt);
-debtsRouter.patch('/:id', httpUpdateDebt);
+debtsRouter.put('/:id', httpUpdateDebt);
 debtsRouter.delete('/:id', httpDeleteDebt);
 
 module.exports = debtsRouter;

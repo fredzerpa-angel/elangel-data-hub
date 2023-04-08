@@ -1,7 +1,7 @@
 const users = require('./users.mongo');
 
 async function getAllUsers() {
-  return await users.find({}, { password: 0 }).lean();
+  return await users.find({});
 }
 
 async function createUser(userData) {
@@ -10,7 +10,7 @@ async function createUser(userData) {
 
 async function updateUserById(userId, updateData) {
   const options = {
-    new: true, // Retorna el Estudiante con los datos actualizados
+    new: true, // Retorna el Usuario con los datos actualizados
     runValidators: true, // Aplica las validaciones del User Schema otra vez
   };
 
@@ -19,7 +19,7 @@ async function updateUserById(userId, updateData) {
 
 async function updateUserByEmail(email, updateData) {
   const options = {
-    new: true, // Retorna el Estudiante con los datos actualizados
+    new: true, // Retorna el Usuario con los datos actualizados
     runValidators: true, // Aplica las validaciones del User Schema otra vez
   };
 
@@ -44,10 +44,10 @@ async function userExists({ email }) {
 
 async function getUserBySearch(search) {
   return await users
-    .find({}, { password: 0 })
+    .find({})
     .or([
       { email: new RegExp(search, 'gi') },
-    ]).lean();
+    ]);
 }
 
 module.exports = {

@@ -14,7 +14,7 @@ studentsRouter.get('/', httpGetAllStudents);
 studentsRouter.get('/:id', httpGetStudent);
 studentsRouter.post('/', httpCreateStudent);
 studentsRouter.post('/bundle', httpCreateStudentsByBundle);
-studentsRouter.patch('/:id', httpUpdateStudent);
+studentsRouter.put('/:id', httpUpdateStudent);
 studentsRouter.delete('/:id', httpDeleteStudent);
 
 module.exports = studentsRouter;

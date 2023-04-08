@@ -18,38 +18,55 @@ import ChangePassword from "./components/ChangePassword";
 import UsersList from "./components/UsersList";
 
 import { useAuth } from "context/auth.context";
-
-// Data
-import USERS_MOCK from "layouts/profile/data/usersListData";
+import useUsers from "hooks/users.hooks";
 
 const ProfileOverview = () => {
-  const { user } = useAuth();
+  const { user: userSession } = useAuth();
+  const { users, createUser, updateUserByEmail, updateSelfData, changePassword } = useUsers();
+
+
+  const handleProfileChange = async data => await updateSelfData(data);
+  const handlePasswordChange = async (oldPassword, newPassword) => await changePassword(oldPassword, newPassword);
+
+  const handleCreateUser = async data => await createUser(data);
+  const handleUpdateUser = async (user, updatedData) => await updateUserByEmail(user.email, updatedData);
+  const handleDeleteUser = async (...data) => console.log(data);
 
   return (
     <DashboardLayout>
-      <Header user={user} />
+      <Header user={userSession} onImageChange={handleProfileChange} />
       <SoftBox mt={5} mb={3}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={4}>
-            <PlatformSettings user={user} />
+            <PlatformSettings settings={userSession.notifications} onChange={handleProfileChange} />
           </Grid>
           <Grid item container xs={12} md={4} spacing={3}>
             <Grid item xs={12} md={12}>
               <ProfileInfoCard
                 title="Informacion de Perfil"
                 info={{
-                  email: user.email,
-                  fullname: user?.fullname,
-                  phone: user?.phones?.main || "N/A",
+                  email: userSession.email,
+                  fullname: {
+                    names: userSession?.names,
+                    lastnames: userSession?.lastnames,
+                  },
+                  phone: userSession?.phones?.main || "N/A",
                 }}
+                onChange={handleProfileChange}
               />
             </Grid>
             <Grid item xs={12} md={12}>
-              <ChangePassword />
+              <ChangePassword onChange={handlePasswordChange} />
             </Grid>
           </Grid>
           <Grid item xs={12} md={4}>
-            <UsersList title="Usuarios" users={USERS_MOCK.filter(({ email }) => email !== user.email)} />
+            <UsersList
+              title="Usuarios"
+              users={users}
+              createUser={handleCreateUser}
+              updateUser={handleUpdateUser}
+              deleteUser={handleDeleteUser}
+            />
           </Grid>
         </Grid>
       </SoftBox>

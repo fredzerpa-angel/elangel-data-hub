@@ -36,6 +36,7 @@ async function uploadFileToBucket(config = UPLOAD_CONFIG, options = { ContentEnc
     return {
       ok: false,
       error: err,
+      message: err.message
     }
   }
 }
@@ -64,6 +65,7 @@ async function deleteFileFromBucket(config = DELETE_CONFIG) {
     return {
       ok: false,
       error: err,
+      message: err.message
     }
   }
 }

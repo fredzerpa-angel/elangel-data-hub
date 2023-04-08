@@ -11,14 +11,12 @@ import SoftTypography from "components/SoftTypography";
 import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
 
-import useUsers from "hooks/users.hooks";
 import { useForm } from "react-hook-form";
 import { enqueueSnackbar } from "notistack";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
-function ChangePassword() {
-  const { changePassword } = useUsers();
-  const { register, handleSubmit, formState: { errors } } = useForm({
+function ChangePassword({ onChange }) {
+  const { register, handleSubmit, reset, formState: { errors } } = useForm({
     defaultValues: {
       oldPassword: "",
       newPassword: ""
@@ -28,15 +26,14 @@ function ChangePassword() {
   const [visibleNewPassword, setVisibleNewPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  
+
   const onSubmit = async ({ oldPassword, newPassword }) => {
     try {
       setIsLoading(true);
-      const response = await changePassword(oldPassword, newPassword);
-      if (!response?.ok) {
-        return enqueueSnackbar(response.message, { variant: "error" });
-      }
+      const response = await onChange(oldPassword, newPassword);
+      if (response?.error || !response) throw new Error(response?.message || "Error al cambiar contraseña")
       enqueueSnackbar("Su clave se ha cambiado exitosamente", { variant: "success" })
+      reset(null, { defaultValues: true });
     } catch (err) {
       return enqueueSnackbar(err.message, { variant: "error" });
     } finally {

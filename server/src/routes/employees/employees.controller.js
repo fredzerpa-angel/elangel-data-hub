@@ -10,11 +10,10 @@ const {
 
 async function httpGetAllEmployees(req, res) {
   const { search } = req.query;
-
-  // TODO: Implementar las validaciones
+  
   try {
     // Si hubo una consulta entonces buscar por consulta
-    const response = response ? await getEmployeeBySearch(search) : await getAllEmployees();
+    const response = search ? await getEmployeeBySearch(search) : await getAllEmployees();
     return res.status(200).json(response);
   } catch (error) {
     return res.status(502).json({ // Base de Datos tiro un error
@@ -26,7 +25,7 @@ async function httpGetAllEmployees(req, res) {
 
 async function httpGetEmployee(req, res) {
   const { id } = req.params;
-  // TODO: Implementar las validaciones
+
   try {
     return res.status(200).json(await getEmployeeById(id));
   } catch (error) {
@@ -39,8 +38,6 @@ async function httpGetEmployee(req, res) {
 
 async function httpCreateEmployee(req, res) {
   const employeeData = req.body;
-
-  // TODO: Implementar las validaciones
 
   try {
     return res.status(201).json(await createEmployee(employeeData));

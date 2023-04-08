@@ -1,7 +1,5 @@
 const jwt = require('jsonwebtoken')
-const { DateTime } = require('luxon');
-const Users = require('../../models/users/users.model');
-const { getGoogleOAuthProfile, getUserByEmailAndPassword, createUserIfNotExists, isAnAllowedUser } = require('./auth.utils');
+const { getGoogleOAuthProfile, getUserByEmailAndPassword, createUserIfNotExists, userExists, setUserCookieSession } = require('./auth.utils');
 require('dotenv').config();
 
 const { JWT_SECRET_USERS } = process.env;
@@ -11,30 +9,17 @@ async function signInWithEmailAndPassword(req, res) {
     const { email, password, session } = req.body;
 
     // Obtenemos el perfil del usuario de nuestra BD
-    const userAccount = (await getUserByEmailAndPassword(email, password))?.toObject({ versionKey: false }); //  Excluye la propiedad __v
-    delete userAccount._id; // Eliminamos la contraseña para no pasarla al Token
-    delete userAccount.password; // Eliminamos la contraseña para no pasarla al Token
+    const userAccount = (await getUserByEmailAndPassword(email, password))?.toJSON();
 
     const token = jwt.sign(userAccount, JWT_SECRET_USERS);
 
     // Creamos una sesion para poder loguear al usuario cuando vuelva
-    if (session) {
-      res.cookie(
-        'user',
-        token, // Guardamos el token en una sesion para leer los datos del usuario cuando vuelva a ingresar 
-        {
-          maxAge: DateTime.now().plus({ weeks: 2 }).diffNow('milliseconds'), // La sesion expira en 2 semanas
-          sameSite: true,
-          httpOnly: true,
-          signed: true,
-        }
-      );
-    }
+    if (session) setUserCookieSession(req, res, token);
 
     return res.status(200).json({ token, ...userAccount });
   } catch (error) {
     res.status(400).json({
-      error: 'Failed to log in with Email',
+      error: 'Error al iniciar sesion con Email y Contraseña',
       message: error.message
     })
   }
@@ -54,33 +39,27 @@ async function signInWithGoogle(req, res) {
       lastnames: googleUserProfile.family_name,
     }
 
-    // Verificamos que el usuario que se esta intentando loguear este permitido por el administrador
-    if (!(await isAnAllowedUser(basicProfile))) throw new Error('User not allowed')
-
-    const userAccount = (await createUserIfNotExists(basicProfile))?.toObject({ versionKey: false }); //  Excluye la propiedad __v
-    delete userAccount._id; // Eliminamos data sensible que se enviara al cliente
-    delete userAccount.password; // Eliminamos data sensible que se enviara al cliente
+    // Solo usuarios pre-creados pueden loguearse
+    if (!(await userExists(basicProfile))) {
+      return res.status(403).json({
+        error: 'Error al iniciar sesion con Google',
+        message: 'Cuenta no permitida'
+      })
+    }
+    
+    const userAccount = (await createUserIfNotExists(basicProfile)).toJSON();
 
     const token = jwt.sign(userAccount, JWT_SECRET_USERS);
 
     // Creamos una sesion para poder loguear al usuario cuando vuelva
     // Loguearse por Google siempre sera guardado como una sesion
-    res.cookie(
-      'user',
-      token, // Guardamos el token en una sesion para leer los datos del usuario cuando vuelva a ingresar 
-      {
-        maxAge: DateTime.now().plus({ weeks: 2 }).diffNow('milliseconds'), // La sesion expira en 2 semanas
-        sameSite: true,
-        httpOnly: true,
-        signed: true,
-      }
-    );
+    setUserCookieSession(req, res, token);
 
     return res.status(200).json({ token, ...userAccount });
 
   } catch (error) {
     return res.status(400).json({
-      error: 'Failed to authenticate with Google',
+      error: 'Error al inicar sesion con Google',
       message: error.message,
     })
   }
@@ -91,18 +70,22 @@ async function checkSession(req, res) {
 
     const { user: token } = req.signedCookies;
 
-    if (!token) return res.status(200).send(null);
+    if (!token) return res.status(200).send(null); // Enviamos null ya que nuestro context del cliente registrara este valor como usuario
 
     const userProfile = jwt.verify(token, JWT_SECRET_USERS);
 
-    const isActive = await Users.userExists(userProfile);
-
-    if (!isActive) throw new Error('User is not valid');
+    // Solo usuarios pre-creados pueden loguearse
+    if (!(await userExists(userProfile))) {
+      return res.status(401).json({
+        error: 'Sesion invalida',
+        message: 'Usuario invalido'
+      });
+    }
 
     return res.status(200).json({ token, ...userProfile });
   } catch (error) {
     return res.status(400).json({
-      error: 'Session Invalid',
+      error: 'Sesion invalida',
       message: error.message
     })
   }

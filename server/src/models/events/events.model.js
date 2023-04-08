@@ -35,6 +35,15 @@ async function getEventBySearch(search) {
     ]).lean();
 }
 
+// @bundle: Array[Object{Student}]
+// Recibe un array de objetos donde crea un key con los matchfields para encontrarlo en la coleccion
+async function upsertEventsByBundle(bundle) {
+  return await events.upsertMany(bundle, {
+    matchFields: ['_id'], // Compara los docs mediante este campo
+    ensureModel: true, // Valida la data por el Schema
+  });
+}
+
 module.exports = {
   getAllEvents,
   createEvent,
@@ -42,4 +51,5 @@ module.exports = {
   deleteEvent,
   getEventById,
   getEventBySearch,
+  upsertEventsByBundle
 };

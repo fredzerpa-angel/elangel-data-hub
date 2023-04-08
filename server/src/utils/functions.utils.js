@@ -2,6 +2,8 @@ const axios = require("axios");
 const { DateTime } = require("luxon");
 const xlsx = require('node-xlsx').default;
 const fs = require('fs');
+const formData = require('form-data-to-object');
+const bcrypt = require('bcrypt');
 
 
 /* 
@@ -127,9 +129,27 @@ function removeFile(filePath) {
 
 }
 
+function formDataToObj(data) {
+  const formattedFormData = Object.fromEntries(Object.entries(data).map(([key, value]) => {
+    try {
+      return [key, JSON.parse(value)]
+    } catch (error) {
+      return [key, value]
+    }
+  }))
+
+  return formData.toObj(formattedFormData);
+}
+
+async function encrypt(data) {
+  return await bcrypt.hash(String(data), 10); // bcrypt solo usa Strings
+}
+
 module.exports = {
   convertObjectStringToSchema,
   fetchAndParseExcelLatinFileToJSON,
   getCurrentSchoolTerm,
-  removeFile
+  removeFile,
+  formDataToObj,
+  encrypt
 };
