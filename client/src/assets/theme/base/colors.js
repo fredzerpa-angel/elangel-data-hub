@@ -71,12 +71,12 @@ const colors = {
 
   error: {
     main: "#ea0606",
-    focus: "#c70505",
+    focus: "#adb5bd",
   },
 
   light: {
     main: "#e9ecef",
-    focus: "#e9ecef",
+    focus: "#dee2e6",
   },
 
   dark: {
