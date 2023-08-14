@@ -225,11 +225,18 @@ async function updateDebtsCollection() {
     return updatedDebts;
   }, INITIAL_DEBTS_DATA).values()]
 
+  // Si mantiene un pending = false entonces la deuda ya fue saldada
+  // por lo que es necesario cambiar su valor pendiente a 0
+  const debtsUpdated = debtsWithRefsLinked.map(debt => {
+    if (!debt.status.pending) debt.amount.pending.usd = 0;
+    return debt;
+  })
+
   /* 
     Las deudas provenientes de ARCADAT actualiza el monto dependiendo si se realizo algun pago
     Por lo que es no solo se actualizara la propiedad 'payments' si no tambien 'amount'
   */
-  return await upsertDebtsByBundle(debtsWithRefsLinked);
+  return await upsertDebtsByBundle(debtsUpdated);
 }
 
 async function updateEmployeesCollection() {
