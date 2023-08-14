@@ -7,6 +7,10 @@ async function getAllDebts() {
   return await debts.find().lean();
 }
 
+async function getAllDebtsPopulated() {
+  return await debts.find().populate('student').lean();
+}
+
 async function createDebt(debtData) {
   return await debts.create(debtData);
 }
@@ -111,6 +115,7 @@ async function getDebtsByYearIssued(year = DateTime.now().year) {
 
 module.exports = {
   getAllDebts,
+  getAllDebtsPopulated,
   createDebt,
   updateDebt,
   deleteDebt,

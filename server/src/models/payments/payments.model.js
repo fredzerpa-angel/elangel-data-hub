@@ -30,12 +30,12 @@ async function getPaymentById(paymentId) {
 async function getPaymentBySearch({ searchBy, value }) {
   // Payer no posee un Schema propio por lo que su busqueda
   // es distinta
-  if (searchBy === 'payer')
+  if (searchBy === 'paymentHolder')
     return await payments
       .find()
       .or([
-        { 'payer.fullname': new RegExp(value, 'gi') },
-        { 'payer.refId': new RegExp(value, 'gi') },
+        { 'paymentHolder.fullname': new RegExp(value, 'gi') },
+        { 'paymentHolder.documentId.number': new RegExp(value, 'gi') },
       ]);
 
   // Obtenemos respuesta del Modelo por filtrado
