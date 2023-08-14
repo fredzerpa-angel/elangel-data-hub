@@ -9,10 +9,13 @@ const {
 
 const paymentsRouter = express.Router();
 
-paymentsRouter.get('/', httpGetAllPayments);
 paymentsRouter.get('/:id', httpGetPayment);
+paymentsRouter.get('/', httpGetAllPayments);
+
 paymentsRouter.post('/', httpCreatePayment);
+
 paymentsRouter.put('/:id', httpUpdatePayment);
+
 paymentsRouter.delete('/:id', httpDeletePayment);
 
 module.exports = paymentsRouter;

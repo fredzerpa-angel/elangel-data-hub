@@ -10,11 +10,15 @@ const {
 
 const studentsRouter = express.Router();
 
-studentsRouter.get('/', httpGetAllStudents);
+// * Tomar en cuenta el orden de las rutas, ya que la respuesta dependera de cual coincida primero
 studentsRouter.get('/:id', httpGetStudent);
-studentsRouter.post('/', httpCreateStudent);
+studentsRouter.get('/', httpGetAllStudents);
+
 studentsRouter.post('/bundle', httpCreateStudentsByBundle);
+studentsRouter.post('/', httpCreateStudent);
+
 studentsRouter.put('/:id', httpUpdateStudent);
+
 studentsRouter.delete('/:id', httpDeleteStudent);
 
 module.exports = studentsRouter;

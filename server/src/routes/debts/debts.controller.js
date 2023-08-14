@@ -5,6 +5,7 @@ const {
   deleteDebt,
   getDebtById,
   getDebtBySearch,
+  getAllDebtsPopulated,
 } = require('../../models/debts/debts.model');
 
 async function httpGetAllDebts(req, res) {
@@ -99,10 +100,35 @@ async function httpDeleteDebt(req, res) {
   }
 }
 
+async function httpGetDebtsNotifications(req, res) {
+  try {
+    const debts = await getAllDebtsPopulated();
+    const debtsGroupedByStudent = [...debts.reduce((groups, debt) => {
+      const { student } = debt;
+      delete debt.student;
+
+      groups.set(
+        student.fullname,
+        groups.has(student.fullname) ? [...groups.get(student.fullname), debt] : [debt]
+      )
+
+      return groups;
+    }, new Map()).entries()].map(([student, debts]) => ({ [student]: debts }));
+
+    return res.status(200).json(debtsGroupedByStudent);
+  } catch (error) {
+    return res.status(502).json({ // Base de datos tiro un error
+      error: 'Failed to fetch debt notifications',
+      message: error.message,
+    });
+  }
+}
+
 module.exports = {
   httpGetAllDebts,
   httpGetDebt,
   httpCreateDebt,
   httpUpdateDebt,
   httpDeleteDebt,
+  httpGetDebtsNotifications
 };

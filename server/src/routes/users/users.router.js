@@ -14,15 +14,15 @@ const {
 const usersRouter = express.Router();
 
 // * Tomar en cuenta el orden de las rutas, ya que la respuesta dependera de cual coincida primero
-usersRouter.get('/', checkUserPrivilegesAccess('users', 'read'), httpGetAllUsers);
 usersRouter.get('/:id', checkUserPrivilegesAccess('users', 'read'), httpGetUser);
+usersRouter.get('/', checkUserPrivilegesAccess('users', 'read'), httpGetAllUsers);
 
-usersRouter.post('/', checkUserPrivilegesAccess('users', 'upsert'), httpCreateUser);
 usersRouter.post('/confirm-password', httpConfirmPassword);
+usersRouter.post('/', checkUserPrivilegesAccess('users', 'upsert'), httpCreateUser);
 
-usersRouter.put('/', httpUpdateSelfUser);
 usersRouter.put('/change-password', httpChangePassword);
 usersRouter.put('/:email', checkUserPrivilegesAccess('users', 'upsert'), httpUpdateUserByEmail);
+usersRouter.put('/', httpUpdateSelfUser);
 
 usersRouter.delete('/:email', checkUserPrivilegesAccess('users', 'delete'), httpDeleteUserByEmail);
 

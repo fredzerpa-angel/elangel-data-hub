@@ -10,11 +10,15 @@ const {
 
 const employeesRouter = express.Router();
 
-employeesRouter.get('/', httpGetAllEmployees);
+// * Tomar en cuenta el orden de las rutas, ya que la respuesta dependera de cual coincida primero
 employeesRouter.get('/:id', httpGetEmployee);
-employeesRouter.post('/', httpCreateEmployee);
+employeesRouter.get('/', httpGetAllEmployees);
+
 employeesRouter.post('/bundle', httpCreateEmployeesByBundle);
+employeesRouter.post('/', httpCreateEmployee);
+
 employeesRouter.put('/:id', httpUpdateEmployee);
+
 employeesRouter.delete('/:id', httpDeleteEmployee);
 
 module.exports = employeesRouter;
