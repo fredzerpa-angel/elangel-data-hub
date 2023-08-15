@@ -6,16 +6,18 @@ const {
   httpDeletePayment,
   httpGetPayment,
 } = require('./payments.controller');
+const { checkUserPrivilegesAccess } = require('../auth/auth.utils');
 
 const paymentsRouter = express.Router();
 
-paymentsRouter.get('/:id', httpGetPayment);
-paymentsRouter.get('/', httpGetAllPayments);
+paymentsRouter.get('/:id', checkUserPrivilegesAccess('reports', 'read'), httpGetPayment);
+paymentsRouter.get('/', checkUserPrivilegesAccess('reports', 'read'), httpGetAllPayments);
 
-paymentsRouter.post('/', httpCreatePayment);
+// * Los pagos son manejadas por ARCADAT por lo que su manejo por el DataHub esta actualmente deshabilitado
+// paymentsRouter.post('/', checkUserPrivilegesAccess('reports', 'upsert'), httpCreatePayment);
 
-paymentsRouter.put('/:id', httpUpdatePayment);
+// paymentsRouter.put('/:id', checkUserPrivilegesAccess('reports', 'upsert'), httpUpdatePayment);
 
-paymentsRouter.delete('/:id', httpDeletePayment);
+// paymentsRouter.delete('/:id', checkUserPrivilegesAccess('reports', 'delete'), httpDeletePayment);
 
 module.exports = paymentsRouter;

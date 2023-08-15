@@ -61,7 +61,6 @@ const checkUserPrivilegesAccess = (privilege = 'users', access = 'read') => asyn
 
     return next(); // Si no hay error, el usuario esta autorizado
   } catch (error) {
-    console.log('Error en privileges')
     return res.status(403).json({
       error: 'Usuario no autorizado',
       message: error.message,

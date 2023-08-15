@@ -14,13 +14,14 @@ const debtsRouter = express.Router();
 
 // * Tomar en cuenta el orden de las rutas, ya que la respuesta dependera de cual coincida primero
 debtsRouter.get('/notifications', checkNotificationStatus('debts', 'onWatch'), httpGetDebtsNotifications);
-debtsRouter.get('/:id', checkUserPrivilegesAccess('debts', 'read'), httpGetDebt);
-debtsRouter.get('/', checkUserPrivilegesAccess('debts', 'read'), httpGetAllDebts);
+debtsRouter.get('/:id', checkUserPrivilegesAccess('reports', 'read'), httpGetDebt);
+debtsRouter.get('/', checkUserPrivilegesAccess('reports', 'read'), httpGetAllDebts);
 
-debtsRouter.post('/', checkUserPrivilegesAccess('debts', 'upsert'), httpCreateDebt);
+// * Las deudas son manejadas por ARCADAT por lo que su manejo por el DataHub esta actualmente deshabilitado
+// debtsRouter.post('/', checkUserPrivilegesAccess('reports', 'upsert'), httpCreateDebt);
 
-debtsRouter.put('/:id', checkUserPrivilegesAccess('debts', 'upsert'), httpUpdateDebt);
+// debtsRouter.put('/:id', checkUserPrivilegesAccess('reports', 'upsert'), httpUpdateDebt);
 
-debtsRouter.delete('/:id', checkUserPrivilegesAccess('debts', 'delete'), httpDeleteDebt);
+// debtsRouter.delete('/:id', checkUserPrivilegesAccess('reports', 'delete'), httpDeleteDebt);
 
 module.exports = debtsRouter;
