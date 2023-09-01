@@ -13,14 +13,14 @@ import lodash from "lodash";
 // Soft UI Dashboard React components
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
-import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import Footer from "examples/Footer";
-import GradientLineChart from "examples/Charts/LineCharts/GradientLineChart";
-import EventsOverview from "./components/EventsOverview";
+import DashboardLayout from "components/LayoutContainers/DashboardLayout";
+import DashboardNavbar from "components/Navbars/DashboardNavbar";
+import Footer from "components/Footer/Dashboard";
+import GradientLineChart from "components/Charts/LineCharts/GradientLineChart";
+import EventsOverview from "../../components/EventsOverview";
 import Calendar from "components/Calendar";
-import EventGroupMembers from "./components/EventGroupMembers";
-import AddEventButton from "./components/AddEventButton";
+import EventGroupMembers from "../../components/EventGroupMembers";
+import AddEventButton from "../../components/AddEventButton";
 
 // Utils
 import { formatNumber } from "utils/functions.utils";

@@ -13,8 +13,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import SoftBox from "components/SoftBox";
 
 // Soft UI Dashboard React examples
-import Sidenav from "examples/Sidenav";
-import Configurator from "examples/Configurator";
+import Sidenav from "components/Sidenav";
 
 // Soft UI Dashboard React themes
 import theme from "assets/theme";
@@ -106,7 +105,6 @@ export default function App() {
             brandName="U.E. El Angel"
             routes={routes}
           />
-          <Configurator />
           {configsButton}
         </>
       )}

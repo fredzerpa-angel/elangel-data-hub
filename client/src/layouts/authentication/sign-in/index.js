@@ -1,37 +1,35 @@
-
-
 import { useEffect, useState } from "react";
 
 // react-router-dom components
 import { useNavigate } from "react-router-dom";
 
-// @mui material components
+// Libraries
 import Card from "@mui/material/Card";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { enqueueSnackbar } from "notistack";
+import { Controller, useForm } from "react-hook-form";
 
-// Soft UI Dashboard React components
+// Components
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
-
-// Authentication layout components
-import BasicLayout from "layouts/authentication/components/BasicLayout";
-import Separator from "layouts/authentication/components/Separator";
-
-// Images
-import logo from "assets/images/el-angel/logo.png"
-import curved6 from "assets/images/curved-images/curved14.jpg";
-
-import AuthApi from "../../../api/auth.api";
-
-import { useAuth } from "context/auth.context";
-import GoogleSocial from "../components/Socials/google";
+import BasicLayout from "components/BasicLayout";
+import Separator from "components/Separator";
+import GoogleSocial from "components/Socials/google";
 import { CardMedia, FormControlLabel, Switch } from "@mui/material";
 
+// Assets
+import logo from "assets/images/el-angel/logo.png"
+import curved6 from "assets/images/backgrounds/curved14.jpg";
 import linearGradient from "assets/theme/functions/linearGradient";
-import { enqueueSnackbar } from "notistack";
-import { Controller, useForm } from "react-hook-form";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+
+// Contexts & Hooks
+import { useAuth } from "context/auth.context";
+
+// API
+import AuthApi from "api/auth.api";
+
 
 function SignIn() {
   const { user, setUser } = useAuth();

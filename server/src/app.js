@@ -4,6 +4,7 @@ const cors = require('cors');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
+const expressStaticGzip = require("express-static-gzip");
 require('dotenv').config();
 
 // Routes
@@ -36,8 +37,6 @@ app.use('/api', checkUserAuth, apiRouter);
 app.use('/auth', authRouter); // LogIn, LogOut y Registro de usuario
 
 // Enviamos el Front End a cada endpoint
-app.get('/*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
-});
+app.get('/*', expressStaticGzip(path.join(__dirname, '..', 'public')));
 
 module.exports = app;

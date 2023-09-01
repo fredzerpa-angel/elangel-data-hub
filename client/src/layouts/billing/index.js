@@ -6,32 +6,32 @@ import lodash from "lodash";
 
 // @mui material components
 import Grid from "@mui/material/Grid";
+import { DateRange, WorkspacePremium } from "@mui/icons-material";
 
 // Soft UI Dashboard React components
 import SoftBox from "components/SoftBox";
 
 // Soft UI Dashboard React examples
-import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import Footer from "examples/Footer";
+import DashboardLayout from "components/LayoutContainers/DashboardLayout";
+import DashboardNavbar from "components/Navbars/DashboardNavbar";
+import Footer from "components/Footer/Dashboard";
 
 // Billing page components
-import MonthGrossIncome from "./components/MonthGrossIncome";
-import MiniStatisticsCard from "examples/Cards/StatisticsCards/MiniStatisticsCard";
-import ProgressLineChart from "examples/Charts/LineCharts/ProgressLineChart";
-import ProgressDoughnutChart from "examples/Charts/DoughnutCharts/ProgressDoughnutChart";
-import { DateRange, WorkspacePremium } from "@mui/icons-material";
-import AnnouncementGroup from "./components/AnnouncementGroup";
-import BillingTable from "./components/BillingTable";
+import MonthGrossIncome from "components/MonthGrossIncome";
+import MiniStatisticsCard from "components/Cards/StatisticsCards/MiniStatisticsCard";
+import ProgressLineChart from "components/Charts/LineCharts/ProgressLineChart";
+import ProgressDoughnutChart from "components/Charts/DoughnutCharts/ProgressDoughnutChart";
+import AnnouncementGroup from "components/AnnouncementGroup";
+import BillingTable from "components/BillingTable";
 
 // Hooks & Contexts
 import { useDebts } from "context/debts.context";
 import { usePayments } from "context/payments.context";
 import { useNotifications } from "context/notifications.context";
+import useStudents from "hooks/students.hooks";
 
 // Utils
 import { getCurrentSchoolTerm, getFormerSchoolTerm, formatCurrency, formatPercentage } from "utils/functions.utils";
-import useStudents from "hooks/students.hooks";
 
 
 // Creador de formato de notificaciones por deudas

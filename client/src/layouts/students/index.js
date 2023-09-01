@@ -7,16 +7,16 @@ import Grid from "@mui/material/Grid";
 import SoftBox from "components/SoftBox";
 
 // Soft UI Dashboard React examples
-import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import Footer from "examples/Footer";
+import DashboardLayout from "components/LayoutContainers/DashboardLayout";
+import DashboardNavbar from "components/Navbars/DashboardNavbar";
+import Footer from "components/Footer/Dashboard";
 
 // Students page components
-import ProgressDoughnutChart from "examples/Charts/DoughnutCharts/ProgressDoughnutChart";
+import ProgressDoughnutChart from "components/Charts/DoughnutCharts/ProgressDoughnutChart";
 import DataTable from "components/DataTable";
 import { studentsData } from "./data/studentsData";
 import { Card } from "@mui/material";
-import MiniGradientLineChart from "examples/Charts/LineCharts/MiniGradientLineChart";
+import MiniGradientLineChart from "components/Charts/LineCharts/MiniGradientLineChart";
 
 const Students = () => {
   const columns = useMemo(

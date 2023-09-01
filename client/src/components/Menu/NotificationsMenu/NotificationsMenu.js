@@ -1,11 +1,11 @@
 import { useState } from 'react';
+
+// Libraries
 import { IconButton, Menu } from '@mui/material';
-import NotificationItem from 'examples/Items/NotificationItem';
 import { Notifications, Payment } from '@mui/icons-material';
 
-// Images
-import team2 from "assets/images/team-2.jpg";
-import logoSpotify from "assets/images/small-logos/logo-spotify.svg";
+// Components
+import NotificationItem from 'components/Items/NotificationItem';
 
 const NotificationsMenu = ({ button, menu }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -39,13 +39,13 @@ const NotificationsMenu = ({ button, menu }) => {
         {...menu}
       >
         <NotificationItem
-          image={<img src={team2} alt="person" />}
+          image={<img src={'#'} alt="person" />}
           title={["New message", "from Laur"]}
           date="13 minutes ago"
           onClick={handleClose}
         />
         <NotificationItem
-          image={<img src={logoSpotify} alt="person" />}
+          image={<img src={'#'} alt="person" />}
           title={["New album", "by Travis Scott"]}
           date="1 day"
           onClick={handleClose}

@@ -7,15 +7,15 @@ import Grid from "@mui/material/Grid";
 import SoftBox from "components/SoftBox";
 
 // Soft UI Dashboard React examples
-import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import Footer from "examples/Footer";
-import ProfileInfoCard from "examples/Cards/InfoCards/ProfileInfoCard";
+import DashboardLayout from "components/LayoutContainers/DashboardLayout";
+import Footer from "components/Footer/Dashboard";
+import ProfileInfoCard from "components/Cards/InfoCards/ProfileInfoCard";
 
 // Overview page components
-import Header from "layouts/profile/components/Header";
-import PlatformSettings from "layouts/profile/components/PlatformSettings";
-import ChangePassword from "./components/ChangePassword";
-import UsersList from "./components/UsersList";
+import Header from "components/Header";
+import PlatformSettings from "components/PlatformSettings";
+import ChangePassword from "../../components/ChangePassword";
+import UsersList from "../../components/UsersList";
 
 import { useAuth } from "context/auth.context";
 import useUsers from "hooks/users.hooks";
