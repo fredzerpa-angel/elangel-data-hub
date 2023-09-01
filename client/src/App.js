@@ -33,6 +33,10 @@ import { Settings } from "@mui/icons-material";
 import { useAuth } from "context/auth.context";
 import { MountPoint } from "context/confirmation.context";
 
+// react-chartjs-2 components
+import { Chart as ChartJS, registerables } from 'chart.js';
+ChartJS.register(...registerables); // Fix react-chartjs-2 migration from v3 to v5
+
 export default function App() {
   const [controller, dispatch] = useSoftUIController();
   const { user } = useAuth();
@@ -93,7 +97,7 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <MountPoint />
+      <MountPoint /> {/* Confirmation Context Provider */}
       {layout === "dashboard" && user && (
         <>
           <Sidenav
@@ -108,7 +112,7 @@ export default function App() {
       )}
       <Routes>
         {getRoutes(routes)}
-        <Route path="*" element={<Navigate to="/dashboard" />} />
+        <Route path="*" element={<Navigate to="/billing" />} />
       </Routes>
     </ThemeProvider>
   );

@@ -63,5 +63,14 @@ const parentSchema = new mongoose.Schema({
   },
 });
 
+// Eliminamos datos sensibles al enviarlos por nuestro API al cliente
+parentSchema.set('toJSON', {
+  transform: function (doc, ret, opt) {
+    delete ret._id;
+    delete ret.__v;
+  }
+});
+
+
 // Conecta parentSchema con "Parents" colleccion
 module.exports = mongoose.model('Parent', parentSchema);

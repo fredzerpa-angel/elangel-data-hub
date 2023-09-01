@@ -35,6 +35,12 @@ const userSchema = new mongoose.Schema({
     default: false,
   },
   privileges: {
+    reports: {
+      read: {
+        type: Boolean,
+        default: true,
+      },
+    },
     users: {
       read: {
         type: Boolean,

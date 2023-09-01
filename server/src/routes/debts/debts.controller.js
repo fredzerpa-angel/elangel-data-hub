@@ -29,7 +29,7 @@ async function httpGetAllDebts(req, res) {
       response = await getDebtBySearch(searchParams);
     } else {
       // Si no hubo consulta entonces retorna todos los estudiantes
-      response = await getAllDebts();
+      response = await getAllDebtsPopulated();
     }
 
     return res.status(200).json(response);
@@ -106,17 +106,20 @@ async function httpGetDebtsNotifications(req, res) {
     const debtsGroupedByStudent = [...debts.reduce((groups, debt) => {
       // Las notificaciones solo usaran deudas pendientes
       if (!debt.status.pending) return groups;
-      
+
       const { student } = debt;
       delete debt.student;
 
       groups.set(
         student.fullname,
-        groups.has(student.fullname) ? [...groups.get(student.fullname), debt] : [debt]
+        {
+          student,
+          debts: groups.has(student.fullname) ? [...groups.get(student.fullname).debts, debt] : [debt],
+        }
       )
 
       return groups;
-    }, new Map()).entries()].map(([student, debts]) => ({ [student]: debts }));
+    }, new Map()).entries()].map(([studentKey, debtsNotifications]) => debtsNotifications);
 
     return res.status(200).json(debtsGroupedByStudent);
   } catch (error) {

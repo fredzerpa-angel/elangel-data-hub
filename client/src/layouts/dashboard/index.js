@@ -2,6 +2,7 @@
 
 // @mui material components
 import Grid from "@mui/material/Grid";
+import { ArrowUpward } from "@mui/icons-material";
 
 // Soft UI Dashboard React components
 import SoftBox from "components/SoftBox";
@@ -28,12 +29,7 @@ import OrderOverview from "layouts/dashboard/components/OrderOverview";
 import reportsBarChartData from "layouts/dashboard/data/reportsBarChartData";
 import gradientLineChartData from "layouts/dashboard/data/gradientLineChartData";
 
-// react-chartjs-2 components
-import { Chart as ChartJS, registerables } from 'chart.js';
-import { ArrowUpward } from "@mui/icons-material";
-ChartJS.register(...registerables); // Fix react-chartjs-2 migration from v3 to v5
-
-function Dashboard() {
+const Dashboard = () => {
   const { size } = typography;
   const { chart, items } = reportsBarChartData;
 

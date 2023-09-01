@@ -11,7 +11,6 @@ export const AuthProvider = ({ userData, children }) => {
   const [loadingSession, setLoadingSession] = useState(true);
   const [error, setError] = useState(null);
 
-  console.log({ user })
   useEffect(() => {
     setLoadingSession(true);
     (async () => {
@@ -27,8 +26,9 @@ export const AuthProvider = ({ userData, children }) => {
           type: 'Fetching Session',
           error: err.response,
         });
+      } finally {
+        setLoadingSession(false);
       }
-      setLoadingSession(false);
     })();
   }, [])
 

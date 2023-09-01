@@ -46,7 +46,7 @@ const DEFAULT_VALUES = {
 
 const ProfileInfoCard = ({ title, info, onChange }) => {
   const [editMode, setEditMode] = useState(false);
-  const { register, handleSubmit, getValues, reset, formState: { errors } } = useForm({
+  const { register, handleSubmit, getValues, reset } = useForm({
     defaultValues: defaultsDeep(serializeUserInfoToSchema(info), DEFAULT_VALUES)
   });
 

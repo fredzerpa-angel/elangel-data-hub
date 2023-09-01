@@ -370,7 +370,7 @@ const EventsModal = ({ open, close, event = {}, upsertEvent, deleteEvent }) => {
                 <SoftBox mb={1}>
                   <SoftBox ml={0.5}>
                     <SoftTypography component="label" variant="caption" fontWeight="bold" textTransform="capitalize">
-                      Objetivo del Evento
+                      Objetivo
                     </SoftTypography>
                   </SoftBox>
                   <SoftInput
@@ -387,7 +387,7 @@ const EventsModal = ({ open, close, event = {}, upsertEvent, deleteEvent }) => {
                 <SoftBox mb={1}>
                   <SoftBox ml={0.5}>
                     <SoftTypography component="label" variant="caption" fontWeight="bold" textTransform="capitalize">
-                      Objetivo del Evento
+                      Observaciones
                     </SoftTypography>
                   </SoftBox>
                   <SoftInput

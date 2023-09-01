@@ -25,7 +25,7 @@ import configs from "examples/Charts/LineCharts/GradientLineChart/configs";
 import colors from "assets/theme/base/colors";
 import isEqual from "react-fast-compare";
 
-function GradientLineChart({ title, description, chart, ...rest }) {
+const GradientLineChart = ({ title, description, chart, ...rest }) => {
   const chartRef = useRef(null);
   const [chartData, setChartData] = useState({
     // Placeholders for initial state, helps with undefined errors

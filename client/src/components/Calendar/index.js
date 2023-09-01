@@ -1,12 +1,13 @@
+import { forwardRef, useMemo, useState } from 'react';
 
+import { Tooltip } from '@mui/material';
 import FullCalendar from '@fullcalendar/react' // must go before plugins
 import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
 import esLocale from '@fullcalendar/core/locales/es-us';
-import CalendarRoot from './CalendarRoot';
-import { forwardRef, useMemo, useState } from 'react';
-import { Tooltip } from '@mui/material';
-import FullcalendarEventBox from './components/fullcalendar-event-box';
 import { DateTime } from 'luxon';
+
+import CalendarRoot from './CalendarRoot';
+import FullcalendarEventBox from './components/FullcalendarEventBox';
 import EventsModal from 'components/Modals/EventsModal/EventsModal';
 
 const Calendar = forwardRef(({ events = [], fullCalendarProps, updateEvent, deleteEvent }, ref) => {

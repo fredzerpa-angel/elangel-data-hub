@@ -61,10 +61,37 @@ async function updateStudentsCollection() {
     return studentsDataUpdated;
   }, INITIAL_STUDENTS_DATA)
 
+  // Esquema de las calificaciones escolares, para incluirla en los estudiantes inscritos por primera vez en la BDD
+  const STUDENT_GRADES_SCHEMA = {
+    elementary: {
+      firstLevel: [],
+      secondLevel: [],
+      thirdLevel: [],
+    },
+    middleschool: {
+      firstGrade: [],
+      secondGrade: [],
+      thirdGrade: [],
+      fourthGrade: [],
+      fifthGrade: [],
+      sixthGrade: [],
+    },
+    highschool: {
+      firstYear: [],
+      secondYear: [],
+      thirdYear: [],
+      fourthYear: [],
+      fifthYear: [],
+    }
+  }
   // Agregamos las calificaciones a los estudiantes
   const studentsDataUpdatedWithGrades = studentsDataUpdated.map(student => {
     const gradesByEducationLevelsEntries = Object.entries(gradesByEducationLevels);
     const schoolTerm = gradesByEducationLevelsEntries.shift()[1]; // Eliminamos el 'schoolTerm' prop
+
+    // Agregamos el esquema de calificaciones al estudiante
+    // ya que si el estudiante es nuevo ocasionara un bug de undefined al agregarle sus notas
+    student.grades = student?.grades || STUDENT_GRADES_SCHEMA;
 
     student.grades = gradesByEducationLevelsEntries
       .reduce((studentGrades, [educationLevel, classroomsGrades]) => {
@@ -82,7 +109,7 @@ async function updateStudentsCollection() {
         if (!studentClassroomGrades) return studentGrades;
 
         // Buscamos si ya se monto las calificaciones de este periodo escolar y si es asi las actualizamos o las agregamos
-        const studentClassroomUniqueGrades = studentGrades[educationLevel][studentClassroomGrades].map(grade => {
+        const studentClassroomUniqueGrades = studentGrades?.[educationLevel]?.[studentClassroomGrades]?.map(grade => {
           return grade.schoolTerm === schoolTerm ? { schoolTerm, stages: studentGradesByStage } : grade;
         });
         return {

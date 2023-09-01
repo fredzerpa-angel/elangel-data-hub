@@ -47,7 +47,6 @@ function SignIn() {
   });
 
   const onSubmit = async ({ email, password, rememberMe }) => {
-    console.log({ email, password, rememberMe })
     try {
       setIsLoading(true);
       const { data } = await AuthApi.loginWithEmailAndPassword({ email, password, session: rememberMe })

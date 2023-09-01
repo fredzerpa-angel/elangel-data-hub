@@ -22,7 +22,7 @@ import useUsers from "hooks/users.hooks";
 
 const ProfileOverview = () => {
   const { user: userSession } = useAuth();
-  const { users, createUser, updateUserByEmail, updateSelfData, changePassword } = useUsers();
+  const { users, createUser, updateUserByEmail, updateSelfData, changePassword, deleteUserByEmail } = useUsers();
 
 
   const handleProfileChange = async data => await updateSelfData(data);
@@ -30,7 +30,7 @@ const ProfileOverview = () => {
 
   const handleCreateUser = async data => await createUser(data);
   const handleUpdateUser = async (user, updatedData) => await updateUserByEmail(user.email, updatedData);
-  const handleDeleteUser = async (...data) => console.log(data);
+  const handleDeleteUser = async user => await deleteUserByEmail(user.email);
 
   return (
     <DashboardLayout>

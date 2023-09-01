@@ -144,5 +144,13 @@ const studentSchema = new mongoose.Schema({
   }
 });
 
+// Eliminamos datos sensibles al enviarlos por nuestro API al cliente
+studentSchema.set('toJSON', {
+  transform: function (doc, ret, opt) {
+    delete ret._id;
+    delete ret.__v;
+  }
+});
+
 // Conecta studentSchema con "Students" colleccion
 module.exports = mongoose.model('Student', studentSchema);

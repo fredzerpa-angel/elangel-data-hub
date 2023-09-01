@@ -94,7 +94,8 @@ function DashboardNavbar({ absolute, light, isMini }) {
             </IconButton>
           </SoftBox>
           <SoftBox color={light ? "white" : "inherit"} sx={(theme) => navbarRow(theme, { hideOnMobile: false })}>
-            <NotificationsMenu button={{ size: 'large', sx: { navbarIconButton } }} />
+            {/* TODO: Agregar icono y notificaciones */}
+            {/* <NotificationsMenu button={{ size: 'large', sx: { navbarIconButton } }} /> */}
             <AccountMenu button={{ sx: navbarIconButton }} />
           </SoftBox>
         </SoftBox>

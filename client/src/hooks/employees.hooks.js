@@ -23,10 +23,6 @@ const useEmployees = () => {
   }, [employeeApiInstance])
 
   useEffect(() => {
-    console.log({ employees })
-  }, [employees])
-
-  useEffect(() => {
     getEmployees();
   }, [getEmployees])
 

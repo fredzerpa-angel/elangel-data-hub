@@ -23,10 +23,6 @@ const useEvents = () => {
   }, [eventApiInstance])
 
   useEffect(() => {
-    console.log({ events })
-  }, [events])
-
-  useEffect(() => {
     getEvents();
   }, [getEvents])
 
