@@ -4,15 +4,15 @@
 
 import React from "react";
 
-// Render the same event container as FullCalendar
+// Reenderiza los cuadros de los eventos visualizados en el calendario
 const FullcalendarEventBox = React.forwardRef(({ eventProps, ...rest }, ref) => {
 	return (
-		<div className='fc-event-main-frame' ref={ref} {...rest}>
-			{eventProps.timeText &&
-				<div className='fc-event-time'>{eventProps.timeText}</div>
+		<div ref={ref} {...rest}>
+			{
+				eventProps.timeText && <div>{eventProps.timeText}</div>
 			}
-			<div className='fc-event-title-container'>
-				<div className='fc-event-title fc-sticky'>
+			<div>
+				<div>
 					{eventProps.event.title || <>&nbsp;</>}
 				</div>
 			</div>

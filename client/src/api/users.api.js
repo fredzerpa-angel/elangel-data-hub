@@ -46,7 +46,7 @@ const createUserApi = (token) => {
     deleteUserByEmail: async (email) => {
       return await usersApiInstance({
         method: 'DELETE',
-        url: { email },
+        url: email,
       });
     },
     changePassword: async (oldPassword, newPassword) => {

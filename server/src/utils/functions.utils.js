@@ -110,6 +110,19 @@ function getCurrentSchoolTerm() {
   return currentSchoolTerm;
 }
 
+function getFormerSchoolTerm() {
+  // Los periodos escolares empiezan el 01/09 y terminan el 30/07 de cada año
+  const startSchoolTermDateTime = DateTime.fromFormat(`01/09/${DateTime.now().year}`, 'dd/MM/yyyy');
+  const newSchoolTermStarted = startSchoolTermDateTime.diff(DateTime.now()).as('milliseconds') < 0;
+  // Buscamos en que periodo escolar estamos, si ya empezo el nuevo año escolar o no
+  const formerSchoolTerm = newSchoolTermStarted ?
+    `${DateTime.now().minus({ years: 1 }).year}-${DateTime.now().year}`
+    :
+    `${DateTime.now().minus({ years: 2 }).year}-${DateTime.now().minus({ years: 1 }).year}`;
+
+  return formerSchoolTerm;
+}
+
 function removeFile(filePath) {
   try {
 
@@ -149,6 +162,7 @@ module.exports = {
   convertObjectStringToSchema,
   fetchAndParseExcelLatinFileToJSON,
   getCurrentSchoolTerm,
+  getFormerSchoolTerm,
   removeFile,
   formDataToObj,
   encrypt

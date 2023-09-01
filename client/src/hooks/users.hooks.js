@@ -8,18 +8,14 @@ const useUsers = () => {
 
   const userApiInstance = useCallback(() => createUserApi(user.token), [user.token]);
 
-  const getUsers = useCallback(async () => {
+  const loadUsers = useCallback(async () => {
     const { data } = await userApiInstance().getAllUsers();
     setUsers(data);
   }, [userApiInstance])
 
   useEffect(() => {
-    console.log({ users })
-  }, [users])
-
-  useEffect(() => {
-    getUsers();
-  }, [getUsers])
+    loadUsers();
+  }, [loadUsers])
 
   const getUserById = useCallback(async (userId) => {
     try {
@@ -33,32 +29,32 @@ const useUsers = () => {
   const createUser = useCallback(async (userData) => {
     try {
       const { data } = await userApiInstance().createUser(userData);
-      await getUsers();
+      await loadUsers();
       return data;
     } catch (err) {
       return err.response.data;
     }
-  }, [getUsers, userApiInstance])
+  }, [loadUsers, userApiInstance])
 
   const updateUserByEmail = useCallback(async (userEmail, userData) => {
     try {
       const { data } = await userApiInstance().updateUserByEmail(userEmail, userData);
-      await getUsers()
+      await loadUsers()
       return data;
     } catch (err) {
       return err.response.data;
     }
-  }, [getUsers, userApiInstance])
+  }, [loadUsers, userApiInstance])
 
   const deleteUserByEmail = useCallback(async (userEmail) => {
     try {
-      const { data } = await userApiInstance().deleteUserByEmail(userEmail);
-      await getUsers()
-      return data;
+      const { data: userDeleted } = await userApiInstance().deleteUserByEmail(userEmail);
+      await loadUsers()
+      return userDeleted;
     } catch (err) {
       return err.response.data;
     }
-  }, [getUsers, userApiInstance])
+  }, [loadUsers, userApiInstance])
 
   const updateSelfData = useCallback(async (userData) => {
     try {
@@ -86,7 +82,7 @@ const useUsers = () => {
 
   return {
     users,
-    getUsers,
+    loadUsers,
     getUserById,
     createUser,
     updateUserByEmail,

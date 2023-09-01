@@ -42,6 +42,7 @@ const checkUserPrivilegesAccess = (privilege = 'users', access = 'read') => asyn
 
     // Verificamos privilegios en las actualizaciones de cuentas
     const accessingAdminPrivilege = privilege === 'users' && access !== 'read';
+    // TODO: Mejorar la seguridad al momento de recibir cambios de usuarios. Ideas: Recopilar la clave del requester para validar que es
     if (accessingAdminPrivilege) {
       const { email } = req.params; // La ruta /api/users cualquier actualizacion se hara directamente por el email (/api/users/:email)
       const updateData = formDataToObj(req.body);

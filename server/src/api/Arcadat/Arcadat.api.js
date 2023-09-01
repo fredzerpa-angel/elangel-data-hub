@@ -6,6 +6,14 @@ const {
   getCurrentSchoolTerm,
 } = require('../../utils/functions.utils');
 
+const CURRENT_SCHOOL_TERM = '2022-2023'; // TODO: Cambiar esto por getCurentSchoolTerm en cuanto se tenga los parametros correspondientes
+
+const ARCADAT_SCHOOL_TERM_PARAMS = {
+  '2021-2022': 'NjcyNw',
+  '2022-2023': 'Njk1NA',
+  '2023-2024': '',
+}
+
 const ArcadatClient = axios.create({
   baseURL: 'https://www.arcadat.com/apps/',
 });
@@ -26,11 +34,11 @@ const getDocumentIdType = {
   },
 };
 
-async function getStudents() {
+async function getStudents({ schoolTerm = CURRENT_SCHOOL_TERM } = {}) {
   const parsedExcelData = await fetchAndParseExcelLatinFileToJSON(
     'https://www.arcadat.com/apps/rptxls/eGxzZGdzYQ',
     {
-      p: 'Njk1NA', // Propiedad de busqueda durante el periodo escolar 2022-2023
+      p: ARCADAT_SCHOOL_TERM_PARAMS[schoolTerm], // Propiedad de busqueda durante el periodo escolar 2022-2023
     }
   );
 
@@ -360,11 +368,11 @@ async function getPendingDebts() {
   return uniqueDebts;
 }
 
-async function getAcademicParents() {
+async function getAcademicParents({ schoolTerm = CURRENT_SCHOOL_TERM } = {}) {
   const parsedExcelData = await fetchAndParseExcelLatinFileToJSON(
     'https://www.arcadat.com/apps/rptxls/eGxzZGdw',
     {
-      p: 'Njk1NA', // Propiedad de busqueda durante el periodo escolar 2022-2023
+      p: ARCADAT_SCHOOL_TERM_PARAMS[schoolTerm], // Propiedad de busqueda durante el periodo escolar 2022-2023
     }
   );
 
@@ -458,11 +466,11 @@ async function getAcademicParents() {
   return parents;
 }
 
-async function getAdministrativeParents() {
+async function getAdministrativeParents({ schoolTerm = CURRENT_SCHOOL_TERM } = {}) {
   const parsedExcelData = await fetchAndParseExcelLatinFileToJSON(
     'https://www.arcadat.com/apps/rptxls/eGxzZGdw',
     {
-      p: 'Njk1NA', // Propiedad de busqueda durante el periodo escolar 2022-2023
+      p: ARCADAT_SCHOOL_TERM_PARAMS[schoolTerm], // Propiedad de busqueda durante el periodo escolar 2022-2023
       t: 'PWn',
     }
   );
@@ -660,7 +668,7 @@ async function getEmployees() {
   return schemedEmployees;
 }
 
-async function getGrades() {
+async function getGrades({ schoolTerm = CURRENT_SCHOOL_TERM } = {}) {
   const BASE_URL = `https://arcadat.com/apps/rptxls/eGxzX2V4cG9ydF9yZQ/`;
   // Un Map de los URLS de los archivos Excel de las notas de cada salon
   const gradesExcelFilesParamsMap = {
@@ -670,31 +678,31 @@ async function getGrades() {
     highschool: {
       firstYear: {
         n: 'MTY2OQ', // n = salon
-        p: 'Njk1NA', // p = periodo escolar
+        p: ARCADAT_SCHOOL_TERM_PARAMS[schoolTerm], // p = periodo escolar
         pe: 'ODMw',
         i: 'OTI',
       },
       secondYear: {
         n: 'MTY3MA', // n = salon
-        p: 'Njk1NA', // p = periodo escolar
+        p: ARCADAT_SCHOOL_TERM_PARAMS[schoolTerm], // p = periodo escolar
         pe: 'ODMw',
         i: 'OTI',
       },
       thirdYear: {
         n: 'MTY3MQ', // n = salon
-        p: 'Njk1NA', // p = periodo escolar
+        p: ARCADAT_SCHOOL_TERM_PARAMS[schoolTerm], // p = periodo escolar
         pe: 'ODMw',
         i: 'OTI',
       },
       fourthYear: {
         n: 'MTY3Mg', // n = salon
-        p: 'Njk1NA', // p = periodo escolar
+        p: ARCADAT_SCHOOL_TERM_PARAMS[schoolTerm], // p = periodo escolar
         pe: 'ODMw',
         i: 'OTI',
       },
       fifthYear: {
         n: 'MTY3Mw', // n = salon
-        p: 'Njk1NA', // p = periodo escolar
+        p: ARCADAT_SCHOOL_TERM_PARAMS[schoolTerm], // p = periodo escolar
         pe: 'ODMw',
         i: 'OTI',
       },
@@ -711,9 +719,9 @@ async function getGrades() {
     }
 
     const stagesParamsMap = {
-      first: { l: 'MQ', }, // l = lapso, 1er lapso
-      second: { l: 'Mg', }, // l = lapso, 2do lapso
-      third: { l: 'Mw', }, // l = lapso, 3er lapso
+      first: { l: 'MQ', }, // l = lapso, 1er lapso - Mq en base 64 significa "1" 
+      second: { l: 'Mg', }, // l = lapso, 2do lapso - Mq en base 64 significa "2"
+      third: { l: 'Mw', }, // l = lapso, 3er lapso - Mq en base 64 significa "3"
     }
 
     return {
@@ -826,7 +834,7 @@ async function getGrades() {
 
       return schemedEducationLevelsGradesByStages
     }, {
-      schoolTerm: getCurrentSchoolTerm(),
+      schoolTerm,
       elementary: {},
       middleschool: {},
       highschool: {},

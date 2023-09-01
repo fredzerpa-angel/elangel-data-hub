@@ -34,7 +34,8 @@ function PlatformSettings({ settings, onChange }) {
         <SoftTypography variant="caption" fontWeight="bold" color="text" textTransform="uppercase">
           Cuenta
         </SoftTypography>
-        <SoftBox display="flex" alignItems="center" py={1} mb={0.25}>
+        {/* TODO: Agregar asistencias academicas */}
+        {/* <SoftBox display="flex" alignItems="center" py={1} mb={0.25}>
           <SoftBox mt={0.25}>
             <Controller
               control={control}
@@ -49,14 +50,16 @@ function PlatformSettings({ settings, onChange }) {
               Notificarme las asistencias academicas
             </SoftTypography>
           </SoftBox>
-        </SoftBox>
-        <SoftBox display="flex" alignItems="center" py={1} mb={0.25}>
+        </SoftBox> */}
+        
+        {/* TODO: Agregar notificaciones de eventos */}
+        {/* <SoftBox display="flex" alignItems="center" py={1} mb={0.25}>
           <SoftBox mt={0.25}>
             <Controller
               control={control}
               name="events.onGoing"
               render={({ field: { value, ...rest } }) => (
-                <Switch checked={value} {...rest} />
+                <Switch checked={false} {...rest} />
               )}
             />
           </SoftBox>
@@ -65,7 +68,8 @@ function PlatformSettings({ settings, onChange }) {
               Notificarme los eventos "En Curso"
             </SoftTypography>
           </SoftBox>
-        </SoftBox>
+        </SoftBox> */}
+
         <SoftBox display="flex" alignItems="center" py={1} mb={0.25}>
           <SoftBox mt={0.25}>
             <Controller

@@ -6,6 +6,60 @@ async function getAllPayments() {
   return await payments.find().lean();
 }
 
+async function getAllPaymentsPopulated() {
+  // Buscamos solamente informacion relevante sin redundancia
+  const populateConfig = [
+    {
+      path: 'student',
+      select: {
+        directDebit: 0,
+        grades: 0,
+      },
+      // Populate Familiares
+      // populate: {
+      //   path: 'familyMembers',
+      //   populate: [
+      //     {
+      //       path: 'parents.father',
+      //       select: {
+      //         children: 0,
+      //       }
+      //     },
+      //     {
+      //       path: 'parents.mother',
+      //       select: {
+      //         children: 0,
+      //       }
+      //     },
+      //     {
+      //       path: 'parents.admin',
+      //       select: {
+      //         children: 0,
+      //       }
+      //     },
+      //     {
+      //       path: 'parents.academic',
+      //       select: {
+      //         children: 0,
+      //       }
+      //     },
+      //     {
+      //       path: 'siblings',
+      //       select: {
+      //         familyMembers: 0
+      //         directDebit: 0,
+      //         grades: 0,
+      //       }
+      //     }
+
+      //   ]
+      // },
+    },
+  ]
+
+  return await payments.find().populate(populateConfig).lean();
+}
+
 async function createPayment(paymentData) {
   return await payments.create(paymentData);
 }
@@ -52,15 +106,12 @@ async function getPaymentBySearch({ searchBy, value }) {
     {
       path: 'student',
       select: {
-        __v: 0,
-        payments: 0,
+        directDebit: 0,
+        grades: 0,
       },
     },
     {
       path: 'cashier',
-      select: {
-        __v: 0,
-      },
     },
   ];
 
@@ -96,6 +147,7 @@ async function getPaymentsByYearIssued(year = DateTime.now().year) {
 
 module.exports = {
   getAllPayments,
+  getAllPaymentsPopulated,
   createPayment,
   updatePayment,
   deletePayment,

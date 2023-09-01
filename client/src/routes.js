@@ -34,16 +34,17 @@ import SignOut from "layouts/authentication/sign-out";
 import { Assessment, Payments, Person, Today } from "@mui/icons-material";
 
 const routes = [
-  {
-    type: "collapse",
-    name: "Dashboard",
-    key: "dashboard",
-    route: "/dashboard",
-    icon: <Assessment />,
-    component: <Dashboard />,
-    noCollapse: true,
-    protected: true,
-  },
+  // TODO: terminar el dashboard
+  // {
+  //   type: "collapse",
+  //   name: "Dashboard",
+  //   key: "dashboard",
+  //   route: "/dashboard",
+  //   icon: <Assessment />,
+  //   component: <Dashboard />,
+  //   noCollapse: true,
+  //   protected: true,
+  // },
   {
     type: "collapse",
     name: "Pagos & Deudas",

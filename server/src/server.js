@@ -1,6 +1,7 @@
 // Libraries
 require('dotenv').config();
 const http = require('http');
+const cron = require('node-cron');
 const mongoose = require('mongoose');
 const upsertMany = require('@meanie/mongoose-upsert-many');
 // Agregamos el plugin para poder usar el method en todos los Schemas
@@ -8,7 +9,7 @@ mongoose.plugin(upsertMany); // ! Necesita estar antes que app.js (antes que los
 
 // Services
 const { refreshCollections } = require('./services/services');
-const { mongoConnect } = require('./services/mongo.services');
+const { mongoConnect, mongoBackupDatabase } = require('./services/mongo.services');
 // Components
 const app = require('./app');
 
@@ -18,6 +19,18 @@ const server = http.createServer(app);
 // Cargamos los servicios
 (async function startServer() {
   await mongoConnect();
-  // await refreshCollections();
+
+  // Programamos la tarea de actualizacion de Collections y Back-Ups diariamente  
+  cron.schedule(
+    '0 0 * * *', // Realiza la tarea a las 12:00 AM 
+    async () => {
+      await refreshCollections();
+      await mongoBackupDatabase();
+    },
+    {
+      timezone: 'America/Caracas' // La tarea toma la hora en Venezuela/Caracas
+    }
+  );
+
   server.listen(PORT, console.log(`Listening on PORT ${PORT}`));
 })()

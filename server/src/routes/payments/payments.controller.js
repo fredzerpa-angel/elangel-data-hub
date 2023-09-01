@@ -5,6 +5,7 @@ const {
   deletePayment,
   getPaymentById,
   getPaymentBySearch,
+  getAllPaymentsPopulated,
 } = require('../../models/payments/payments.model');
 
 async function httpGetAllPayments(req, res) {
@@ -28,7 +29,7 @@ async function httpGetAllPayments(req, res) {
       response = await getPaymentBySearch(searchParams);
     } else {
       // Si no hubo consulta entonces retorna todos los estudiantes
-      response = await getAllPayments();
+      response = await getAllPaymentsPopulated();
     }
 
     return res.status(200).json(response);

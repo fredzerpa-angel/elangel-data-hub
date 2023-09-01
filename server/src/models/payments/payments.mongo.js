@@ -40,7 +40,7 @@ const paymentSchema = new mongoose.Schema({
     date: {
       type: String,
       required: false,
-    },  
+    },
     hour: {
       type: String,
       required: false,
@@ -67,7 +67,7 @@ const paymentSchema = new mongoose.Schema({
     ref: 'Student',
     required: false,
   },
-  cashier: { 
+  cashier: {
     // TODO: cambiar a usar type: ObjectId cuando se pueda obtener todos los empleados de ARCADAT
     documentId: documentsIdSchema,
     fullname: {
@@ -75,6 +75,14 @@ const paymentSchema = new mongoose.Schema({
       required: true
     }
   },
+});
+
+// Eliminamos datos sensibles al enviarlos por nuestro API al cliente
+paymentSchema.set('toJSON', {
+  transform: function (doc, ret, opt) {
+    delete ret._id;
+    delete ret.__v;
+  }
 });
 
 module.exports = mongoose.model('Payment', paymentSchema);

@@ -1,30 +1,30 @@
+import { useCallback, useMemo } from "react";
 
+// Contexts & Hooks
+import { useAuth } from "context/auth.context";
+import useEvents from "hooks/events.hooks";
 
-// @mui material components
+// Libraries
 import { Grid } from "@mui/material";
-
-// @mui material icons
 import { ArrowDownward, ArrowUpward } from "@mui/icons-material";
+import { DateTime, Info } from "luxon";
+import lodash from "lodash";
 
 // Soft UI Dashboard React components
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
-
-// Soft UI Dashboard React examples
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import GradientLineChart from "examples/Charts/LineCharts/GradientLineChart";
 import EventsOverview from "./components/EventsOverview";
-
 import Calendar from "components/Calendar";
-
 import EventGroupMembers from "./components/EventGroupMembers";
 import AddEventButton from "./components/AddEventButton";
-import useEvents from "hooks/events.hooks";
-import { DateTime, Info } from "luxon";
-import { useCallback, useMemo } from "react";
-import { useAuth } from "context/auth.context";
+
+// Utils
+import { formatNumber } from "utils/functions.utils";
+
 
 const Events = () => {
   const { user } = useAuth();
@@ -52,22 +52,43 @@ const Events = () => {
   const renderChart = useCallback(() => {
     const todayDT = DateTime.now();
     const MONTHS_LABELS = {
-      short: Info.monthsFormat("short", { locale: "es" }),
-      long: Info.monthsFormat("long", { locale: "es" }),
+      short: Info.monthsFormat("short", { locale: "es" }).map(month => lodash.capitalize(month)),
+      long: Info.monthsFormat("long", { locale: "es" }).map(month => lodash.capitalize(month)),
     }
 
+    const monthsParticipants = events.reduce((participants, event) => {
+      // Calculamos cuantos meses han pasado y para evitar cualquier mal calculo ponemos el mismo dia a ambos DateTimes
+      const currentMonthDT = DateTime.now().startOf('month');
+      const startMonthEventDT = DateTime.fromISO(event.start).startOf('month');
+      const monthsPassedSinceEventStarted = currentMonthDT.diff(startMonthEventDT).as('months');
+      const isSixMonthsAgoFromNow = monthsPassedSinceEventStarted >= 0 && monthsPassedSinceEventStarted < 6;
+
+      if (!isSixMonthsAgoFromNow) return participants; // Solo interesa los ultimos 6 meses de eventos - Valores entre 0-5
+
+      // Buscamos el indice del mes y sumamos los participantes
+      const monthIdx = Math.floor(monthsPassedSinceEventStarted);
+      participants[monthIdx] += event.participants.length;
+
+      return participants;
+    }, [0, 0, 0, 0, 0, 0])
+
+    // Teniendo en cuenta que el calculo de los participantes por meses se organizan desde el mes actual hasta el 6to mes pasado
+    // es necesario cambiar el orden del Array para poderlo incluir en el grafico
+    const participantsChartData = [...monthsParticipants].reverse(); // Hay que tener en cuenta que .reverse() cambia tambien el Array original
+
+    // Buscamos los Labels de los ultimos 6 meses
     const chartLabels = todayDT.month > todayDT.minus({ months: 6 }).month ?
-      MONTHS_LABELS.short.slice(todayDT.minus({ months: 6 }).month, todayDT.month)
+      MONTHS_LABELS.long.slice(todayDT.minus({ months: 6 }).month, todayDT.month)
       :
-      MONTHS_LABELS.short.slice(todayDT.minus({ months: 6 }).month - 12).concat(MONTHS_LABELS.short.slice(0, todayDT.month))
+      MONTHS_LABELS.long.slice(todayDT.minus({ months: 6 }).month - 12).concat(MONTHS_LABELS.long.slice(0, todayDT.month))
 
     const chartData = {
       labels: chartLabels,
       datasets: [
         {
-          label: "Mobile apps",
+          label: "Estudiantes",
           color: "white",
-          data: [50, 40, 300, 220, 500, 250],
+          data: participantsChartData,
         },
       ],
       // Clean chart
@@ -88,6 +109,12 @@ const Events = () => {
             ticks: {
               display: false,
             }
+          }
+        },
+        plugins: {
+          // Quitamos las cajas de colores en la leyenda durante el hover
+          tooltip: {
+            displayColors: false, // Caja de color de las leyendas en el hover
           }
         }
       }
@@ -112,15 +139,15 @@ const Events = () => {
 
     const prevMonth = {
       label: MONTHS_LABELS.long[todayDT.month - 2],
-      getTotal: function () { return participantsByMonth.get(this.label) },
+      getTotalParticipants: function () { return participantsByMonth.get(this.label) },
     };
     const thisMonth = {
       label: MONTHS_LABELS.long[todayDT.month - 1],
-      getTotal: function () { return participantsByMonth.get(this.label) },
+      getTotalParticipants: function () { return participantsByMonth.get(this.label) },
     };
 
-    const porcentage = ((thisMonth.getTotal() * 100) / prevMonth.getTotal()) - 100;
-    const isUp = porcentage > 0;
+    const participantsDiff = thisMonth.getTotalParticipants() - prevMonth.getTotalParticipants();
+    const isUp = participantsDiff > 0;
     return (
       <GradientLineChart
         title={
@@ -128,11 +155,17 @@ const Events = () => {
         }
         description={(
           <SoftBox display="flex" alignItems="center">
-            <SoftBox fontSize='large' color={isUp ? "success" : "error"} mr={0.5} lineHeight={0}>
-              {isUp ? <ArrowUpward /> : <ArrowDownward />}
-            </SoftBox>
-            <SoftTypography variant="button" color="white" fontWeight="regular" textTransform="capitalize">
-              <strong>{porcentage.toFixed(2)}% {isUp ? "Mas" : "Menos"}</strong> en {thisMonth.label}
+            {
+              participantsDiff !== 0 &&
+              (
+                <SoftBox fontSize='large' color={isUp ? "success" : "error"} mr={0.5} lineHeight={0}>
+                  {isUp ? <ArrowUpward /> : <ArrowDownward />}
+                </SoftBox>
+              )
+            }
+            <SoftTypography variant="button" color="white" fontWeight="regular">
+              {/* "{ signDisplay: 'exceptZero' }" permite el mostrar los simbolos de "+" o "-" */}
+              <strong>{formatNumber(thisMonth.getTotalParticipants(), { signDisplay: 'exceptZero' })} participantes</strong> en {thisMonth.label}
             </SoftTypography>
           </SoftBox>
         )}

@@ -21,6 +21,9 @@ import App from "App";
 import { AuthProvider } from "./context/auth.context";
 import { SoftUIControllerProvider } from "context";
 import { SnackbarProvider } from 'notistack'
+import { NotificationsProvider } from 'context/notifications.context';
+import { PaymentsProvider } from 'context/payments.context';
+import { DebtsProvider } from 'context/debts.context';
 
 createRoot(document.getElementById("root"))
   .render(
@@ -32,9 +35,15 @@ createRoot(document.getElementById("root"))
           disableWindowBlurListener={true}
         >
           <AuthProvider userData={null}>
-            <App />
+            <PaymentsProvider>
+              <DebtsProvider>
+                <NotificationsProvider>
+                  <App />
+                </NotificationsProvider>
+              </DebtsProvider>
+            </PaymentsProvider>
           </AuthProvider>
         </SnackbarProvider>
       </SoftUIControllerProvider>
-    </BrowserRouter >
+    </BrowserRouter>
   );

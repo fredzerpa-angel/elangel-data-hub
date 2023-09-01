@@ -8,7 +8,13 @@ async function getAllDebts() {
 }
 
 async function getAllDebtsPopulated() {
-  return await debts.find().populate('student').lean();
+  return await debts.find().populate({
+    path: 'student',
+    select: {
+      directDebit: 0,
+      grades: 0,
+    },
+  }).lean();
 }
 
 async function createDebt(debtData) {
@@ -47,27 +53,8 @@ async function getDebtBySearch({ searchBy, value }) {
     {
       path: 'student',
       select: {
-        __v: 0,
-        payments: 0,
-        debts: 0,
-      },
-    },
-    {
-      path: 'father',
-      select: {
-        __v: 0,
-      },
-    },
-    {
-      path: 'mother',
-      select: {
-        __v: 0,
-      },
-    },
-    {
-      path: 'parentAdmin',
-      select: {
-        __v: 0,
+        directDebit: 0,
+        grades: 0,
       },
     },
   ];

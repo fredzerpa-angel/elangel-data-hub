@@ -1,8 +1,3 @@
-
-
-// prop-types is a library for typechecking of props
-import PropTypes from "prop-types";
-
 // @mui material components
 import Card from "@mui/material/Card";
 import Grid from "@mui/material/Grid";
@@ -11,6 +6,11 @@ import Icon from "@mui/material/Icon";
 // Soft UI Dashboard React components
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
+
+// Libraries
+import { memo } from "react";
+import isEqual from "react-fast-compare";
+import PropTypes from "prop-types";
 
 function MiniStatisticsCard({ bgColor, title, count, percentage, icon }) {
   return (
@@ -54,7 +54,7 @@ function MiniStatisticsCard({ bgColor, title, count, percentage, icon }) {
                 >
                   {count}{" "}
                   <SoftTypography variant="button" color={percentage.color} fontWeight="bold">
-                    {percentage.text}
+                    {percentage.text ?? ''}
                   </SoftTypography>
                 </SoftTypography>
               </SoftBox>
@@ -77,6 +77,10 @@ MiniStatisticsCard.defaultProps = {
     color: "success",
     text: "",
   },
+  icon: {
+    color: "info",
+    component: "paid",
+  }
 };
 
 // Typechecking props for the MiniStatisticsCard
@@ -115,4 +119,4 @@ MiniStatisticsCard.propTypes = {
   }).isRequired,
 };
 
-export default MiniStatisticsCard;
+export default memo(MiniStatisticsCard, isEqual);
