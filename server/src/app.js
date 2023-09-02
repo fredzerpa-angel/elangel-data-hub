@@ -1,11 +1,12 @@
 // Libraries
 const path = require('path');
 const cors = require('cors');
+const helmet = require('helmet');
 const express = require('express');
+const compression = require('compression'); // Comprime los archivos al mandarlos al cliente
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 const fallback = require('express-history-api-fallback'); // 
-const compression = require('compression'); // Comprime los archivos al mandarlos al cliente
 require('dotenv').config();
 
 // Routes
@@ -13,6 +14,8 @@ const apiRouter = require('./routes/api/api.router');
 const authRouter = require('./routes/auth/auth.router');
 const { checkUserAuth } = require('./routes/auth/auth.utils');
 const app = express();
+
+app.use(helmet());
 
 // Nos permite el uso concurrente de cliente y el servidor
 if (process.env.NODE_ENV === 'development') {

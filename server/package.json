@@ -29,6 +29,7 @@
     "express-history-api-fallback": "^2.2.1",
     "form-data-to-object": "^0.2.0",
     "google-auth-library": "^8.7.0",
+    "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.0",
     "luxon": "^2.4.0",
     "mongoose": "^6.3.1",
