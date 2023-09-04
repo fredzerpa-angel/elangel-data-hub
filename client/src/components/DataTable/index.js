@@ -1,31 +1,54 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo, useCallback, useMemo } from "react";
 
 import { Menu, MenuItem } from "@mui/material";
 import { FileDownload } from "@mui/icons-material";
-
 import MaterialReactTable from "material-react-table";
-//Import Material React Table Translations
-import { MRT_Localization_ES } from "material-react-table/locales/es";
+import { MRT_Localization_ES } from "material-react-table/locales/es"; // Import Material React Table Translations
+import xlsx from "json-as-xlsx"
+import isEqual from "react-fast-compare";
 
 import SoftBox from "components/SoftBox";
 import SoftButton from "components/SoftButton";
 
 import colors from "assets/theme/base/colors";
 
-const ExportsMenu = ({ exportAllRows, exportSelectedRows }) => {
+const ExportsMenu = ({ table, columns }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
   const openMenu = (event) => setAnchorEl(event.currentTarget);
   const closeMenu = () => setAnchorEl(null);
 
+  const isPaymentsData = useMemo(() => columns.some(column => column.accessorKey.includes('paymentHolder')), [columns]);
+
+  const setXlsxDataConfig = useCallback((content) => [{
+    sheet: isPaymentsData ? 'Pagos' : 'Deudas',
+    columns: columns.map(column => {
+      return {
+        label: column.header,
+        value: column.accessorKey
+      }
+    }),
+    content,
+  }], [columns, isPaymentsData]);
+
+  const xlsxSettings = {
+    fileName: `DataHub - ${isPaymentsData ? 'Pagos' : 'Deudas'}`, // Name of the resulting spreadsheet
+    extraLength: 3, // A bigger number means that columns will be wider
+    writeMode: "writeFile", // The available parameters are 'WriteFile' and 'write'. This setting is optional. Useful in such cases https://docs.sheetjs.com/docs/solutions/output#example-remote-file
+    writeOptions: {}, // Style options from https://docs.sheetjs.com/docs/api/write-options
+    RTL: false, // Display the columns from right-to-left (the default value is false)
+  }
+
   const handleExportByTable = async () => {
-    await exportAllRows();
+    const tableCurrentData = table.getPrePaginationRowModel().rows.map(row => row.original);
+    xlsx(setXlsxDataConfig(tableCurrentData), xlsxSettings)
     closeMenu();
   }
 
   const handleExportByRows = async () => {
-    await exportSelectedRows();
+    const selectedRowsData = table.getSelectedRowModel().rows.map(row => row.original);
+    xlsx(setXlsxDataConfig(selectedRowsData), xlsxSettings)
     closeMenu();
   }
 
@@ -36,11 +59,16 @@ const ExportsMenu = ({ exportAllRows, exportSelectedRows }) => {
       </SoftButton>
       <Menu anchorEl={anchorEl} open={open} onClose={closeMenu}>
         <MenuItem onClick={handleExportByTable}>Exportar tabla</MenuItem>
-        <MenuItem onClick={handleExportByRows}>Exportar por filas</MenuItem>
+        <MenuItem
+          disabled={!table.getIsSomeRowsSelected()}
+          onClick={handleExportByRows}>
+          Exportar por filas
+        </MenuItem>
       </Menu>
     </SoftBox>
   );
 }
+
 
 const DataTable = ({ columns, data, isLoading, ...props }) => {
   const tableContainerRef = useRef(null); // we can get access to the underlying TableContainer element and react to its scroll events
@@ -64,7 +92,7 @@ const DataTable = ({ columns, data, isLoading, ...props }) => {
       columns={columns}
       data={data}
       localization={MRT_Localization_ES}
-      renderTopToolbarCustomActions={() => <ExportsMenu />}
+      renderTopToolbarCustomActions={({ table }) => <ExportsMenu table={table} columns={columns} />}
       initialState={{ density: "compact", columnVisibility: { id: false } }}
       enableDensityToggle={false}
       positionToolbarAlertBanner="top"
@@ -169,4 +197,4 @@ const DataTable = ({ columns, data, isLoading, ...props }) => {
   );
 }
 
-export default DataTable;
+export default memo(DataTable, isEqual);
