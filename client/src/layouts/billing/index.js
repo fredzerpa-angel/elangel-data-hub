@@ -171,19 +171,21 @@ const Billing = () => {
       return sumTotalPayments(filteredPaymentsByDay);
     }
 
-    const getIncomeByWeekNumber = (paymentsArray, weekNumber, term = currentSchoolTerm) => {
+    const getIncomeByWeekNumber = (paymentsArray, weekNumber) => {
       const filteredPaymentsByWeek = paymentsArray.filter(payment => {
-        const weekPayments = DateTime.fromFormat(payment.time.date, 'd/M/yyyy').weekNumber === weekNumber;
-        return payment.schoolTerm === term && weekPayments;
+        const paymentDT = DateTime.fromFormat(payment.time.date, 'd/M/yyyy');
+        const weekPayments = paymentDT.weekNumber === weekNumber;
+        return paymentDT.year === todayDT.year && weekPayments;
       });
 
       return sumTotalPayments(filteredPaymentsByWeek);
     }
 
-    const getIncomeByMonth = (paymentsArray, monthNumber, term = currentSchoolTerm) => {
+    const getIncomeByMonth = (paymentsArray, monthNumber) => {
       const filteredPaymentsByMonth = paymentsArray.filter(payment => {
-        const monthPayments = DateTime.fromFormat(payment.time.date, 'd/M/yyyy').month === monthNumber;
-        return payment.schoolTerm === term && monthPayments;
+        const paymentDT = DateTime.fromFormat(payment.time.date, 'd/M/yyyy');
+        const monthPayments = paymentDT.month === monthNumber;
+        return paymentDT.year === todayDT.year && monthPayments;
       });
 
       return sumTotalPayments(filteredPaymentsByMonth);
@@ -218,10 +220,10 @@ const Billing = () => {
           )
         },
         week: {
-          income: getIncomeByWeekNumber(payments, DateTime.now().weekNumber),
+          income: getIncomeByWeekNumber(payments, todayDT.weekNumber),
           increment: getIncomeDiff(
-            getIncomeByWeekNumber(payments, DateTime.now().weekNumber),
-            getIncomeByWeekNumber(payments, DateTime.now().minus({ weeks: 1 }).weekNumber)
+            getIncomeByWeekNumber(payments, todayDT.weekNumber),
+            getIncomeByWeekNumber(payments, todayDT.minus({ weeks: 1 }).weekNumber)
           ),
           dailyIncome: paymentsConfig.week.dailyIncome.map((day) => ({
             ...day,
@@ -229,10 +231,10 @@ const Billing = () => {
           }))
         },
         month: {
-          income: getIncomeByMonth(payments, DateTime.now().month),
+          income: getIncomeByMonth(payments, todayDT.month),
           increment: getIncomeDiff(
-            getIncomeByMonth(payments, DateTime.now().month),
-            getIncomeByMonth(payments, DateTime.now().minus({ months: 1 }).month)
+            getIncomeByMonth(payments, todayDT.month),
+            getIncomeByMonth(payments, todayDT.minus({ months: 1 }).month)
           ),
         },
         schoolTerm: {
@@ -244,6 +246,7 @@ const Billing = () => {
         },
       })
     }
+
     //! Si se agrega la dependencia paymentsConfig.week.dailyIncome se crea un loop infinito por la instancia de un objeto nuevo en el state
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSchoolTerm, formerSchoolTerm, payments, todayDT])
