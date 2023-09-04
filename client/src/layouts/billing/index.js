@@ -335,7 +335,7 @@ const Billing = () => {
               {
                 !!debtsNotifications.length &&
                 (
-                  <Grid item xs={12}>
+                  <Grid item xs={12} display={{ xs: 'none', lg: 'block' }}>
                     <AnnouncementGroup announcements={debtsNotifications} />
                   </Grid>
                 )
