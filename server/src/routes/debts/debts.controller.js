@@ -104,8 +104,8 @@ async function httpGetDebtsNotifications(req, res) {
   try {
     const debts = await getAllDebtsPopulated();
     const debtsGroupedByStudent = [...debts.reduce((groups, debt) => {
-      // Las notificaciones solo usaran deudas pendientes
-      if (!debt.status.pending) return groups;
+      // Las notificaciones solo usaran deudas pendientes y estudiantes inscritos
+      if (!debt.status.pending || !debt.student.isActive) return groups;
 
       const { student } = debt;
       delete debt.student;
