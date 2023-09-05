@@ -20,7 +20,7 @@ const server = http.createServer(app);
 (async function startServer() {
   await mongoConnect();
 
-  // Programamos la tarea de actualizacion de Collections y Back-Ups diariamente  
+  // Programamos la tarea de actualizacion de Collections y Back-Ups diariamente    
   cron.schedule(
     '0 0 * * *', // Realiza la tarea a las 12:00 AM 
     async () => {
