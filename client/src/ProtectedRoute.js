@@ -7,7 +7,7 @@ export const ProtectedRoute = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (!user || !user.token || user.token === "") {
+    if (!user || !user?.token || user?.token === "") {
       navigate("/auth/sign-in")
     }
   }, [navigate, user])

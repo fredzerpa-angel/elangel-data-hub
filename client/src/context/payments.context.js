@@ -11,7 +11,7 @@ export const PaymentsProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [errors, setErrors] = useState([]);
 
-  const paymentsApiInstance = useCallback(() => createPaymentApi(user.token), [user.token]);
+  const paymentsApiInstance = useCallback(() => createPaymentApi(user.token), [user]);
 
   const getPayments = useCallback(async () => {
     try {

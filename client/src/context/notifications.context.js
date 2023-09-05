@@ -11,7 +11,7 @@ export const NotificationsProvider = ({ children }) => {
   const [loadingNotifications, setLoadingNotifications] = useState(true);
   const [errors, setErrors] = useState([]);
 
-  const debtApiInstance = useCallback(() => createDebtApi(user.token), [user.token]);
+  const debtApiInstance = useCallback(() => createDebtApi(user.token), [user]);
 
   const getDebtsNotifications = useCallback(async () => {
     const { data } = await debtApiInstance().getDebtsNotifications();
@@ -21,7 +21,7 @@ export const NotificationsProvider = ({ children }) => {
   const loadNotifications = useCallback(async () => {
     try {
       setLoadingNotifications(true);
-      const debtsNotifications = user.notifications.debts.onWatch ? await getDebtsNotifications() : [];
+      const debtsNotifications = user?.notifications?.debts?.onWatch ? await getDebtsNotifications() : [];
       setNotifications({
         debts: debtsNotifications,
       });
@@ -33,7 +33,7 @@ export const NotificationsProvider = ({ children }) => {
     } finally {
       setLoadingNotifications(false);
     }
-  }, [getDebtsNotifications, user.notifications])
+  }, [getDebtsNotifications, user])
 
   useEffect(() => {
     // Al ser un context de react, este carga al inicio del render de la pagina

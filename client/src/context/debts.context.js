@@ -11,7 +11,7 @@ export const DebtsProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [errors, setErrors] = useState([]);
 
-  const debtApiInstance = useCallback(() => createDebtApi(user.token), [user.token]);
+  const debtApiInstance = useCallback(() => createDebtApi(user.token), [user]);
 
   const getDebts = useCallback(async () => {
     try {
