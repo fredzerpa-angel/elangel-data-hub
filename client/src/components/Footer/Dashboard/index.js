@@ -85,7 +85,7 @@ Footer.defaultProps = {
   },
   links: [
     { href: encodeURI("mailto:administracion@elangel.edu.ve?subject=Soporte Data Hub"), name: "Soporte" },
-    { href: "https://www.creative-tim.com/learning-lab/react/default-item/soft-ui-dashboard/", name: "Docs" },
+    // { href: "https://www.creative-tim.com/learning-lab/react/default-item/soft-ui-dashboard/", name: "Docs" },
   ],
 };
 
