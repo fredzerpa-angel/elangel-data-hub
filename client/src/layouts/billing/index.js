@@ -81,7 +81,7 @@ const Billing = () => {
     schoolTerm: 0,
   });
   const [paymentsConfig, setPaymentsConfig] = useState({
-    day: {
+    yesterday: {
       income: 0,
       increment: {
         value: 0,
@@ -212,11 +212,11 @@ const Billing = () => {
 
     if (payments.length) {
       setPaymentsConfig({
-        day: {
-          income: getIncomeByDate(payments, todayDT.toLocaleString(DateTime.DATE_SHORT)),
+        yesterday: {
+          income: getIncomeByDate(payments, todayDT.minus({ days: 1 }).toLocaleString(DateTime.DATE_SHORT)),
           increment: getIncomeDiff(
-            getIncomeByDate(payments, todayDT.toLocaleString(DateTime.DATE_SHORT)),
-            getIncomeByDate(payments, todayDT.minus({ days: 1 }).toLocaleString(DateTime.DATE_SHORT))
+            getIncomeByDate(payments, todayDT.minus({ days: 1 }).toLocaleString(DateTime.DATE_SHORT)),
+            getIncomeByDate(payments, todayDT.minus({ days: 2 }).toLocaleString(DateTime.DATE_SHORT))
           )
         },
         week: {
@@ -251,6 +251,8 @@ const Billing = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSchoolTerm, formerSchoolTerm, payments, todayDT])
 
+  useEffect(() => { console.log({ paymentsConfig }) }, [paymentsConfig])
+  
   // Calculo de Notificaciones por Deudas
   useEffect(() => {
     if (notifications.debts.length) setDebtsNotifications(createDebtNotifications(notifications.debts, { minDebtsPending: 6 }));
@@ -290,9 +292,9 @@ const Billing = () => {
                   <Grid container item xs={12} md={6} spacing={2}>
                     <Grid item xs={12} sm={6} md={12}>
                       <MiniStatisticsCard
-                        title={{ text: "Ingresos de hoy" }}
-                        count={formatCurrency(paymentsConfig.day.income, { maximumFractionDigits: 2 })}
-                        percentage={{ color: paymentsConfig.day.increment.color, text: paymentsConfig.day.increment.label }}
+                        title={{ text: "Ingresos de ayer" }}
+                        count={formatCurrency(paymentsConfig.yesterday.income, { maximumFractionDigits: 2 })}
+                        percentage={{ color: paymentsConfig.yesterday.increment.color, text: paymentsConfig.yesterday.increment.label }}
                         icon={{ color: "info", component: "paid" }}
                       />
                     </Grid>

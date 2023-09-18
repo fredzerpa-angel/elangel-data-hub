@@ -15,7 +15,6 @@ const authRouter = require('./routes/auth/auth.router');
 const { checkUserAuth } = require('./routes/auth/auth.utils');
 const app = express();
 
-app.use(helmet());
 
 // Nos permite el uso concurrente de cliente y el servidor
 if (process.env.NODE_ENV === 'development') {
@@ -24,6 +23,8 @@ if (process.env.NODE_ENV === 'development') {
     origin: 'http://localhost:3000',
   }))
 }
+
+app.use(helmet());
 // Transforma requests entrantes con datos tipo JSON
 app.use(express.json({ limit: '50mb' })); // Cambiamos el limite para poder obtener decenas de miles de datos JSON, como los pagos
 // Transforma requests entrantes con datos tipo Form

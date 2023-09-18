@@ -9,9 +9,6 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 
-// Soft UI Dashboard React components
-import SoftBox from "components/SoftBox";
-
 // Soft UI Dashboard React examples
 import Sidenav from "components/Sidenav";
 
@@ -23,11 +20,10 @@ import routes from "./routes";
 import { ProtectedRoute } from "./ProtectedRoute";
 
 // Soft UI Dashboard React contexts
-import { useSoftUIController, setOpenConfigurator } from "context";
+import { useSoftUIController } from "context";
 
 // Images
 import brandLogo from "assets/images/el-angel/logo-small.png";
-import { Settings } from "@mui/icons-material";
 
 import { useAuth } from "context/auth.context";
 import { MountPoint } from "context/confirmation.context";
@@ -36,14 +32,13 @@ import { MountPoint } from "context/confirmation.context";
 import { Chart as ChartJS, registerables } from 'chart.js';
 ChartJS.register(...registerables); // Fix react-chartjs-2 migration from v3 to v5
 
-export default function App() {
-  const [controller, dispatch] = useSoftUIController();
+function App() {
+  const [controller] = useSoftUIController();
   const { user } = useAuth();
-  const { layout, openConfigurator, sidenavColor } = controller;
+  const { layout, sidenavColor } = controller;
   const { pathname } = useLocation();
 
   // Change the openConfigurator state
-  const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
 
   // Setting page scroll to 0 when changing the route
   useEffect(() => {
@@ -71,28 +66,6 @@ export default function App() {
       return null;
     });
 
-  const configsButton = (
-    <SoftBox
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      width="3.5rem"
-      height="3.5rem"
-      bgColor="white"
-      shadow="sm"
-      borderRadius="50%"
-      position="fixed"
-      right="2rem"
-      bottom="2rem"
-      zIndex={99}
-      color="dark"
-      sx={{ cursor: "pointer" }}
-      onClick={handleConfiguratorOpen}
-    >
-      <Settings />
-    </SoftBox>
-  );
-
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -105,7 +78,6 @@ export default function App() {
             brandName="U.E. El Angel"
             routes={routes}
           />
-          {configsButton}
         </>
       )}
       <Routes>
@@ -115,3 +87,5 @@ export default function App() {
     </ThemeProvider>
   );
 }
+
+export default App;
